@@ -2,7 +2,7 @@ import PlainExplainer from "./ui/PlainExplainer";
 
 export default function HomePanel() {
   return (
-    <div className="space-y-8 max-w-3xl">
+    <article className="space-y-8 max-w-3xl">
       <PlainExplainer title="Welcome to the Casimir & Cavity Field Simulator">
         <p>
           This interactive tool lets you explore quantum vacuum physics, the Casimir effect,
@@ -104,6 +104,6 @@ export default function HomePanel() {
           The vacuum is infinite. Your curiosity should be, too.
         </p>
       </section>
-    </div>
+    </article>
   );
 }

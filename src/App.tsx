@@ -86,9 +86,9 @@ function AppContent() {
 
       <main className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-10">
-          <h2 className="text-4xl font-bold bg-gradient-to-r dark-mode:from-cyan-400 dark-mode:to-blue-400 light-mode:from-blue-600 light-mode:to-cyan-600 coffee-mode:from-amber-500 coffee-mode:to-orange-600 bg-clip-text text-transparent mb-3">
+          <h1 className="text-4xl font-bold bg-gradient-to-r dark-mode:from-cyan-400 dark-mode:to-blue-400 light-mode:from-blue-600 light-mode:to-cyan-600 coffee-mode:from-amber-500 coffee-mode:to-orange-600 bg-clip-text text-transparent mb-3">
             Quantum Vacuum &amp; Cavity Physics
-          </h2>
+          </h1>
           <p className="dark-mode:text-slate-400 light-mode:text-slate-700 coffee-mode:text-amber-700 max-w-3xl text-lg leading-relaxed">
             Honest numerical simulations of the Casimir effect, rotating polarization waves, and resonant cavity coupling. Compare claimed outputs against quantifiable leakage channels.
           </p>
@@ -97,11 +97,14 @@ function AppContent() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 mb-8 p-2 panel-bg rounded-xl border">
+        <nav className="flex flex-wrap gap-2 mb-8 p-2 panel-bg rounded-xl border" role="tablist" aria-label="Simulator sections">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              aria-controls={`panel-${tab.id}`}
               className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
                 activeTab === tab.id
                   ? "button-primary shadow-lg"
@@ -111,7 +114,7 @@ function AppContent() {
               {tab.label}
             </button>
           ))}
-        </div>
+        </nav>
 
         <div className="mb-6">
           {TABS.filter((t) => t.id === activeTab).map((tab) => (
@@ -121,7 +124,7 @@ function AppContent() {
           ))}
         </div>
 
-        <div className="min-h-[600px]">
+        <section className="min-h-[600px]" role="tabpanel" id={`panel-${activeTab}`}>
           {activeTab === "home" && <HomePanel />}
           {activeTab === "teacher" && <TeacherGuidePanel />}
           {activeTab === "worksheet" && <LabWorksheetPanel />}
@@ -133,7 +136,7 @@ function AppContent() {
           {activeTab === "device" && <DeviceModelPanel />}
           {activeTab === "diagnostic" && <DiagnosticPanel />}
           {activeTab === "thrust" && <ThrustDiagnosticPanel />}
-        </div>
+        </section>
 
         <footer className="mt-20 pt-8 dark-mode:border-slate-800/50 light-mode:border-slate-200 coffee-mode:border-amber-800/40 border-t">
           <div className="space-y-6">
