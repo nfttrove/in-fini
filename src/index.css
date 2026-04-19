@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root.dark-mode {
+    color-scheme: dark;
+  }
+
+  :root.light-mode {
+    color-scheme: light;
+  }
+
+  :root.coffee-mode {
+    color-scheme: dark;
+  }
+
+  * {
+    @apply transition-colors duration-200;
+  }
+}
+
+@layer utilities {
+  /* Dark Mode */
+  .dark-mode {
+    @apply bg-slate-950 text-slate-50;
+  }
+
+  .dark-mode .panel-bg {
+    @apply bg-slate-900/40 border border-slate-800/60 backdrop-blur-sm;
+  }
+
+  .dark-mode .panel-border {
+    @apply border-slate-800/60;
+  }
+
+  .dark-mode .input-bg {
+    @apply bg-slate-900/50 border border-slate-800/50 text-slate-50 focus:border-cyan-500/50 focus:bg-slate-900/70;
+  }
+
+  .dark-mode .input-bg::placeholder {
+    @apply text-slate-500;
+  }
+
+  .dark-mode .button-primary {
+    @apply bg-gradient-to-r from-cyan-600 to-blue-600 text-white hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-900/20;
+  }
+
+  .dark-mode .text-muted {
+    @apply text-slate-400;
+  }
+
+  .dark-mode .text-subtle {
+    @apply text-slate-500;
+  }
+
+  .dark-mode .card-bg {
+    @apply bg-slate-900/30 border border-slate-800/40 rounded-xl backdrop-blur-sm;
+  }
+
+  /* Light Mode */
+  .light-mode {
+    @apply bg-gradient-to-br from-slate-50 to-blue-50 text-slate-900;
+  }
+
+  .light-mode .panel-bg {
+    @apply bg-white/80 border border-slate-200/60 backdrop-blur-sm shadow-sm;
+  }
+
+  .light-mode .panel-border {
+    @apply border-slate-200/60;
+  }
+
+  .light-mode .input-bg {
+    @apply bg-white/60 border border-slate-300/50 text-slate-900 focus:border-blue-400 focus:bg-white;
+  }
+
+  .light-mode .input-bg::placeholder {
+    @apply text-slate-500;
+  }
+
+  .light-mode .button-primary {
+    @apply bg-gradient-to-r from-blue-600 to-cyan-600 text-white hover:from-blue-500 hover:to-cyan-500 shadow-lg shadow-blue-900/20;
+  }
+
+  .light-mode .text-muted {
+    @apply text-slate-700;
+  }
+
+  .light-mode .text-subtle {
+    @apply text-slate-600;
+  }
+
+  .light-mode .card-bg {
+    @apply bg-white/50 border border-slate-200/40 rounded-xl backdrop-blur-sm shadow-sm;
+  }
+
+  /* Coffee Mode */
+  .coffee-mode {
+    @apply bg-gradient-to-br from-amber-950 to-stone-900 text-amber-50;
+  }
+
+  .coffee-mode .panel-bg {
+    @apply bg-amber-900/30 border border-amber-800/40 backdrop-blur-sm;
+  }
+
+  .coffee-mode .panel-border {
+    @apply border-amber-800/40;
+  }
+
+  .coffee-mode .input-bg {
+    @apply bg-amber-950/50 border border-amber-800/40 text-amber-50 focus:border-amber-600/60 focus:bg-amber-950/70;
+  }
+
+  .coffee-mode .input-bg::placeholder {
+    @apply text-amber-700;
+  }
+
+  .coffee-mode .button-primary {
+    @apply bg-gradient-to-r from-amber-700 to-orange-700 text-amber-50 hover:from-amber-600 hover:to-orange-600 shadow-lg shadow-amber-900/30;
+  }
+
+  .coffee-mode .text-muted {
+    @apply text-amber-200;
+  }
+
+  .coffee-mode .text-subtle {
+    @apply text-amber-300;
+  }
+
+  .coffee-mode .card-bg {
+    @apply bg-amber-900/20 border border-amber-800/30 rounded-xl backdrop-blur-sm;
+  }
+}
