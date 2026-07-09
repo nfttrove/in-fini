@@ -36,7 +36,30 @@ const PALETTE = {
   warn: "#ffd66f",
 };
 
-const PRESETS = {
+interface GateValues {
+  claim: number;
+  P: number;
+  leak: number;
+  I: number;
+  Leff: number;
+  B: number;
+  pressure: number;
+  area: number;
+  epsGas: number;
+  cth: number;
+  V: number;
+  Aes: number;
+  gap: number;
+  noise: number;
+}
+
+interface PresetConfig {
+  label: string;
+  note: string;
+  values: GateValues;
+}
+
+const PRESETS: Record<string, PresetConfig> = {
   eagleworks: {
     label: "Eagleworks 2016 (EmDrive)",
     note: "80 W RF, ~100 µN claimed. Long unshielded DC run in Earth's field.",
@@ -57,7 +80,14 @@ const PRESETS = {
   },
 };
 
-const CHANNEL_DEFS = [
+interface ChannelDef {
+  key: string;
+  name: string;
+  formula: string;
+  compute: (v: GateValues) => number;
+}
+
+const CHANNEL_DEFS: ChannelDef[] = [
   {
     key: "photon",
     name: "Photon pressure",
@@ -97,7 +127,7 @@ const CHANNEL_DEFS = [
   },
 ];
 
-function fmtForce(N) {
+function fmtForce(N: number): string {
   if (!isFinite(N)) return "—";
   const a = Math.abs(N);
   if (a >= 1e-3) return (N * 1e3).toPrecision(3) + " mN";
@@ -107,16 +137,22 @@ function fmtForce(N) {
 
 // ---------- log-scale force ruler (the signature element) ----------
 
-function ForceRuler({ channels, sum, claim }) {
+interface ForceRulerProps {
+  channels: (ChannelDef & { value: number })[];
+  sum: number;
+  claim: number;
+}
+
+function ForceRuler({ channels, sum, claim }: ForceRulerProps) {
   const W = 720, H = 168, X0 = 24, X1 = 700;
   const LOG_MIN = 0; // 1 nN
   const LOG_MAX = 7; // 10 mN
-  const x = (N) => {
+  const x = (N: number) => {
     const nN = Math.max(N / 1e-9, 1e-4);
     const t = (Math.log10(nN) - LOG_MIN) / (LOG_MAX - LOG_MIN);
     return X0 + Math.min(Math.max(t, 0), 1) * (X1 - X0);
   };
-  const ticks = [
+  const ticks: [number, string][] = [
     [1e-9, "1 nN"], [1e-8, "10"], [1e-7, "100"], [1e-6, "1 µN"],
     [1e-5, "10"], [1e-4, "100"], [1e-3, "1 mN"], [1e-2, "10"],
   ];
@@ -176,7 +212,15 @@ function ForceRuler({ channels, sum, claim }) {
 
 // ---------- small labelled numeric input ----------
 
-function Field({ label, unit, value, onChange, step }) {
+interface FieldProps {
+  label: string;
+  unit?: string;
+  value: number;
+  onChange: (val: number) => void;
+  step?: string;
+}
+
+function Field({ label, unit, value, onChange, step }: FieldProps) {
   return (
     <label style={{ display: "flex", flexDirection: "column", gap: 3, minWidth: 0 }}>
       <span style={{
@@ -201,7 +245,13 @@ function Field({ label, unit, value, onChange, step }) {
   );
 }
 
-function ChannelGroup({ title, contribution, children }) {
+interface ChannelGroupProps {
+  title: string;
+  contribution: string;
+  children: React.ReactNode;
+}
+
+function ChannelGroup({ title, contribution, children }: ChannelGroupProps) {
   return (
     <fieldset style={{
       border: `1px solid ${PALETTE.panelEdge}`, borderRadius: 10,
@@ -230,10 +280,10 @@ function ChannelGroup({ title, contribution, children }) {
 // ---------- main ----------
 
 export default function ArtifactBudgetGate() {
-  const [v, setV] = useState(PRESETS.eagleworks.values);
-  const [activePreset, setActivePreset] = useState("eagleworks");
+  const [v, setV] = useState<GateValues>(PRESETS.eagleworks.values);
+  const [activePreset, setActivePreset] = useState<string | null>("eagleworks");
 
-  const set = (key) => (val) => {
+  const set = (key: keyof GateValues) => (val: number) => {
     setV((prev) => ({ ...prev, [key]: val }));
     setActivePreset(null);
   };
@@ -247,7 +297,7 @@ export default function ArtifactBudgetGate() {
   const claimN = v.claim * 1e-6;
   const ratio = sum > 0 ? claimN / sum : Infinity;
 
-  let verdict, verdictColor, verdictDetail;
+  let verdict: string, verdictColor: string, verdictDetail: string;
   if (ratio <= 1) {
     verdict = "INSIDE BUDGET — NO ANOMALY";
     verdictColor = PALETTE.fail;
@@ -267,7 +317,7 @@ export default function ArtifactBudgetGate() {
 
   const dominant = channels.reduce((a, c) => (c.value > a.value ? c : a), channels[0]);
 
-  const applyPreset = (key) => {
+  const applyPreset = (key: string) => {
     setV(PRESETS[key].values);
     setActivePreset(key);
   };

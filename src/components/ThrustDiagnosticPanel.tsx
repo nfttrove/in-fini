@@ -10,6 +10,7 @@ import ThrustDceLimit from "./thrust/ThrustDceLimit";
 import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
 import GoverningEquation from "./ui/GoverningEquation";
+import ArtifactBudgetGate from "./diagnostic/ArtifactBudgetGate";
 import { ThrustParams, computeThrustBudget, dceThrustLimitG } from "../utils/thrustLeakage";
 
 const DEFAULT_PARAMS: ThrustParams = {
@@ -113,6 +114,17 @@ export default function ThrustDiagnosticPanel() {
             }}
           />
         </div>
+      </div>
+
+      <div className="mt-8 pt-8 border-t dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-amber-700">
+        <h3 className="text-lg font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-amber-200 mb-4">
+          Force Artifact Budget Gate
+        </h3>
+        <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-400 mb-4">
+          The comprehensive referee for anomalous thrust claims. Compute all known artifact channels
+          and see if the signal survives. This is the gate the EmDrive failed.
+        </p>
+        <ArtifactBudgetGate />
       </div>
     </div>
   );

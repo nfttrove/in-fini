@@ -15,6 +15,7 @@ interface RotatingCanvasProps {
   amplitude: number;
   cavityLength: number;
   running: boolean;
+  timestep?: number;
   onTimeUpdate: (tUs: number) => void;
 }
 
@@ -24,8 +25,11 @@ export default function RotatingCanvas({
   amplitude,
   cavityLength,
   running,
+  timestep: _timestep = 1e-6,
   onTimeUpdate,
 }: RotatingCanvasProps) {
+  // Note: timestep is available for conscience meter integration but
+  // this panel uses analytical solutions (no numerical integration artifacts)
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const timeRef = useRef(0);
