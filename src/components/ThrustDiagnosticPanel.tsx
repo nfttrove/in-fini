@@ -10,7 +10,7 @@ import ThrustDceLimit from "./thrust/ThrustDceLimit";
 import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
 import GoverningEquation from "./ui/GoverningEquation";
-import { ThrustParams, computeThrustBudget, dceThrustLimitG, formatForceG } from "../utils/thrustLeakage";
+import { ThrustParams, computeThrustBudget, dceThrustLimitG } from "../utils/thrustLeakage";
 
 const DEFAULT_PARAMS: ThrustParams = {
   claimedDeltaG: 0.1,
@@ -116,4 +116,5 @@ export default function ThrustDiagnosticPanel() {
       </div>
     </div>
   );
+}
 }
