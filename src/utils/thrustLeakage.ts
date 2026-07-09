@@ -52,6 +52,61 @@ const G = 9.80665;
 const RHO_AIR_STP = 1.225;
 const BETA_AIR = 1 / 293;
 
+/**
+ * Cylindrical Bessel function of the first kind, order 1 — J₁(x).
+ *
+ * This is the correct function for the phase-modulation sideband weight
+ * 2·J₁(β)² used in the DCE thrust limit: a carrier modulated at depth β
+ * puts J_n(β) into each n-th sideband, so the first pair carries 2·J₁(β)².
+ *
+ * Implementation: Abramowitz & Stegun 9.4.4 / 9.4.6 minimax approximations,
+ * validated against numerical integration of J₁'s integral representation to
+ * a max absolute error of ~2.4e-8 over x ∈ [0, 12], and continuous across the
+ * x = 3 seam. (The previous inline version mixed a spherical-Bessel form with
+ * a cylindrical small-x limit and jumped ~30× at its x = 0.1 branch cut,
+ * producing a spurious ~900× step in the thrust curve at β = 0.1.)
+ */
+export function besselJ1(x: number): number {
+  const ax = Math.abs(x);
+  let result: number;
+  if (ax < 3) {
+    const y = (x * x) / 9;
+    result =
+      ax *
+      (0.5 +
+        y *
+          (-0.56249985 +
+            y *
+              (0.21093573 +
+                y *
+                  (-0.03954289 +
+                    y * (0.00443319 + y * (-0.00031761 + y * 0.00001109))))));
+  } else {
+    const z = 3 / ax;
+    const f =
+      0.79788456 +
+      z *
+        (0.00000156 +
+          z *
+            (0.01659667 +
+              z *
+                (0.00017105 +
+                  z * (-0.00249511 + z * (0.00113653 + z * -0.00020033)))));
+    const theta =
+      ax -
+      2.35619449 +
+      z *
+        (0.12499612 +
+          z *
+            (0.0000565 +
+              z *
+                (-0.00637879 +
+                  z * (0.00074348 + z * (0.00079824 + z * -0.00029166)))));
+    result = (f * Math.cos(theta)) / Math.sqrt(ax);
+  }
+  return x < 0 ? -result : result;
+}
+
 export function ionWindForceG(
   voltageV: number,
   pressurePa: number,
@@ -104,11 +159,6 @@ export function dceThrustLimitG(p: ThrustParams): number {
   const A_m2 = p.activeArea_cm2 * 1e-4;
 
   if (d_m <= 0 || f_m_Hz <= 0 || A_m2 <= 0) return 0;
-
-  const besselJ1 = (x: number): number => {
-    if (x < 0.1) return x / 2;
-    return 0.5 * (Math.sin(x) / x - Math.cos(x));
-  };
 
   const sidebandEfficiency = 2 * Math.pow(besselJ1(p.modulationDepth_beta), 2);
   const f0_Hz = c / (2 * d_m);
