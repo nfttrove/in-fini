@@ -26,6 +26,14 @@ interface ConscienceMeterProps {
   currentValue?: number;
   label?: string;
   className?: string;
+  /**
+   * True when the panel computes its result from a closed-form (analytic)
+   * expression, so there is no timestep in the physics and dt cannot change
+   * the reading. In that case invariance is guaranteed by construction — it is
+   * NOT a passed artifact test — and the meter says so honestly instead of
+   * showing a green "stable across dt" check it could never fail.
+   */
+  analytic?: boolean;
 }
 
 export default function ConscienceMeter({
@@ -36,6 +44,7 @@ export default function ConscienceMeter({
   currentValue,
   label = "signal",
   className = "",
+  analytic = false,
 }: ConscienceMeterProps) {
   const [showInfo, setShowInfo] = useState(false);
 
@@ -90,6 +99,14 @@ export default function ConscienceMeter({
               when you halve dt, it was never real—it was discretisation error.
               This is the simulator&apos;s equivalent of a shuffled-drift null: one cheap
               control that mirages cannot survive.
+              {analytic && (
+                <span className="block mt-2 dark-mode:text-cyan-300/90 light-mode:text-cyan-700 coffee-mode:text-amber-300">
+                  Note: this panel draws the exact closed-form field, so there is no
+                  timestep in the physics and no discretisation error to find—the control
+                  passes by construction, not by test. On a panel with a numerical
+                  integrator, the same meter becomes a live test that can actually fail.
+                </span>
+              )}
             </p>
           )}
 
@@ -132,39 +149,71 @@ export default function ConscienceMeter({
             </div>
           </div>
 
-          {/* Deviation indicator */}
-          {hasDeviation && (
+          {/* Status: an analytic panel is dt-exact by construction — that is
+              honest to state, but it is NOT a passed artifact test, so we don't
+              show the green "stable across dt" check it could never fail. A
+              numerical panel shows the live baseline-vs-current comparison. */}
+          {analytic ? (
             <div
-              className={`mt-3 flex items-center gap-2 px-3 py-2 rounded
-                ${
-                  isArtifact
-                    ? "dark-mode:bg-red-900/30 dark-mode:border-red-500/50 light-mode:bg-red-100 light-mode:border-red-300 coffee-mode:bg-red-900/40 coffee-mode:border-red-600/50"
-                    : "dark-mode:bg-emerald-900/30 dark-mode:border-emerald-500/50 light-mode:bg-emerald-100 light-mode:border-emerald-300 coffee-mode:bg-emerald-900/40 coffee-mode:border-emerald-600/50"
-                }
-                border`}
+              className="mt-3 flex items-start gap-2 px-3 py-2 rounded border
+                dark-mode:bg-cyan-900/20 dark-mode:border-cyan-500/40
+                light-mode:bg-cyan-50 light-mode:border-cyan-300
+                coffee-mode:bg-amber-900/30 coffee-mode:border-amber-600/50"
             >
-              {isArtifact ? (
-                <AlertTriangle className="w-4 h-4 text-red-400" />
-              ) : (
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-              )}
-              <span className="text-xs dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-amber-200">
-                {label}:{" "}
-                <span className="font-mono font-semibold">
-                  {currentValue!.toExponential(3)}
-                </span>
-                {isArtifact ? (
-                  <span className="ml-2 text-red-400">
-                    ({deviation.toFixed(1)}% deviation — likely numerical
-                    artifact)
-                  </span>
-                ) : (
-                  <span className="ml-2 dark-mode:text-emerald-400 light-mode:text-emerald-600 coffee-mode:text-amber-400">
-                    (stable across dt change)
-                  </span>
+              <Info className="w-4 h-4 mt-0.5 shrink-0 dark-mode:text-cyan-400 light-mode:text-cyan-600 coffee-mode:text-amber-300" />
+              <span className="text-xs dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-amber-200 leading-relaxed">
+                <span className="font-semibold">
+                  Analytic solution — dt-exact by construction.
+                </span>{" "}
+                dt does not enter this computation
+                {currentValue !== undefined && (
+                  <>
+                    {" "}
+                    (
+                    <span className="font-mono">
+                      {label} = {currentValue.toExponential(3)}
+                    </span>
+                    )
+                  </>
                 )}
+                , so the reading cannot move. That is a control which passes by
+                definition — not evidence the physics is real.
               </span>
             </div>
+          ) : (
+            hasDeviation && (
+              <div
+                className={`mt-3 flex items-center gap-2 px-3 py-2 rounded
+                  ${
+                    isArtifact
+                      ? "dark-mode:bg-red-900/30 dark-mode:border-red-500/50 light-mode:bg-red-100 light-mode:border-red-300 coffee-mode:bg-red-900/40 coffee-mode:border-red-600/50"
+                      : "dark-mode:bg-emerald-900/30 dark-mode:border-emerald-500/50 light-mode:bg-emerald-100 light-mode:border-emerald-300 coffee-mode:bg-emerald-900/40 coffee-mode:border-emerald-600/50"
+                  }
+                  border`}
+              >
+                {isArtifact ? (
+                  <AlertTriangle className="w-4 h-4 text-red-400" />
+                ) : (
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                )}
+                <span className="text-xs dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-amber-200">
+                  {label}:{" "}
+                  <span className="font-mono font-semibold">
+                    {currentValue!.toExponential(3)}
+                  </span>
+                  {isArtifact ? (
+                    <span className="ml-2 text-red-400">
+                      ({deviation.toFixed(1)}% deviation — likely numerical
+                      artifact)
+                    </span>
+                  ) : (
+                    <span className="ml-2 dark-mode:text-emerald-400 light-mode:text-emerald-600 coffee-mode:text-amber-400">
+                      (stable across dt change)
+                    </span>
+                  )}
+                </span>
+              </div>
+            )
           )}
         </div>
       </div>

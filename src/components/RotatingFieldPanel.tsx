@@ -72,7 +72,9 @@ export default function RotatingFieldPanel() {
           <span className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">Try this:</span>{" "}
           Change the frequency slider to make it spin faster or slower.
           Press pause to freeze the animation and study one snapshot.
-          Use the Conscience Meter below to verify the physics is genuine.
+          The Conscience Meter below shows what a dt-exact control looks like:
+          this wave is the exact closed-form solution, so halving dt can&apos;t
+          change it — by construction, not by luck.
         </p>
       </PlainExplainer>
 
@@ -107,6 +109,7 @@ export default function RotatingFieldPanel() {
         baselineValue={baselineEnergyRef.current ?? undefined}
         currentValue={currentEnergy ?? undefined}
         label="Avg E²"
+        analytic
         className="mt-4"
       />
 
