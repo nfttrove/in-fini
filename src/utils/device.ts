@@ -30,14 +30,14 @@ export interface DevicePrediction {
 }
 
 /**
- * DCE power density scaling used in this model:
- *   P_DCE ∝ (ħ c³ / d⁴) · (v/c)² · A
- * (user-supplied ansatz; dimensionful prefactor uses the cavity volume
- *  ħc³/d⁴ per unit area, multiplied by (v/c)²)
- *
- * Note: the true DCE photon-production rate from a boundary oscillating at
- * ω_m with amplitude δ is of order (ω_m / c)³ · (δ·c)² per unit area, which
- * numerically matches the same order of magnitude as the ansatz below.
+ * DCE power ceiling used in this model:
+ *   P_DCE = (ħc²/d⁴) · (v/c)² · A
+ * Generous order-of-magnitude ceiling, not a first-principles result:
+ * Casimir-scale energy density ħc/d⁴ (the π²/720 ≈ 0.014 prefactor is
+ * deliberately dropped to keep this an upper bound), × plate area, × c as
+ * the fastest conceivable out-coupling, × (v/c)² perturbative suppression
+ * for slow boundary motion. Yields watts. Matches dceThrustLimitG in
+ * thrustLeakage.ts.
  */
 export function predictDevice(p: DeviceParams): DevicePrediction {
   const d = p.dNm * 1e-9;
@@ -50,7 +50,7 @@ export function predictDevice(p: DeviceParams): DevicePrediction {
   const v = omega_m * r;
   const vOverC = v / C;
 
-  const P_DCE_raw = (HBAR * Math.pow(C, 3) / Math.pow(d, 4)) * vOverC * vOverC * A;
+  const P_DCE_raw = (HBAR * Math.pow(C, 2) / Math.pow(d, 4)) * vOverC * vOverC * A;
 
   const j1 = besselJ(1, p.beta);
   const P_upconverted = 2 * j1 * j1 * P_DCE_raw;

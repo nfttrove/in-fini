@@ -35,7 +35,7 @@ export default function DeviceNotes({ p }: Props) {
           Final prediction at current settings:
           <span className="text-cyan-300 font-mono">
             {" "}
-            P_out = (ħc³/d⁴) · (v/c)² · A · 2J₁²(β) · L(fₘ; γ) ={" "}
+            P_out = (ħc²/d⁴) · (v/c)² · A · 2J₁²(β) · L(fₘ; γ) ={" "}
             {formatPower(p.P_output)}
           </span>
           .
@@ -76,12 +76,12 @@ export default function DeviceNotes({ p }: Props) {
           </ul>
         </InfoNote>
         <InfoNote>
-          This model is honest about its own limits. The ansatz
-          P_DCE ∝ (ħc³/d⁴)(v/c)² is a scaling, not a first-principles
+          This model is honest about its own limits. The ceiling
+          P_DCE = (ħc²/d⁴)(v/c)²·A is a scaling, not a first-principles
           calculation; the exact prefactor for a given geometry may differ by
           one or two orders of magnitude. Even generously accounting for
           geometric factors of 10²-10⁴, the remaining shortfall relative to
-          the claim is ≳ 10¹⁴. No tuning of the included physics brings the
+          the claim is ≳ 10¹⁰. No tuning of the included physics brings the
           prediction within range.
         </InfoNote>
       </div>

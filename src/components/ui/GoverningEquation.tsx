@@ -11,9 +11,9 @@ export default function GoverningEquation({ type, className = "" }: Props) {
       <div className="text-xs dark-mode:text-blue-300 light-mode:text-slate-700 coffee-mode:text-blue-300 uppercase tracking-wider font-semibold">Governing equation</div>
       <div className="font-mono text-sm md:text-base overflow-x-auto mt-2 dark-mode:text-blue-100 light-mode:text-slate-800 coffee-mode:text-blue-100">
         {isPower ? (
-          <>P<sub>out</sub> = (ħc³/d⁴) · (v/c)² · A · 2J₁²(β) · ℒ(f<sub>m</sub>; Q)</>
+          <>P<sub>out</sub> = (ħc²/d⁴) · (v/c)² · A · 2J₁²(β) · ℒ(f<sub>m</sub>; Q)</>
         ) : (
-          <>F<sub>DCE</sub> = P<sub>out</sub> / c = (ħc⁴/d⁴) · (v/c)² · A · 2J₁²(β) · ℒ(f<sub>m</sub>; Q)</>
+          <>F<sub>DCE</sub> = P<sub>out</sub> / c = (ħc/d⁴) · (v/c)² · A · 2J₁²(β) · ℒ(f<sub>m</sub>; Q)</>
         )}
       </div>
       <div className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400 mt-2 leading-relaxed">

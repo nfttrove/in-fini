@@ -50,7 +50,7 @@ export default function DevicePowerSummary({ p }: Props) {
         <MetricCard
           label="DCE power (pre-modulation)"
           value={formatPower(p.P_DCE_raw)}
-          sub="∝ (ħc³/d⁴)·(v/c)²·A"
+          sub="∝ (ħc²/d⁴)·(v/c)²·A"
         />
         <MetricCard
           label="After sideband (×2J₁²)"
