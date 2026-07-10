@@ -2,16 +2,16 @@ import Panel from "../ui/Panel";
 import MetricCard from "../ui/MetricCard";
 
 interface CavityMetricsProps {
-  resonantFreqKHz: number;
-  drivingFreqKHz: number;
+  resonantFreqMHz: number;
+  drivingFreqMHz: number;
   detuning: number;
   coupling: number;
   modeNumber: number;
 }
 
 export default function CavityMetrics({
-  resonantFreqKHz,
-  drivingFreqKHz,
+  resonantFreqMHz,
+  drivingFreqMHz,
   detuning,
   coupling,
   modeNumber,
@@ -21,13 +21,13 @@ export default function CavityMetrics({
       <div className="space-y-3">
         <MetricCard
           label="Resonant Frequency (f₀)"
-          value={`${resonantFreqKHz.toFixed(1)} kHz`}
+          value={`${resonantFreqMHz.toFixed(1)} MHz`}
           sub={`f₀ = nc/(2L), n=${modeNumber}`}
           color="text-cyan-400"
         />
         <MetricCard
           label="Driving Frequency (f_drive)"
-          value={`${drivingFreqKHz} kHz`}
+          value={`${drivingFreqMHz} MHz`}
           sub="User-controlled"
           color="text-amber-400"
         />

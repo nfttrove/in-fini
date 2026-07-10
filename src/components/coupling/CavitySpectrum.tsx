@@ -11,7 +11,7 @@ import {
 
 interface CavitySpectrumProps {
   resonantFreqHz: number;
-  drivingFreqKHz: number;
+  drivingFreqMHz: number;
   Q: number;
 }
 
@@ -21,7 +21,7 @@ function lerp(a: number, b: number, t: number) {
 
 export default function CavitySpectrum({
   resonantFreqHz,
-  drivingFreqKHz,
+  drivingFreqMHz,
   Q,
 }: CavitySpectrumProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -32,7 +32,7 @@ export default function CavitySpectrum({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const resonantFreqKHz = resonantFreqHz / 1e3;
+    const resonantFreqMHz = resonantFreqHz / 1e6;
     const pad = { l: 50, r: 20, t: 20, b: 40 };
     const rect = plotRect(ctx, pad);
 
@@ -40,12 +40,12 @@ export default function CavitySpectrum({
     drawGrid(ctx, rect, 4, 0);
 
     const freqMin = 1;
-    const freqMax = Math.max(resonantFreqKHz * 3, drivingFreqKHz * 1.5, 2000);
+    const freqMax = Math.max(resonantFreqMHz * 3, drivingFreqMHz * 1.5, 2000);
 
     const pts: { x: number; y: number }[] = [];
     for (let i = 0; i <= 400; i++) {
       const t = i / 400;
-      const freq = lerp(freqMin, freqMax, t) * 1e3;
+      const freq = lerp(freqMin, freqMax, t) * 1e6;
       pts.push({ x: t, y: couplingStrength(freq, resonantFreqHz, Q) });
     }
 
@@ -74,20 +74,20 @@ export default function CavitySpectrum({
       2.5
     );
 
-    const drivT = (drivingFreqKHz - freqMin) / (freqMax - freqMin);
+    const drivT = (drivingFreqMHz - freqMin) / (freqMax - freqMin);
     const drivPx = rect.x + drivT * rect.w;
     drawVLine(ctx, rect, drivPx, "#f59e0b", true, 2);
-    label(ctx, `f_drive = ${drivingFreqKHz} kHz`, drivPx, rect.y - 6, {
+    label(ctx, `f_drive = ${drivingFreqMHz} MHz`, drivPx, rect.y - 6, {
       color: "#f59e0b",
       align: "center",
     });
 
-    const resT = (resonantFreqKHz - freqMin) / (freqMax - freqMin);
+    const resT = (resonantFreqMHz - freqMin) / (freqMax - freqMin);
     const resPx = rect.x + resT * rect.w;
     drawVLine(ctx, rect, resPx, "#06b6d4", true, 1.5);
     label(
       ctx,
-      `f₀ = ${resonantFreqKHz.toFixed(0)} kHz`,
+      `f₀ = ${resonantFreqMHz.toFixed(0)} MHz`,
       resPx,
       rect.y + rect.h + 18,
       { color: "#06b6d4", align: "center" }
@@ -110,7 +110,7 @@ export default function CavitySpectrum({
     });
     label(
       ctx,
-      "Driving Frequency (kHz)",
+      "Driving Frequency (MHz)",
       rect.x + rect.w / 2,
       ctx.canvas.height - 4,
       { color: "#94a3b8", align: "center" }
@@ -124,7 +124,7 @@ export default function CavitySpectrum({
       align: "center",
     });
     ctx.restore();
-  }, [resonantFreqHz, drivingFreqKHz, Q]);
+  }, [resonantFreqHz, drivingFreqMHz, Q]);
 
   return (
     <div className="dark-mode:bg-slate-800 light-mode:bg-slate-50 coffee-mode:bg-slate-800 rounded-xl p-4">

@@ -15,8 +15,10 @@ export function casimirEnergy(d: number, area: number): number {
   return -(PI * PI * HBAR * C * area) / (720 * Math.pow(d, 3));
 }
 
+// Mode frequency in Hz: f_n = n·c/(2L). (nπc/L is the angular frequency
+// ω_n — returning that here put every consumer off by 2π.)
 export function cavityResonantFrequency(L: number, n: number): number {
-  return (n * PI * C) / L;
+  return (n * C) / (2 * L);
 }
 
 export function cavityQualityFactor(

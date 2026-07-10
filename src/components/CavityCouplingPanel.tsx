@@ -11,15 +11,15 @@ import { cavityResonantFrequency, couplingStrength } from "../utils/physics";
 export default function CavityCouplingPanel() {
   const [cavityLength, setCavityLength] = useState(0.3);
   const [modeNumber, setModeNumber] = useState(1);
-  const [drivingFreqKHz, setDrivingFreqKHz] = useState(500);
+  const [drivingFreqMHz, setDrivingFreqMHz] = useState(300);
   const [Q, setQ] = useState(1000);
   const [running, setRunning] = useState(true);
 
   const resonantFreqHz = cavityResonantFrequency(cavityLength, modeNumber);
-  const resonantFreqKHz = resonantFreqHz / 1e3;
-  const drivingFreqHz = drivingFreqKHz * 1e3;
+  const resonantFreqMHz = resonantFreqHz / 1e6;
+  const drivingFreqHz = drivingFreqMHz * 1e6;
   const coupling = couplingStrength(drivingFreqHz, resonantFreqHz, Q);
-  const detuning = ((drivingFreqKHz - resonantFreqKHz) / resonantFreqKHz) * 100;
+  const detuning = ((drivingFreqMHz - resonantFreqMHz) / resonantFreqMHz) * 100;
 
   return (
     <div className="space-y-6">
@@ -43,18 +43,18 @@ export default function CavityCouplingPanel() {
         <CavityControls
           cavityLength={cavityLength}
           modeNumber={modeNumber}
-          drivingFreqKHz={drivingFreqKHz}
+          drivingFreqMHz={drivingFreqMHz}
           Q={Q}
           running={running}
           onCavityLength={setCavityLength}
           onModeNumber={setModeNumber}
-          onDrivingFreqKHz={setDrivingFreqKHz}
+          onDrivingFreqMHz={setDrivingFreqMHz}
           onQ={setQ}
           onToggleRun={() => setRunning((r) => !r)}
         />
         <CavityMetrics
-          resonantFreqKHz={resonantFreqKHz}
-          drivingFreqKHz={drivingFreqKHz}
+          resonantFreqMHz={resonantFreqMHz}
+          drivingFreqMHz={drivingFreqMHz}
           detuning={detuning}
           coupling={coupling}
           modeNumber={modeNumber}
@@ -72,7 +72,7 @@ export default function CavityCouplingPanel() {
 
       <CavitySpectrum
         resonantFreqHz={resonantFreqHz}
-        drivingFreqKHz={drivingFreqKHz}
+        drivingFreqMHz={drivingFreqMHz}
         Q={Q}
       />
 
@@ -82,11 +82,13 @@ export default function CavityCouplingPanel() {
         </div>
         <PresetBar
           panel="coupling"
-          currentParams={{ cavityLength, modeNumber, drivingFreqKHz, Q }}
+          currentParams={{ cavityLength, modeNumber, drivingFreqMHz, Q }}
           onLoad={(p) => {
             if (typeof p.cavityLength === "number") setCavityLength(p.cavityLength);
             if (typeof p.modeNumber === "number") setModeNumber(p.modeNumber);
-            if (typeof p.drivingFreqKHz === "number") setDrivingFreqKHz(p.drivingFreqKHz);
+            if (typeof p.drivingFreqMHz === "number") setDrivingFreqMHz(p.drivingFreqMHz);
+            // Presets saved before the kHz→MHz rescale stored drivingFreqKHz.
+            else if (typeof p.drivingFreqKHz === "number") setDrivingFreqMHz(p.drivingFreqKHz / 1e3);
             if (typeof p.Q === "number") setQ(p.Q);
           }}
         />

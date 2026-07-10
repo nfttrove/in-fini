@@ -5,12 +5,12 @@ import ToggleButton from "../ui/ToggleButton";
 interface CavityControlsProps {
   cavityLength: number;
   modeNumber: number;
-  drivingFreqKHz: number;
+  drivingFreqMHz: number;
   Q: number;
   running: boolean;
   onCavityLength: (v: number) => void;
   onModeNumber: (v: number) => void;
-  onDrivingFreqKHz: (v: number) => void;
+  onDrivingFreqMHz: (v: number) => void;
   onQ: (v: number) => void;
   onToggleRun: () => void;
 }
@@ -39,11 +39,11 @@ export default function CavityControls(props: CavityControlsProps) {
         />
         <Slider
           label="Driving Frequency"
-          value={props.drivingFreqKHz}
-          displayValue={`${props.drivingFreqKHz} kHz`}
-          min={1}
+          value={props.drivingFreqMHz}
+          displayValue={`${props.drivingFreqMHz} MHz`}
+          min={50}
           max={2000}
-          onChange={props.onDrivingFreqKHz}
+          onChange={props.onDrivingFreqMHz}
         />
         <Slider
           label="Quality Factor (Q)"
