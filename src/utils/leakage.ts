@@ -80,8 +80,10 @@ export function mechanicalW(
   if (mechQ <= 0) return 0;
   const x = rotorAmpNm * 1e-9;
   const omega = 2 * Math.PI * fmHz;
-  const peakKE = 0.5 * rotorMassKg * Math.pow(omega * x, 2);
-  return (peakKE * omega) / (2 * Math.PI * mechQ);
+  // Stored energy of a harmonic oscillator E = ½m(ωx)²; the drive power
+  // needed to sustain it is P = ωE/Q (Q ≡ ω·E/P_dissipated).
+  const storedE = 0.5 * rotorMassKg * Math.pow(omega * x, 2);
+  return (storedE * omega) / mechQ;
 }
 
 export function triboBaselineW(): number {
@@ -112,7 +114,7 @@ export function computeBudget(p: LeakageParams): LeakageBudget {
       key: "mechanical",
       label: "Mechanical bleed-through",
       valueW: mechanicalW(p.rotorMassKg, p.rotorAmpNm, p.fmHz, p.mechQ),
-      formula: "½ m (ω x)² · ω / (2π Q)",
+      formula: "½ m (ω x)² · ω / Q",
     },
     {
       key: "tribo",
@@ -162,7 +164,7 @@ function classifyVerdict(
       key: "consistent",
       label: "Consistent with known physics (DCE regime)",
       description:
-        "Claim is at the femtowatt scale and matches the expected dynamical Casimir / thermal budget — no unexplained excess.",
+        "Claim is at or below the nanowatt scale and matches the expected dynamical Casimir / thermal budget — no unexplained excess.",
       tone: "sky",
     };
   }
