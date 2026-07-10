@@ -89,7 +89,7 @@ function buildReport(budget: ThrustBudget, params: ThrustParams): string {
 
   lines.push("GOVERNING EQUATION");
   lines.push("-".repeat(40));
-  lines.push(`  F_DCE = (ħc⁴/d⁴) · (v/c)² · A · 2J₁²(β) · ℒ(f_m; Q)`);
+  lines.push(`  F_DCE = (ħc/d⁴) · (v/c)² · A · 2J₁²(β) · ℒ(f_m; Q)`);
   lines.push(`  Where: ħ = reduced Planck constant`);
   lines.push(`         c = speed of light`);
   lines.push(`         d = cavity gap`);

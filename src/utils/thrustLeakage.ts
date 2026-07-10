@@ -164,7 +164,13 @@ export function dceThrustLimitG(p: ThrustParams): number {
   const f0_Hz = c / (2 * d_m);
   const detuning = (f_m_Hz - f0_Hz) / f0_Hz;
   const Lorentzian = 1 / (1 + 4 * p.cavityQ * p.cavityQ * detuning * detuning);
-  const pDCE_W = (hbar * Math.pow(c, 3) / Math.pow(d_m, 4)) * Math.pow(v / c, 2) * A_m2;
+  // Generous order-of-magnitude ceiling, not a derived result: Casimir-scale
+  // energy density ħc/d⁴ (the π²/720 ≈ 0.014 prefactor is deliberately
+  // dropped to keep this an upper bound), × plate area, × c as the fastest
+  // conceivable out-coupling, × (v/c)² perturbative suppression for slow
+  // boundary motion. Yields watts: ħc²/d⁴ · (v/c)² · A. A claim exceeding
+  // even this bound is excluded; a claim under it is not thereby explained.
+  const pDCE_W = (hbar * Math.pow(c, 2) / Math.pow(d_m, 4)) * Math.pow(v / c, 2) * A_m2;
   const power_W = pDCE_W * sidebandEfficiency * Lorentzian;
   const force_N = power_W / c;
   const force_mg = (force_N / G) * 1000;
