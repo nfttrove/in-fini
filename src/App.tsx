@@ -148,10 +148,10 @@ function AppContent() {
             Quantum Vacuum &amp; Cavity Physics
           </h1>
           <p className="dark-mode:text-slate-400 light-mode:text-slate-700 coffee-mode:text-amber-700 max-w-3xl text-lg leading-relaxed">
-            Honest numerical simulations of the Casimir effect, rotating polarization waves, and resonant cavity coupling. Compare claimed outputs against quantifiable leakage channels.
+            Honest numerical simulations of quantum vacuum physics — and a trial bench for extraordinary claims. Simulate the Casimir effect, cavity QED, and the one experiment that made photons from vacuum; then run any claim through its artifact budget, error bars included.
           </p>
           <div className="mt-6 max-w-3xl card-bg px-5 py-4 text-sm leading-relaxed dark-mode:border-cyan-500/20 dark-mode:bg-cyan-600/5 dark-mode:text-cyan-100/80 light-mode:border-blue-200/50 light-mode:bg-blue-50/60 light-mode:text-blue-900 coffee-mode:border-amber-600/30 coffee-mode:bg-amber-900/20 coffee-mode:text-amber-100">
-            <span className="font-semibold dark-mode:text-cyan-300 light-mode:text-blue-600 coffee-mode:text-amber-200">New here?</span> Each tab below is a mini experiment. Drag the sliders to change the inputs and watch the numbers and charts update live. Every panel has a "In plain English" box at the top that explains what's going on without any jargon.
+            <span className="font-semibold dark-mode:text-cyan-300 light-mode:text-blue-600 coffee-mode:text-amber-200">New here?</span> Every tab is a mini experiment: drag the sliders, watch the numbers move, and read the "plain English" box at the top of each panel. The tab strip runs from foundations (Casimir, cavities) to the frontier (circuit QED, the dark 95%) — and the tools in between put claims on trial with error bars.
           </div>
         </div>
 
@@ -209,6 +209,8 @@ function AppContent() {
               <p>Casimir force formula: F/A = −π²ℏc / (240 d⁴) — Casimir (1948), Proc. Kon. Ned. Akad. Wetensch. 51, 793.</p>
               <p>Experimental confirmation: Lamoreaux (1997) PRL 78, 5; Mohideen &amp; Roy (1998) PRL 81, 4549.</p>
               <p>Cavity QED field enhancement: Haroche &amp; Raimond, "Exploring the Quantum", Oxford UP (2006).</p>
+              <p>Microwave dynamical Casimir effect: Wilson et al., Nature 479, 376 (2011); Lähteenmäki et al., PNAS 110, 4234 (2013).</p>
+              <p>Cosmological parameters: Planck 2018 results, A&amp;A 641, A6 (2020).</p>
             </div>
             <div className="pt-4 dark-mode:border-slate-800/40 light-mode:border-slate-200 coffee-mode:border-amber-800/30 border-t">
               <a
