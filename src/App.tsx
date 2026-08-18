@@ -17,6 +17,7 @@ import CircuitQEDPanel from "./components/CircuitQEDPanel";
 import ClaimRegistryPanel from "./components/ClaimRegistryPanel";
 import ExperimentDesignPanel from "./components/ExperimentDesignPanel";
 import DataLabPanel from "./components/DataLabPanel";
+import NetworkPanel from "./components/NetworkPanel";
 import { readUrlParam, writeUrlParam } from "./hooks/usePanelUrlState";
 
 const TABS = [
@@ -104,6 +105,12 @@ const TABS = [
     description:
       "Paste your own measurement series, strip drift and mains pickup, and hunt the residual — then test yourself in the blind artifact-or-anomaly challenge",
   },
+  {
+    id: "network",
+    label: "Replication Network",
+    description:
+      "Calibration Census 001: record 60 seconds of your rig's environment and join the fleet's collective detection floor",
+  },
 ];
 
 function AppContent() {
@@ -177,6 +184,7 @@ function AppContent() {
           {activeTab === "registry" && <ClaimRegistryPanel />}
           {activeTab === "design" && <ExperimentDesignPanel />}
           {activeTab === "datalab" && <DataLabPanel />}
+          {activeTab === "network" && <NetworkPanel />}
         </section>
 
         <footer className="mt-20 pt-8 dark-mode:border-slate-800/50 light-mode:border-slate-200 coffee-mode:border-amber-800/40 border-t">

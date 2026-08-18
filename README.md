@@ -14,7 +14,7 @@ test: if a discovery disappears when you halve the timestep, it was never real.
 
 ## What's inside
 
-The app is organised as fifteen tabs, each a self-contained mini-experiment:
+The app is organised as sixteen tabs, each a self-contained mini-experiment:
 
 | Tab | What it shows |
 | --- | --- |
@@ -33,13 +33,14 @@ The app is organised as fifteen tabs, each a self-contained mini-experiment:
 | **Claim Registry** | File an anomalous power/thrust claim together with its computed artifact budget and uncertainty into a public, reproducible record; pre-register predictions before running the experiment |
 | **Experiment Design** | The budget engines inverted: state the effect you want to detect and at how many σ, get the rig requirements (vibration floor, pressure, shielding, temperature stability) — round-trip tested against the forward engines |
 | **Data Lab & Challenge** | Paste your own measurement series: drift removal, mains-comb identification, FFT spectrum and residual statistics — plus a blind "artifact or anomaly?" training game |
+| **Replication Network** | Calibration Census 001: record 60 s of your rig's noise floor (phone accelerometer in-browser, or paste CSV) and file it; the fleet's collective floor is median/√N — the honest detection limit of the crowd before any replication round |
 
 Diagnostic panels end in a colour-coded verdict — *explained / partial / excess /
 gross-excess* — based on how much of the claim the mundane channels account for.
 
 ### The physics modules
 
-All numerical models live in `src/utils/` and are unit-tested (111 tests, Vitest):
+All numerical models live in `src/utils/` and are unit-tested (125 tests, Vitest):
 
 - `physics.ts` — Casimir pressure `−π²ħc/240d⁴`, force and energy; cavity mode
   frequencies `fₙ = n·c/2L`; Lorentzian cavity response.
@@ -68,6 +69,9 @@ All numerical models live in `src/utils/` and are unit-tested (111 tests, Vitest
   and a seeded synthetic-trace generator for the blind challenge.
 - `correlation.ts` — Gaussian-moment g² correlations for thermal + pair
   states and the Cauchy–Schwarz violation criterion.
+- `networkCensus.ts` — fleet statistics for the replication network:
+  median/percentile rig noise, mains split, and the collective floor
+  (median/√N) with its citable bound statement.
 - `thermalFloor.ts` — the measurability limit of matter itself: Brownian
   force noise √(4k_B·T·m·ω/Qτ), equipartition jitter, the kT power bound,
   and a three-way decidability verdict (decidable / marginal / sub-thermal —
@@ -124,7 +128,7 @@ The unit tests never touch the network and need no environment at all.
 npm run dev        # start the dev server
 npm run build      # production build to dist/
 npm run preview    # serve the production build
-npm test           # run the Vitest suite (111 tests)
+npm test           # run the Vitest suite (125 tests)
 npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
 ```
@@ -132,7 +136,7 @@ npm run lint       # eslint
 ## Supabase backend
 
 SQL migrations are in `supabase/migrations/` (apply them with the Supabase CLI or by
-pasting them into the SQL editor in creation order). Five tables:
+pasting them into the SQL editor in creation order). Six tables:
 
 - **`simulation_presets`** — user-saved parameter sets per panel. Anonymous by design:
   inserts are open, but deletion is authorised by a per-preset `owner_token` generated
@@ -146,6 +150,9 @@ pasting them into the SQL editor in creation order). Five tables:
   verdict + uncertainty). Public read, bounded anonymous insert, intentionally
   no delete in v1: it is a record, not a scratchpad. Seeded with the famous
   historical cases, their verdicts computed by these same engines.
+- **`network_runs`** — census filings for the Replication Network (noise
+  floor, top vibration line, mains frequency; no geolocation). Public read,
+  bounded anonymous insert, no delete.
 - **`preregistrations`** — timestamped predictions committed before an
   experiment (client-side SHA-256 over a canonical title/type/magnitude
   string). Filed claims matching a prior pre-registration are flagged
@@ -170,6 +177,13 @@ src/
   utils/                  # the physics and formatting modules (unit-tested)
 supabase/migrations/      # database schema and policies
 ```
+
+## CI
+
+GitHub Actions runs typecheck, lint, the full test suite (including the
+deterministic engine fuzz — the descendant of the permutation sweep that
+found the double-counted thermal channel) and a production build whose
+bundle is grepped for the shipped UI, on every push to `main`.
 
 ## Sharing and permalinks
 

@@ -276,3 +276,59 @@ export async function savePreregistration(entry: {
   if (error) throw error;
   return data as Preregistration;
 }
+
+// ---------------------------------------------------------------------------
+// Replication Network runs
+// ---------------------------------------------------------------------------
+
+export interface NetworkRun {
+  id: string;
+  campaign: string;
+  device_label: string;
+  source: "phone-accelerometer" | "csv-paste";
+  sample_rate_hz: number;
+  duration_s: number;
+  /** Residual noise RMS in milli-g. */
+  noise_rms: number;
+  top_peak_hz: number;
+  top_peak_g: number;
+  mains_hz: 0 | 50 | 60;
+  created_at: string;
+}
+
+const NETWORK_COLUMNS =
+  "id,campaign,device_label,source,sample_rate_hz,duration_s,noise_rms,top_peak_hz,top_peak_g,mains_hz,created_at";
+
+export async function listNetworkRuns(
+  campaign = "census-001",
+  limit = 500
+): Promise<NetworkRun[]> {
+  const { data, error } = await requireClient()
+    .from("network_runs")
+    .select(NETWORK_COLUMNS)
+    .eq("campaign", campaign)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data ?? []) as NetworkRun[];
+}
+
+export async function fileNetworkRun(entry: {
+  campaign?: string;
+  device_label: string;
+  source: "phone-accelerometer" | "csv-paste";
+  sample_rate_hz: number;
+  duration_s: number;
+  noise_rms: number;
+  top_peak_hz: number;
+  top_peak_g: number;
+  mains_hz: 0 | 50 | 60;
+}): Promise<NetworkRun> {
+  const { data, error } = await requireClient()
+    .from("network_runs")
+    .insert({ campaign: entry.campaign ?? "census-001", ...entry })
+    .select(NETWORK_COLUMNS)
+    .maybeSingle();
+  if (error) throw error;
+  return data as NetworkRun;
+}
