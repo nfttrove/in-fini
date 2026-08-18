@@ -23,6 +23,6 @@ jobs:
       - name: bundle sanity (new UI actually shipped)
         run: |
           BUNDLE=$(ls dist/assets/index-*.js)
-          for m in "Claim Registry" "Experiment Design" "Data Lab" "Replication Network" "Circuit QED"; do
+          for m in "Claim Registry" "Experiment Design" "Data Lab" "Replication Network" "Circuit QED" "Acoustic Casimir"; do
             grep -q "$m" "$BUNDLE" || { echo "MISSING FROM BUNDLE: $m"; exit 1; }
           done

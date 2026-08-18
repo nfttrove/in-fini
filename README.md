@@ -14,7 +14,7 @@ test: if a discovery disappears when you halve the timestep, it was never real.
 
 ## What's inside
 
-The app is organised as sixteen tabs, each a self-contained mini-experiment:
+The app is organised as seventeen tabs, each a self-contained mini-experiment:
 
 | Tab | What it shows |
 | --- | --- |
@@ -33,6 +33,7 @@ The app is organised as sixteen tabs, each a self-contained mini-experiment:
 | **Claim Registry** | File an anomalous power/thrust claim together with its computed artifact budget and uncertainty into a public, reproducible record; pre-register predictions before running the experiment |
 | **Experiment Design** | The budget engines inverted: state the effect you want to detect and at how many σ, get the rig requirements (vibration floor, pressure, shielding, temperature stability) — round-trip tested against the forward engines |
 | **Data Lab & Challenge** | Paste your own measurement series: drift removal, mains-comb identification, FFT spectrum and residual statistics — plus a blind "artifact or anomaly?" training game |
+| **Acoustic Casimir** | Sound's radiation pressure (p²/ρc²) side by side with the vacuum Casimir force it mirrors — with the gap at which empty space matches your speaker, and a build-it-tonight parts list |
 | **Replication Network** | Calibration Census 001: record 60 s of your rig's noise floor (phone accelerometer in-browser, or paste CSV) and file it; the fleet's collective floor is median/√N — the honest detection limit of the crowd before any replication round |
 
 Diagnostic panels end in a colour-coded verdict — *explained / partial / excess /
@@ -40,7 +41,7 @@ gross-excess* — based on how much of the claim the mundane channels account fo
 
 ### The physics modules
 
-All numerical models live in `src/utils/` and are unit-tested (125 tests, Vitest):
+All numerical models live in `src/utils/` and are unit-tested (133 tests, Vitest):
 
 - `physics.ts` — Casimir pressure `−π²ħc/240d⁴`, force and energy; cavity mode
   frequencies `fₙ = n·c/2L`; Lorentzian cavity response.
@@ -69,6 +70,9 @@ All numerical models live in `src/utils/` and are unit-tested (125 tests, Vitest
   and a seeded synthetic-trace generator for the blind challenge.
 - `correlation.ts` — Gaussian-moment g² correlations for thermal + pair
   states and the Cauchy–Schwarz violation criterion.
+- `acousticCasimir.ts` — SPL→pressure→intensity→radiation-pressure chain,
+  force on a plate, household-scale verdicts, and the inverse-Casimir gap
+  at which the vacuum matches the sound force.
 - `networkCensus.ts` — fleet statistics for the replication network:
   median/percentile rig noise, mains split, and the collective floor
   (median/√N) with its citable bound statement.
@@ -128,7 +132,7 @@ The unit tests never touch the network and need no environment at all.
 npm run dev        # start the dev server
 npm run build      # production build to dist/
 npm run preview    # serve the production build
-npm test           # run the Vitest suite (125 tests)
+npm test           # run the Vitest suite (133 tests)
 npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
 ```

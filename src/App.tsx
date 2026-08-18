@@ -18,6 +18,7 @@ import ClaimRegistryPanel from "./components/ClaimRegistryPanel";
 import ExperimentDesignPanel from "./components/ExperimentDesignPanel";
 import DataLabPanel from "./components/DataLabPanel";
 import NetworkPanel from "./components/NetworkPanel";
+import AcousticCasimirPanel from "./components/AcousticCasimirPanel";
 import { readUrlParam, writeUrlParam } from "./hooks/usePanelUrlState";
 
 const TABS = [
@@ -111,6 +112,12 @@ const TABS = [
     description:
       "Calibration Census 001: record 60 seconds of your rig's environment and join the fleet's collective detection floor",
   },
+  {
+    id: "acoustic",
+    label: "Acoustic Casimir (build it)",
+    description:
+      "Radiation pressure from sound side-by-side with the vacuum Casimir force — the one fluctuation force you can measure tonight for €25",
+  },
 ];
 
 function AppContent() {
@@ -185,6 +192,7 @@ function AppContent() {
           {activeTab === "design" && <ExperimentDesignPanel />}
           {activeTab === "datalab" && <DataLabPanel />}
           {activeTab === "network" && <NetworkPanel />}
+          {activeTab === "acoustic" && <AcousticCasimirPanel />}
         </section>
 
         <footer className="mt-20 pt-8 dark-mode:border-slate-800/50 light-mode:border-slate-200 coffee-mode:border-amber-800/40 border-t">
