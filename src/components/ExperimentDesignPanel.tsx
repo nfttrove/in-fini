@@ -26,7 +26,7 @@ export default function ExperimentDesignPanel() {
   const [k, setK] = useState(2);
 
   // Thrust context
-  const [claimedDeltaG, setClaimedDeltaG] = useState(0.1);
+  const [claimedDeltaGLog, setClaimedDeltaGLog] = useState(-1); // log10(Δg)
   const [driveVoltageV, setDriveVoltageV] = useState(10000);
   const [deviceMassKg, setDeviceMassKg] = useState(0.1);
   const [deviceHeightM, setDeviceHeightM] = useState(0.1);
@@ -38,7 +38,7 @@ export default function ExperimentDesignPanel() {
   const [rigIntegrationS, setRigIntegrationS] = useState(100);
 
   // Power context
-  const [claimedW, setClaimedW] = useState(0.1);
+  const [claimedWLog, setClaimedWLog] = useState(-1); // log10(W)
   const [vDriveV, setVDriveV] = useState(10);
   const [rDriveOhm, setRDriveOhm] = useState(50);
   const [shieldDb, setShieldDb] = useState(40);
@@ -50,7 +50,7 @@ export default function ExperimentDesignPanel() {
 
   const thrustCtx: ThrustDesignContext = useMemo(
     () => ({
-      claimedDeltaG,
+      claimedDeltaG: Math.pow(10, claimedDeltaGLog),
       k,
       driveVoltageV,
       electrodeGapM: 0.01,
@@ -62,12 +62,12 @@ export default function ExperimentDesignPanel() {
       ambientPressurePa: 101325,
       tempGradKPerM,
     }),
-    [claimedDeltaG, k, driveVoltageV, deviceMassKg, deviceHeightM, vibrationFreqHz, vibrationAmpNm, plateAreaM2, tempGradKPerM]
+    [claimedDeltaGLog, k, driveVoltageV, deviceMassKg, deviceHeightM, vibrationFreqHz, vibrationAmpNm, plateAreaM2, tempGradKPerM]
   );
 
   const powerCtx: PowerDesignContext = useMemo(
     () => ({
-      claimedW,
+      claimedW: Math.pow(10, claimedWLog),
       k,
       vDriveV,
       rDriveOhm,
@@ -79,12 +79,12 @@ export default function ExperimentDesignPanel() {
       emissivity,
       tHotK: tColdK + 50,
     }),
-    [claimedW, k, vDriveV, rDriveOhm, shieldDb, iBiasA, rResOhm, tColdK, aRadM2, emissivity]
+    [claimedWLog, k, vDriveV, rDriveOhm, shieldDb, iBiasA, rResOhm, tColdK, aRadM2, emissivity]
   );
 
   const result = mode === "thrust" ? thrustRequirements(thrustCtx) : powerRequirements(powerCtx);
 
-  const decidability = assessDecidability(claimedDeltaG, {
+  const decidability = assessDecidability(Math.pow(10, claimedDeltaGLog), {
     massKg: deviceMassKg,
     freqHz: vibrationFreqHz,
     qualityFactor: 100,
@@ -155,13 +155,13 @@ export default function ExperimentDesignPanel() {
               <>
                 <Slider
                   label="Effect you hope to detect"
-                  value={claimedDeltaG}
-                  displayValue={`${claimedDeltaG.toExponential(2)} Δg`}
-                  min={0.001}
-                  max={10}
-                  step={0.001}
-                  onChange={setClaimedDeltaG}
-                  minLabel="1 mΔg"
+                  value={claimedDeltaGLog}
+                  displayValue={`${Math.pow(10, claimedDeltaGLog).toExponential(2)} Δg`}
+                  min={-13}
+                  max={1}
+                  step={0.05}
+                  onChange={setClaimedDeltaGLog}
+                  minLabel="10⁻¹³"
                   maxLabel="10 Δg"
                 />
                 <Slider
@@ -246,13 +246,13 @@ export default function ExperimentDesignPanel() {
               <>
                 <Slider
                   label="Effect you hope to detect"
-                  value={claimedW}
-                  displayValue={`${claimedW.toExponential(2)} W`}
-                  min={1e-4}
-                  max={100}
-                  step={1e-4}
-                  onChange={setClaimedW}
-                  minLabel="100 µW"
+                  value={claimedWLog}
+                  displayValue={`${Math.pow(10, claimedWLog).toExponential(2)} W`}
+                  min={-22}
+                  max={2}
+                  step={0.05}
+                  onChange={setClaimedWLog}
+                  minLabel="10⁻²² W"
                   maxLabel="100 W"
                 />
                 <Slider
@@ -472,7 +472,7 @@ export default function ExperimentDesignPanel() {
                   />
                   <MetricCard
                     label="Claim ÷ floor"
-                    value={(claimedW / powerFloor).toExponential(2) + "×"}
+                    value={(Math.pow(10, claimedWLog) / powerFloor).toExponential(2) + "×"}
                     sub="claim vs smallest meaningfully measurable power"
                   />
                 </div>
