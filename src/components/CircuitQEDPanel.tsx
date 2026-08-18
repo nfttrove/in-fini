@@ -1,14 +1,28 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { usePanelUrlState } from "../hooks/usePanelUrlState";
 import Panel from "./ui/Panel";
 import PlainExplainer from "./ui/PlainExplainer";
 import Slider from "./ui/Slider";
 import MetricCard from "./ui/MetricCard";
+import CqedSweep from "./cqed/CqedSweep";
+import G2Correlation from "./cqed/G2Correlation";
 import {
   predictCqed,
   CircuitQEDParams,
   CqedPrediction,
 } from "../utils/circuitQED";
 import { formatFreq } from "../utils/device";
+import { CQED_DEFAULTS } from "./cqed/defaults";
+
+export interface CqedState {
+  f0GHz: number;
+  Qexp: number;
+  deltaXnm: number;
+  fmGHz: number;
+  tempmK: number;
+  lengthMm: number;
+  integrationS: number;
+}
 
 function fmtHz(hz: number): string {
   if (hz === 0) return "0 /s";
@@ -25,9 +39,7 @@ const VERDICT_STYLES: Record<string, string> = {
 
 function VerdictBanner({ pred }: { pred: CqedPrediction }) {
   return (
-    <div
-      className={`rounded-xl border p-4 ${VERDICT_STYLES[pred.verdict.tone]}`}
-    >
+    <div className={`rounded-xl border p-4 ${VERDICT_STYLES[pred.verdict.tone]}`}>
       <div className="font-semibold text-sm">{pred.verdict.label}</div>
       <p className="text-xs mt-1 leading-relaxed opacity-90">
         {pred.verdict.description}
@@ -36,29 +48,35 @@ function VerdictBanner({ pred }: { pred: CqedPrediction }) {
   );
 }
 
-export default function CircuitQEDPanel() {
-  const [f0GHz, setF0GHz] = useState(10);
-  const [Qexp, setQexp] = useState(5); // slider is log10(Q)
-  const [deltaXnm, setDeltaXnm] = useState(1);
-  const [fmGHz, setFmGHz] = useState(20);
-  const [tempmK, setTempmK] = useState(20);
-  const [lengthMm, setLengthMm] = useState(10);
-  const [integrationS, setIntegrationS] = useState(100);
+export default function CircuitQEDPanel({
+  initialState,
+}: {
+  initialState?: Partial<CqedState>;
+}) {
+  const [s, setS] = usePanelUrlState<CqedState>("cqed", {
+    ...CQED_DEFAULTS,
+    ...initialState,
+  });
+  const set = (patch: Partial<CqedState>) =>
+    setS((prev) => ({ ...prev, ...patch }));
 
   const params: CircuitQEDParams = useMemo(
     () => ({
-      f0GHz,
-      Q: Math.pow(10, Qexp),
-      deltaXnm,
-      fmGHz,
-      tempmK,
-      lengthMm,
-      integrationS,
+      f0GHz: s.f0GHz,
+      Q: Math.pow(10, s.Qexp),
+      deltaXnm: s.deltaXnm,
+      fmGHz: s.fmGHz,
+      tempmK: s.tempmK,
+      lengthMm: s.lengthMm,
+      integrationS: s.integrationS,
     }),
-    [f0GHz, Qexp, deltaXnm, fmGHz, tempmK, lengthMm, integrationS]
+    [s]
   );
 
   const pred = useMemo(() => predictCqed(params), [params]);
+
+  // Per-mode pair number on resonance: n_p = (λ/κ)².
+  const defaultPairNumber = Math.pow(pred.lambdaHz / pred.kappaHz, 2);
 
   return (
     <div className="space-y-6">
@@ -103,86 +121,86 @@ export default function CircuitQEDPanel() {
           <div className="space-y-5">
             <Slider
               label="Resonator frequency f₀"
-              value={f0GHz}
-              displayValue={`${f0GHz.toFixed(1)} GHz`}
+              value={s.f0GHz}
+              displayValue={`${s.f0GHz.toFixed(1)} GHz`}
               min={4}
               max={12}
               step={0.5}
-              onChange={setF0GHz}
+              onChange={(v) => set({ f0GHz: v })}
               minLabel="4 GHz"
               maxLabel="12 GHz"
             />
             <Slider
               label="Pump frequency fₘ (2·f₀ = resonance)"
-              value={fmGHz}
-              displayValue={`${fmGHz.toFixed(1)} GHz`}
+              value={s.fmGHz}
+              displayValue={`${s.fmGHz.toFixed(1)} GHz`}
               min={4}
               max={40}
               step={0.1}
-              onChange={setFmGHz}
+              onChange={(v) => set({ fmGHz: v })}
               minLabel="4 GHz"
               maxLabel="40 GHz"
             />
             <Slider
               label="Loaded quality factor Q"
-              value={Qexp}
-              displayValue={`10^${Qexp.toFixed(0)} = ${Math.pow(10, Qexp).toExponential(0)}`}
+              value={s.Qexp}
+              displayValue={`10^${s.Qexp.toFixed(0)} = ${Math.pow(10, s.Qexp).toExponential(0)}`}
               min={4}
               max={6}
               step={0.25}
-              onChange={setQexp}
+              onChange={(v) => set({ Qexp: v })}
               minLabel="10⁴"
               maxLabel="10⁶"
             />
             <Slider
               label="Boundary wiggle δx"
-              value={deltaXnm}
-              displayValue={`${deltaXnm.toFixed(1)} nm`}
+              value={s.deltaXnm}
+              displayValue={`${s.deltaXnm.toFixed(1)} nm`}
               min={0.1}
               max={100}
               step={0.1}
-              onChange={setDeltaXnm}
+              onChange={(v) => set({ deltaXnm: v })}
               minLabel="0.1 nm"
               maxLabel="100 nm"
             />
             <Slider
               label="Resonator electrical length L"
-              value={lengthMm}
-              displayValue={`${lengthMm.toFixed(1)} mm`}
+              value={s.lengthMm}
+              displayValue={`${s.lengthMm.toFixed(1)} mm`}
               min={5}
               max={20}
               step={0.5}
-              onChange={setLengthMm}
+              onChange={(v) => set({ lengthMm: v })}
               minLabel="5 mm"
               maxLabel="20 mm"
             />
             <Slider
               label="Temperature"
-              value={tempmK}
+              value={s.tempmK}
               displayValue={
-                tempmK >= 1000
-                  ? `${(tempmK / 1000).toFixed(0)} K`
-                  : `${tempmK.toFixed(0)} mK`
+                s.tempmK >= 1000
+                  ? `${(s.tempmK / 1000).toFixed(0)} K`
+                  : `${s.tempmK.toFixed(0)} mK`
               }
               min={10}
               max={300000}
               step={10}
-              onChange={setTempmK}
+              onChange={(v) => set({ tempmK: v })}
               minLabel="10 mK"
               maxLabel="300 K"
             />
             <Slider
               label="Integration time"
-              value={integrationS}
+              value={s.integrationS}
               displayValue={
-                integrationS >= 3600
-                  ? `${(integrationS / 3600).toFixed(1)} h`
-                  : `${integrationS.toFixed(0)} s`
+                s.integrationS >= 3600
+                  ? `${(s.integrationS / 3600).toFixed(1)} h`
+                  : `${s.integrationS.toFixed(0)} s`
               }
               min={1}
               max={100000}
               step={1}
-              onChange={setIntegrationS}
+              onChange={(v) => set({ integrationS: v })}
               minLabel="1 s"
               maxLabel="28 h"
             />
@@ -204,7 +222,7 @@ export default function CircuitQEDPanel() {
                     ? pred.expectedPairs.toFixed(0)
                     : pred.expectedPairs.toExponential(1)
                 }
-                sub={`over ${params.integrationS} s`}
+                sub={`over ${s.integrationS} s`}
               />
               <MetricCard
                 label="Counting SNR"
@@ -238,7 +256,7 @@ export default function CircuitQEDPanel() {
                     ? "0"
                     : pred.thermalOccupation.toExponential(2)
                 }
-                sub={`at ${params.tempmK >= 1000 ? (params.tempmK / 1000).toFixed(0) + " K" : params.tempmK.toFixed(0) + " mK"}`}
+                sub={`at ${s.tempmK >= 1000 ? (s.tempmK / 1000).toFixed(0) + " K" : s.tempmK.toFixed(0) + " mK"}`}
               />
               <MetricCard
                 label="Thermal photon flux"
@@ -253,7 +271,7 @@ export default function CircuitQEDPanel() {
               <MetricCard
                 label="Cavity linewidth κ"
                 value={formatFreq(pred.kappaHz)}
-                sub={`Q = ${Math.pow(10, Qexp).toExponential(0)}`}
+                sub={`Q = ${Math.pow(10, s.Qexp).toExponential(0)}`}
               />
               <MetricCard
                 label="Parametric coupling λ"
@@ -287,6 +305,30 @@ export default function CircuitQEDPanel() {
           </Panel>
         </div>
       </div>
+
+      <Panel title="Pump scan across the 2·f₀ resonance">
+        <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-amber-600 mb-3 leading-relaxed">
+          What you would sweep in the lab: pair rate (cyan) vs pump frequency,
+          log scale, against the thermal floor (red). Off resonance the rate
+          collapses; the resonance width is κ/2. If the cyan line does not
+          clear the red one, there is nothing to detect.
+        </p>
+        <CqedSweep base={params} />
+      </Panel>
+
+      <Panel title="Proving the pairs: correlation spectroscopy (g²)">
+        <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-amber-600 mb-4 leading-relaxed">
+          A count rate alone never proves vacuum origin — a warm resistor
+          emits photons too. The pair signature is correlation: vacuum pairs
+          exit in twos, one into each output mode, so coincidences violate
+          the classical Cauchy–Schwarz bound. This is the measurement that
+          sealed the 2011 result.
+        </p>
+        <G2Correlation
+          defaultPairNumber={defaultPairNumber}
+          defaultThermal={pred.thermalOccupation}
+        />
+      </Panel>
 
       <Panel title="Scope and honesty">
         <p className="text-xs leading-relaxed dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700">
