@@ -27,6 +27,8 @@ export interface DevicePrediction {
   j1: number;
   claimedW: number;
   shortfall: number;
+  /** Centrifugal acceleration at the rotor rim, a = v²/r, in g. */
+  rimAccelerationG: number;
 }
 
 /**
@@ -68,6 +70,7 @@ export function predictDevice(p: DeviceParams): DevicePrediction {
 
   const claimedW = 1.3;
   const shortfall = P_output > 0 ? claimedW / P_output : Infinity;
+  const rimAccelerationG = r > 0 ? (v * v) / r / 9.80665 : 0;
 
   return {
     f0Hz,
@@ -83,6 +86,7 @@ export function predictDevice(p: DeviceParams): DevicePrediction {
     j1,
     claimedW,
     shortfall,
+    rimAccelerationG,
   };
 }
 

@@ -62,6 +62,20 @@ export default function DeviceSanity({ p, Q, beta }: Props) {
     status: p.shortfall < 10 ? "pass" : "fail",
   });
 
+  checks.push({
+    key: "material",
+    label: "Rotor survives its own spin  (rim acceleration)",
+    detail: `a = v²/r = ${p.rimAccelerationG.toExponential(2)} g  ·  ${
+      p.rimAccelerationG > 1e6
+        ? "beyond any demonstrated micro-rotor — it shatters long before physics gets interesting"
+        : p.rimAccelerationG > 1e4
+          ? "extreme MEMS territory"
+          : "within material limits"
+    }`,
+    status:
+      p.rimAccelerationG > 1e6 ? "fail" : p.rimAccelerationG > 1e4 ? "warn" : "pass",
+  });
+
   const Icon = (s: Status) =>
     s === "pass" ? (
       <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />

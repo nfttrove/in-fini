@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Beaker, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import Panel from "../ui/Panel";
-import { ThrustParams } from "../../utils/thrustLeakage";
+import { ThrustParams, verdictStability } from "../../utils/thrustLeakage";
 import { supabase, supabaseConfigured } from "../../lib/supabase";
 import { THRUST_PRESETS } from "../../data/thrustPresets";
 
@@ -82,9 +82,11 @@ function builtInPresets(): PresetItem[] {
 function PresetCard({
   item,
   onLoad,
+  stability,
 }: {
   item: PresetItem;
   onLoad: () => void;
+  stability?: { dominantShare: number; tally: Record<string, number> };
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -99,7 +101,22 @@ function PresetCard({
             <div className="text-sm font-medium dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200 group-hover:text-cyan-300 transition-colors truncate">
               {item.name}
             </div>
-            <div className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 mt-0.5">{item.verdict}</div>
+            <div className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 mt-0.5">
+              {item.verdict}
+              {stability && stability.dominantShare < 0.95 && (
+                <span
+                  className="ml-1.5 text-amber-400"
+                  title={`Verdict flips under ±20% parameter jitter: ${Object.entries(
+                    stability.tally
+                  )
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([k, v]) => `${k} ${(100 * v / 120).toFixed(0)}%`)
+                    .join(" / ")}`}
+                >
+                  ⚠ boundary-sensitive
+                </span>
+              )}
+            </div>
           </div>
           <Beaker className="w-4 h-4 dark-mode:text-slate-600 light-mode:text-slate-400 coffee-mode:text-slate-600 group-hover:text-cyan-400 transition-colors flex-shrink-0 mt-0.5" />
         </div>
@@ -132,6 +149,16 @@ export default function ThrustPresetPicker({ onLoad }: Props) {
   const [presets, setPresets] = useState<PresetItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Robustness of each built-in preset's verdict under ±20% jitter,
+  // computed once from the same engine the verdicts come from.
+  const stabilityByParams = useMemo(() => {
+    const map = new Map<ThrustParams, { dominantShare: number; tally: Record<string, number> }>();
+    for (const preset of Object.values(THRUST_PRESETS)) {
+      map.set(preset.params, verdictStability(preset.params, { trials: 120 }));
+    }
+    return map;
+  }, []);
 
   useEffect(() => {
     const fetchPresets = async () => {
@@ -197,6 +224,7 @@ export default function ThrustPresetPicker({ onLoad }: Props) {
               key={preset.name}
               item={preset}
               onLoad={() => onLoad(preset.params)}
+              stability={stabilityByParams.get(preset.params)}
             />
           ))}
         </div>

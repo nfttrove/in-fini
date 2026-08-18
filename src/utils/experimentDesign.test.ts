@@ -47,7 +47,7 @@ describe("thrustRequirements (round-trip against the real channels)", () => {
 
   it("splits the claim across channels in quadrature", () => {
     expect(res.sigmaPerChannel).toBeCloseTo(
-      TCTX.claimedDeltaG / (2 * Math.sqrt(5)),
+      TCTX.claimedDeltaG / (2 * Math.sqrt(4)),
       10
     );
   });

@@ -70,7 +70,7 @@ export interface ThrustDesignContext {
 
 export function thrustRequirements(ctx: ThrustDesignContext): DesignResult {
   const k = ctx.k ?? 2;
-  const N = 5; // ion wind, vibration, electrostatic, convection, buoyancy
+  const N = 4; // ion wind, vibration, electrostatic, thermal buoyancy
   const allow = ctx.claimedDeltaG / (k * Math.sqrt(N));
 
   // vibration: value_mG = m ω² x / g × 1000 → x_max
@@ -94,9 +94,7 @@ export function thrustRequirements(ctx: ThrustDesignContext): DesignResult {
   // electrostatic: value_mG = ½ ε₀ E² A / g × 1000 → E_max
   const eMax = Math.sqrt((2 * allow * G) / (1000 * EPS0 * ctx.plateAreaM2));
 
-  // convection & buoyancy are linear in the temperature gradient, and both
-  // see the same gradient, so one requirement covers both. Scale via the
-  // convection channel (the larger of the two at typical aspect ratios).
+  // The thermal channel is linear in the temperature gradient.
   const convNow = thermalConvectionG(
     ctx.tempGradKPerM,
     ctx.deviceHeightM,
@@ -135,7 +133,7 @@ export function thrustRequirements(ctx: ThrustDesignContext): DesignResult {
       },
       {
         key: "thermal",
-        label: "Vertical temperature gradient (covers convection + buoyancy)",
+        label: "Vertical temperature gradient (thermal buoyancy channel)",
         value: gradMax,
         unit: "K/m",
         asFractionOfReference: frac(ctx.tempGradKPerM, gradMax),

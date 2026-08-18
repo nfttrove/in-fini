@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { besselJ1, dceThrustLimitG, type ThrustParams } from "./thrustLeakage";
+import { besselJ1, dceThrustLimitG, computeThrustBudget, verdictStability, type ThrustParams } from "./thrustLeakage";
 
 const base: ThrustParams = {
   claimedDeltaG: 0,
@@ -89,5 +89,91 @@ describe("dceThrustLimitG — the ceiling is watts-scale, not watts×c", () => {
     expect(dceThrustLimitG({ ...base, cavityGap_nm: 0 })).toBe(0);
     expect(dceThrustLimitG({ ...base, driveFrequency_Hz: 0 })).toBe(0);
     expect(dceThrustLimitG({ ...base, activeArea_cm2: 0 })).toBe(0);
+  });
+});
+
+describe("no duplicate channels (double-count regression)", () => {
+  // The budget once listed "convection" and "buoyancy" as separate channels
+  // with algebraically identical formulas — the same physics counted twice.
+  // Found by the permutation sweep; this test keeps it dead.
+  it("every channel is distinct across randomized parameters", () => {
+    const ref = computeThrustBudget(base).channels;
+    expect(ref.map((c) => c.key)).toEqual([
+      "ionWind",
+      "vibration",
+      "electrostatic",
+      "thermal",
+    ]);
+    for (let i = 0; i < 200; i++) {
+      const jittered: ThrustParams = {
+        ...base,
+        driveVoltageV: 100 + Math.random() * 49000,
+        ambientPressurePa: 100 + Math.random() * 101325,
+        electrodeGapM: 1e-3 + Math.random() * 0.1,
+        deviceMassKg: 0.01 + Math.random() * 5,
+        vibrationAmpNm: 10 + Math.random() * 5000,
+        vibrationFreqHz: 5 + Math.random() * 900,
+        tempGradientKPerM: Math.random() * 20,
+        deviceHeightM: 0.005 + Math.random() * 2,
+        plateAreaM2: 0.0001 + Math.random(),
+        electrostaticFieldVPerM: 100 + Math.random() * 1e6,
+      };
+      const ch = computeThrustBudget(jittered).channels;
+      for (let a = 0; a < ch.length; a++) {
+        for (let b = a + 1; b < ch.length; b++) {
+          const rel =
+            Math.abs(ch[a].valueG - ch[b].valueG) /
+            Math.max(Math.abs(ch[a].valueG), Math.abs(ch[b].valueG), 1e-30);
+          expect(rel).toBeGreaterThan(1e-6);
+        }
+      }
+    }
+  });
+});
+
+describe("verdictStability", () => {
+  it("flags Podkletnov as boundary-sensitive under ±20% jitter", () => {
+    // Parameters from the famous preset:
+    const s = verdictStability(
+      {
+        claimedDeltaG: 2, driveVoltageV: 10000, ambientPressurePa: 101325,
+        electrodeGapM: 0.03, deviceMassKg: 0.1, vibrationAmpNm: 1000,
+        vibrationFreqHz: 50, tempGradientKPerM: 1, deviceHeightM: 0.15,
+        plateAreaM2: 0.03, electrostaticFieldVPerM: 10000, cavityGap_nm: 100,
+        rotorRadius_um: 50, modulationDepth_beta: 0.5, cavityQ: 10000,
+        activeArea_cm2: 1, driveFrequency_Hz: 1e6,
+      },
+      { trials: 400 }
+    );
+    expect(s.boundary).toBe(true);
+    expect(Object.keys(s.tally).length).toBeGreaterThan(1);
+  });
+
+  it("finds Manchester Sphere rock-stable", () => {
+    const s = verdictStability(
+      {
+        claimedDeltaG: 0.18, driveVoltageV: 50000, ambientPressurePa: 101325,
+        electrodeGapM: 0.05, deviceMassKg: 0.5, vibrationAmpNm: 500,
+        vibrationFreqHz: 30, tempGradientKPerM: 0.2, deviceHeightM: 0.15,
+        plateAreaM2: 0.02, electrostaticFieldVPerM: 50000, cavityGap_nm: 100,
+        rotorRadius_um: 50, modulationDepth_beta: 0.5, cavityQ: 10000,
+        activeArea_cm2: 1, driveFrequency_Hz: 1e6,
+      },
+      { trials: 200 }
+    );
+    expect(s.boundary).toBe(false);
+    expect(s.dominant).toBe("explained");
+  });
+
+  it("is deterministic per seed", () => {
+    const p = {
+      claimedDeltaG: 2, driveVoltageV: 10000, ambientPressurePa: 101325,
+      electrodeGapM: 0.03, deviceMassKg: 0.1, vibrationAmpNm: 1000,
+      vibrationFreqHz: 50, tempGradientKPerM: 1, deviceHeightM: 0.15,
+      plateAreaM2: 0.03, electrostaticFieldVPerM: 10000, cavityGap_nm: 100,
+      rotorRadius_um: 50, modulationDepth_beta: 0.5, cavityQ: 10000,
+      activeArea_cm2: 1, driveFrequency_Hz: 1e6,
+    };
+    expect(verdictStability(p)).toEqual(verdictStability(p));
   });
 });

@@ -19,6 +19,7 @@ export interface ThrustParams {
 }
 
 import { SigmaAssessment, assessResidual, combinedSigma } from "./uncertainty";
+import { seededRandom } from "./residuals";
 
 export interface ThrustChannel {
   key: string;
@@ -183,18 +184,38 @@ export function dceThrustLimitG(p: ThrustParams): number {
   return force_mg;
 }
 
-export function buoyancyShiftG(
-  tempGradKPerM: number,
-  heightM: number,
-  areaM2: number
-): number {
-  const vol = areaM2 * heightM;
-  const deltaT = tempGradKPerM * heightM;
-  const deltaRho = RHO_AIR_STP * BETA_AIR * deltaT;
-  return deltaRho * vol * 1000;
+/**
+ * Verdict robustness: jitter every parameter ±`jitter` fraction and recount
+ * the verdicts. A preset whose verdict flips on plausible measurement
+ * uncertainty is boundary-sensitive — a fact worth showing next to the
+ * verdict itself. Deterministic via seededRandom.
+ */
+export function verdictStability(
+  p: ThrustParams,
+  opts: { trials?: number; jitter?: number; seed?: number } = {}
+): { dominant: string; dominantShare: number; boundary: boolean; tally: Record<string, number> } {
+  const trials = opts.trials ?? 120;
+  const jitter = opts.jitter ?? 0.2;
+  const rnd = seededRandom(opts.seed ?? 1234);
+  const tally: Record<string, number> = {};
+  for (let i = 0; i < trials; i++) {
+    const q: ThrustParams = { ...p };
+    for (const k of Object.keys(q) as (keyof ThrustParams)[]) {
+      q[k] = (q[k] as number) * (1 + 2 * jitter * (rnd() - 0.5));
+    }
+    const v = computeThrustBudget(q).verdict.key;
+    tally[v] = (tally[v] ?? 0) + 1;
+  }
+  const [dominant, count] = Object.entries(tally).sort((a, b) => b[1] - a[1])[0];
+  const share = count / trials;
+  return { dominant, dominantShare: share, boundary: share < 0.95, tally };
 }
 
 export function computeThrustBudget(p: ThrustParams): ThrustBudget {
+  // One thermal channel, once. The budget previously listed "convection"
+  // and "buoyancy" separately, but both reduce to the same Δρ·A·h term —
+  // the same physics counted twice (found by the permutation sweep,
+  // regression-tested below).
   const channels: ThrustChannel[] = [
     {
       key: "ionWind",
@@ -215,16 +236,10 @@ export function computeThrustBudget(p: ThrustParams): ThrustBudget {
       formula: "½ ε₀ E² A / g",
     },
     {
-      key: "convection",
-      label: "Thermal convection lift",
+      key: "thermal",
+      label: "Thermal buoyancy (heated air)",
       valueG: thermalConvectionG(p.tempGradientKPerM, p.deviceHeightM, p.plateAreaM2),
-      formula: "Δρ A h g / g",
-    },
-    {
-      key: "buoyancy",
-      label: "Buoyancy shift (heated air)",
-      valueG: buoyancyShiftG(p.tempGradientKPerM, p.deviceHeightM, p.plateAreaM2),
-      formula: "Δρ · V",
+      formula: "Δρ · A · h",
     },
   ];
 

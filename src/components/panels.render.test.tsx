@@ -52,8 +52,7 @@ describe("ExperimentDesignPanel render", () => {
     );
     expect(html).toContain("What your rig must achieve");
     expect(html).toContain("Vibration amplitude below");
-    // Default claim 0.1 Δg at 2σ over 5 channels:
-    expect(html).toContain("2.24"); // 0.1 / (2·√5) = 0.0224 → ×100 nm scale may vary; check exponent instead
+    expect(html).toContain("Per-channel artifact allowance");
   });
 
   it("flips to power mode requirements via props-free default render", () => {
