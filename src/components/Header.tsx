@@ -1,5 +1,5 @@
 import ThemeSwitcher from "./ThemeSwitcher";
-import { useTheme } from "../contexts/ThemeContext";
+import { useTheme } from "../contexts/theme-context";
 
 const LogoImage = ({ isDark }: { isDark: boolean }) => (
   <img

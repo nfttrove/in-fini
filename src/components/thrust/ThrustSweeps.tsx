@@ -1,5 +1,5 @@
 import { useMemo, useRef, useEffect, useState } from "react";
-import { useTheme } from "../../contexts/ThemeContext";
+import { useTheme } from "../../contexts/theme-context";
 import Panel from "../ui/Panel";
 import {
   ThrustParams,
@@ -145,7 +145,7 @@ function SweepCanvas({
       residual: d.residualG,
       leakage: d.totalLeakageG,
     }));
-  }, [base.claimedDeltaG, base.driveVoltageV, base.ambientPressurePa, base.electrodeGapM, base.deviceMassKg, base.vibrationAmpNm, base.vibrationFreqHz, base.tempGradientKPerM, base.deviceHeightM, base.plateAreaM2, base.electrostaticFieldVPerM, sweep]);
+  }, [base, sweep]);
 
   const xLabel = sweep === "voltage" ? "Drive voltage (V)" : "Pressure (Pa)";
 

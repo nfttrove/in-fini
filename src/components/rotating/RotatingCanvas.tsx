@@ -25,11 +25,10 @@ export default function RotatingCanvas({
   amplitude,
   cavityLength,
   running,
-  timestep: _timestep = 1e-6,
   onTimeUpdate,
 }: RotatingCanvasProps) {
-  // Note: timestep is available for conscience meter integration but
-  // this panel uses analytical solutions (no numerical integration artifacts)
+  // This panel plots analytical solutions only, so there is no timestep
+  // (and no numerical-integration artifact) to account for.
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const timeRef = useRef(0);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Save, Trash2, Download, RefreshCw } from "lucide-react";
 import {
   SimulationPreset,
@@ -28,7 +28,7 @@ export default function PresetBar({ panel, currentParams, onLoad }: PresetBarPro
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function refresh() {
+  const refresh = useCallback(async () => {
     try {
       setBusy(true);
       setError(null);
@@ -39,11 +39,11 @@ export default function PresetBar({ panel, currentParams, onLoad }: PresetBarPro
     } finally {
       setBusy(false);
     }
-  }
+  }, [panel]);
 
   useEffect(() => {
     refresh();
-  }, [panel]);
+  }, [refresh]);
 
   async function handleSave() {
     if (!name.trim()) return;

@@ -1,5 +1,5 @@
 import { Sun, Moon, Coffee } from "lucide-react";
-import { useTheme } from "../contexts/ThemeContext";
+import { useTheme } from "../contexts/theme-context";
 
 export default function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
