@@ -73,10 +73,13 @@ cd in-fini
 npm install
 ```
 
-### Environment variables (required)
+### Environment variables (optional)
 
-The app initialises the Supabase client at import time and **will not start without
-these** — `createClient` throws `supabaseUrl is required` and the page white-screens:
+Without `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` the app still runs:
+every panel computes, and the Thrust panel serves its famous-claims presets
+from the built-in copy in `src/data/thrustPresets.ts`. Only cloud-backed
+features are unavailable — preset save/load and diagnostic-run history show a
+"Supabase is not configured" notice instead. To enable them, create:
 
 ```bash
 # .env.local
@@ -87,8 +90,7 @@ VITE_SUPABASE_ANON_KEY=<your-anon-key>
 Both values come from your Supabase dashboard (Project Settings → API). The anon key is
 public by design; access control is enforced by row-level security (see below).
 
-If you only want to run the unit tests, no environment is needed — the test suite
-exercises the pure calculation modules in `src/utils/` and never touches the network.
+The unit tests never touch the network and need no environment at all.
 
 ### Commands
 
@@ -96,7 +98,7 @@ exercises the pure calculation modules in `src/utils/` and never touches the net
 npm run dev        # start the dev server
 npm run build      # production build to dist/
 npm run preview    # serve the production build
-npm test           # run the Vitest suite (46 tests)
+npm test           # run the Vitest suite (49 tests)
 npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
 ```
@@ -127,20 +129,29 @@ src/
   components/             # one panel per topic (Controls/Metrics/Notes/Sweeps subfiles)
     ui/                   # shared primitives: Slider, MetricCard, GoverningEquation,
                           # PlainExplainer, ConscienceMeter, PresetBar, …
-  contexts/               # theme context (dark / light / coffee)
-  data/                   # built-in thrust-claim presets
-  lib/supabase.ts         # Supabase client + preset/run persistence
+  contexts/               # theme provider (dark / light / coffee) + theme context
+  data/                   # built-in thrust-claim presets (offline fallback, unit-tested)
+  lib/supabase.ts         # Supabase client + preset/run persistence (null-safe when
+                          # env vars are absent)
   utils/                  # the physics and formatting modules (unit-tested)
 supabase/migrations/      # database schema and policies
 ```
 
+## Deployment
+
+The live site (infini.dev) is published through the Bolt.new pipeline — this repo
+has **no CI/CD**: pushing to GitHub does not redeploy it. After merging changes
+here, redeploy from the Bolt workspace (or wire up Netlify/Vercel against the
+repo and `npm run build` to change that).
+
 ## Status and known caveats
 
-- Tests, typecheck and build all pass as of this writing. `npm run lint` has one
-  pre-existing error (an unused variable in `src/components/rotating/RotatingCanvas.tsx`)
-  and three warnings.
+- Tests (49), typecheck, lint and build all pass as of this writing.
+- Dependencies are current within their declared semver ranges. Deliberately
+  *not* upgraded: React 19, Vite 6+, TypeScript 7, Tailwind 4, ESLint 10 are
+  available as majors; the two remaining `npm audit` findings live in the dev
+  toolchain (esbuild via Vite 5) and are fixed by the Vite upgrade.
 - The DCE power and thrust ceilings are generous order-of-magnitude bounds, not
-  first-principles results — by design, so the computed shortfall against a claim is
-  conservative.
-- No license file has been declared yet, despite the "fully open source" copy in the
-  app. If you intend others to reuse it, add one.
+  first-principles results — by design, so the computed shortfall against a
+  claim is conservative.
+- Licensed under the [MIT License](LICENSE).
