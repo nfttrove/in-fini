@@ -19,6 +19,7 @@ import ExperimentDesignPanel from "./components/ExperimentDesignPanel";
 import DataLabPanel from "./components/DataLabPanel";
 import NetworkPanel from "./components/NetworkPanel";
 import AcousticCasimirPanel from "./components/AcousticCasimirPanel";
+import DarkCornersPanel from "./components/DarkCornersPanel";
 import { readUrlParam, writeUrlParam } from "./hooks/usePanelUrlState";
 
 const TABS = [
@@ -118,6 +119,12 @@ const TABS = [
     description:
       "Radiation pressure from sound side-by-side with the vacuum Casimir force — the one fluctuation force you can measure tonight for €25",
   },
+  {
+    id: "dark",
+    label: "Dark Corners (the 95%)",
+    description:
+      "Dark matter through your desk and dark energy's tide across it — the unnamed bulk of the universe computed next to what your instruments can reach",
+  },
 ];
 
 function AppContent() {
@@ -193,6 +200,7 @@ function AppContent() {
           {activeTab === "datalab" && <DataLabPanel />}
           {activeTab === "network" && <NetworkPanel />}
           {activeTab === "acoustic" && <AcousticCasimirPanel />}
+          {activeTab === "dark" && <DarkCornersPanel />}
         </section>
 
         <footer className="mt-20 pt-8 dark-mode:border-slate-800/50 light-mode:border-slate-200 coffee-mode:border-amber-800/40 border-t">
