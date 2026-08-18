@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Beaker, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import Panel from "../ui/Panel";
-import { ThrustParams, verdictStability } from "../../utils/thrustLeakage";
+import { ThrustParams, verdictStability, computeThrustBudget } from "../../utils/thrustLeakage";
 import { supabase, supabaseConfigured } from "../../lib/supabase";
 import { THRUST_PRESETS } from "../../data/thrustPresets";
 
@@ -136,9 +136,21 @@ function PresetCard({
         </button>
 
         {expanded && (
-          <p className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400 italic mt-2 leading-relaxed pb-1">
-            "{item.tagline}"
-          </p>
+          <>
+            <p className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400 italic mt-2 leading-relaxed pb-1">
+              "{item.tagline}"
+            </p>
+            <p className="text-[10px] dark-mode:text-slate-500 light-mode:text-slate-500 coffee-mode:text-amber-700 mt-1 font-mono">
+              distance to legitimacy:{" "}
+              {(() => {
+                const b = computeThrustBudget(item.params);
+                const d = b.sigmaG > 0 ? b.residualG / b.sigmaG : Infinity;
+                return isFinite(d)
+                  ? `${d.toFixed(1)}σ of artifact uncertainty`
+                  : "claim exceeds the budget outright";
+              })()}
+            </p>
+          </>
         )}
       </div>
     </div>

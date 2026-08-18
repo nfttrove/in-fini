@@ -9,6 +9,7 @@ import {
   ThrustDesignContext,
   PowerDesignContext,
 } from "../utils/experimentDesign";
+import { assessDecidability, thermalPowerFloorW } from "../utils/thermalFloor";
 
 type Mode = "thrust" | "power";
 
@@ -33,6 +34,8 @@ export default function ExperimentDesignPanel() {
   const [vibrationAmpNm, setVibrationAmpNm] = useState(100);
   const [plateAreaM2, setPlateAreaM2] = useState(0.01);
   const [tempGradKPerM, setTempGradKPerM] = useState(2);
+  const [rigTempK, setRigTempK] = useState(300);
+  const [rigIntegrationS, setRigIntegrationS] = useState(100);
 
   // Power context
   const [claimedW, setClaimedW] = useState(0.1);
@@ -80,6 +83,15 @@ export default function ExperimentDesignPanel() {
   );
 
   const result = mode === "thrust" ? thrustRequirements(thrustCtx) : powerRequirements(powerCtx);
+
+  const decidability = assessDecidability(claimedDeltaG, {
+    massKg: deviceMassKg,
+    freqHz: vibrationFreqHz,
+    qualityFactor: 100,
+    tempK: rigTempK,
+    integrationS: rigIntegrationS,
+  });
+  const powerFloor = thermalPowerFloorW(rigTempK, rigIntegrationS);
 
   return (
     <div className="space-y-6">
@@ -389,6 +401,90 @@ export default function ExperimentDesignPanel() {
                 );
               })}
             </ul>
+          </Panel>
+
+          <Panel title="The thermal floor — can matter itself arbitrate this?">
+            <div className="space-y-5">
+              <div className="grid grid-cols-2 gap-3">
+                <Slider
+                  label="Rig temperature"
+                  value={rigTempK}
+                  displayValue={`${rigTempK.toFixed(0)} K`}
+                  min={0.01}
+                  max={400}
+                  step={0.01}
+                  onChange={setRigTempK}
+                  minLabel="10 mK"
+                  maxLabel="400 K"
+                />
+                <Slider
+                  label="Integration time"
+                  value={rigIntegrationS}
+                  displayValue={rigIntegrationS >= 3600 ? `${(rigIntegrationS / 3600).toFixed(1)} h` : `${rigIntegrationS.toFixed(0)} s`}
+                  min={1}
+                  max={1e6}
+                  step={1}
+                  onChange={setRigIntegrationS}
+                  minLabel="1 s"
+                  maxLabel="12 days"
+                />
+              </div>
+              {mode === "thrust" ? (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <MetricCard
+                      label="Thermal force floor of the test mass"
+                      value={`${decidability.floorG.toExponential(2)} Δg`}
+                      sub="√(4k_B·T·m·ω/Qτ) — Brownian limit"
+                    />
+                    <MetricCard
+                      label="Claim ÷ floor"
+                      value={decidability.ratio.toExponential(2) + "×"}
+                      sub="how much matter can arbitrate"
+                      color={
+                        decidability.verdict.tone === "emerald"
+                          ? "dark-mode:text-emerald-400 light-mode:text-emerald-600 coffee-mode:text-emerald-400"
+                          : decidability.verdict.tone === "red"
+                            ? "dark-mode:text-red-400 light-mode:text-red-600 coffee-mode:text-red-400"
+                            : undefined
+                      }
+                    />
+                  </div>
+                  <div className={`rounded-xl border p-4 ${
+                    decidability.verdict.tone === "emerald"
+                      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                      : decidability.verdict.tone === "amber"
+                        ? "border-amber-500/40 bg-amber-500/10 text-amber-300"
+                        : "border-red-500/40 bg-red-500/10 text-red-300"
+                  }`}>
+                    <div className="font-semibold text-sm">{decidability.verdict.label}</div>
+                    <p className="text-xs mt-1 leading-relaxed opacity-90">
+                      {decidability.verdict.description}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <MetricCard
+                    label="Energy floor (one kT per measurement)"
+                    value={`${powerFloor.toExponential(2)} W`}
+                    sub="k_B·T/τ — matched-filter bound"
+                  />
+                  <MetricCard
+                    label="Claim ÷ floor"
+                    value={(claimedW / powerFloor).toExponential(2) + "×"}
+                    sub="claim vs smallest meaningfully measurable power"
+                  />
+                </div>
+              )}
+              <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-amber-600 leading-relaxed">
+                Beyond artifacts and error bars there is a third wall: the test
+                mass is made of atoms, and atoms at temperature T jitter. A
+                claim below that jitter is not false — it is unwitnessable by
+                any matter-based instrument at that temperature. Cooling helps
+                only as √T.
+              </p>
+            </div>
           </Panel>
 
           <Panel title="What this does NOT guarantee">

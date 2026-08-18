@@ -39,7 +39,7 @@ gross-excess* — based on how much of the claim the mundane channels account fo
 
 ### The physics modules
 
-All numerical models live in `src/utils/` and are unit-tested (103 tests, Vitest):
+All numerical models live in `src/utils/` and are unit-tested (111 tests, Vitest):
 
 - `physics.ts` — Casimir pressure `−π²ħc/240d⁴`, force and energy; cavity mode
   frequencies `fₙ = n·c/2L`; Lorentzian cavity response.
@@ -68,6 +68,11 @@ All numerical models live in `src/utils/` and are unit-tested (103 tests, Vitest
   and a seeded synthetic-trace generator for the blind challenge.
 - `correlation.ts` — Gaussian-moment g² correlations for thermal + pair
   states and the Cauchy–Schwarz violation criterion.
+- `thermalFloor.ts` — the measurability limit of matter itself: Brownian
+  force noise √(4k_B·T·m·ω/Qτ), equipartition jitter, the kT power bound,
+  and a three-way decidability verdict (decidable / marginal / sub-thermal —
+  the last meaning no instrument made of atoms at that temperature could
+  ever witness the claim).
 - `format.ts` — SI-prefixed formatting helpers.
 
 A note on intellectual honesty, since it's the point of the project: analytic panels are
@@ -119,7 +124,7 @@ The unit tests never touch the network and need no environment at all.
 npm run dev        # start the dev server
 npm run build      # production build to dist/
 npm run preview    # serve the production build
-npm test           # run the Vitest suite (103 tests)
+npm test           # run the Vitest suite (111 tests)
 npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
 ```
