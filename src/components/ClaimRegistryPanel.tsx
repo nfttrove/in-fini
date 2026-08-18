@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FileText, Gavel, RefreshCw, Send } from "lucide-react";
+import { BookmarkCheck, FileText, Gavel, RefreshCw, Send } from "lucide-react";
 import Panel from "./ui/Panel";
 import PlainExplainer from "./ui/PlainExplainer";
 import Slider from "./ui/Slider";
@@ -10,8 +10,12 @@ import { formatPower } from "../utils/device";
 import { formatForce } from "../utils/physics";
 import {
   ClaimEntry,
+  Preregistration,
+  claimHash,
   fileClaim,
   listClaims,
+  listPreregistrations,
+  savePreregistration,
   supabaseConfigured,
 } from "../lib/supabase";
 
@@ -84,6 +88,8 @@ export default function ClaimRegistryPanel() {
           leakage: powerBudget.totalLeakageW,
           residual: powerBudget.residualW,
           residualFrac: powerBudget.residualFrac,
+          sigma: powerBudget.sigmaW,
+          sigmaAssessment: powerBudget.sigmaAssessment,
           verdictKey: powerBudget.verdict.key,
           verdictLabel: powerBudget.verdict.label,
           verdictDescription: powerBudget.verdict.description,
@@ -97,6 +103,8 @@ export default function ClaimRegistryPanel() {
           leakage: thrustBudget.totalLeakageG,
           residual: thrustBudget.residualG,
           residualFrac: thrustBudget.residualFrac,
+          sigma: thrustBudget.sigmaG,
+          sigmaAssessment: thrustBudget.sigmaAssessment,
           verdictKey: thrustBudget.verdict.key,
           verdictLabel: thrustBudget.verdict.label,
           verdictDescription: thrustBudget.verdict.description,
@@ -104,12 +112,29 @@ export default function ClaimRegistryPanel() {
           params: thrust as unknown as Record<string, number>,
         };
 
+  const [preregs, setPreregs] = useState<Preregistration[]>([]);
+  const [preregNote, setPreregNote] = useState<string | null>(null);
+  const [matchedClaimIds, setMatchedClaimIds] = useState<Set<string>>(new Set());
+
   const refresh = useCallback(async () => {
     if (!supabaseConfigured) return;
     try {
       setBusy(true);
       setError(null);
-      setClaims(await listClaims());
+      const [claimList, preregList] = await Promise.all([
+        listClaims(),
+        listPreregistrations(),
+      ]);
+      setClaims(claimList);
+      setPreregs(preregList);
+      // Match filed claims to pre-registrations by canonical hash.
+      const hashes = new Set(preregList.map((p) => p.param_hash));
+      const matched = new Set<string>();
+      for (const c of claimList) {
+        const h = await claimHash(c.title, c.claim_type, c.claimed_value);
+        if (hashes.has(h)) matched.add(c.id);
+      }
+      setMatchedClaimIds(matched);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -142,8 +167,45 @@ export default function ClaimRegistryPanel() {
           : 1e9,
         params: budget.params,
       });
-      setFiled(`Filed "${entry.title}" — verdict: ${entry.verdict_label}.`);
+      // Does this filing match a prior pre-registration?
+      const h = await claimHash(entry.title, entry.claim_type, entry.claimed_value);
+      const wasPreregistered = preregs.some((p) => p.param_hash === h);
+      setFiled(
+        wasPreregistered
+          ? `Filed "${entry.title}" — verdict: ${entry.verdict_label}. Matches a prior pre-registration ✓`
+          : `Filed "${entry.title}" — verdict: ${entry.verdict_label}. (No matching pre-registration: nobody predicted this in advance.)`
+      );
       setTitle("");
+      await refresh();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handlePreregister() {
+    const trimmed = title.trim();
+    if (trimmed.length < 3) {
+      setError("Give the claim a title first (at least 3 characters).");
+      return;
+    }
+    try {
+      setBusy(true);
+      setError(null);
+      setPreregNote(null);
+      const h = await claimHash(trimmed.slice(0, 80), claimType, budget.claimed);
+      await savePreregistration({
+        claim_type: claimType,
+        title: trimmed.slice(0, 80),
+        claimed_value: budget.claimed,
+        claimed_unit: budget.unit,
+        param_hash: h,
+        params: budget.params,
+      });
+      setPreregNote(
+        `Pre-registered "${trimmed.slice(0, 80)}" (${budget.claimed.toPrecision(6)} ${budget.unit}). This prediction is now timestamped and public — file the real result after the experiment, and the registry will mark the match.`
+      );
       await refresh();
     } catch (e) {
       setError((e as Error).message);
@@ -311,6 +373,21 @@ export default function ClaimRegistryPanel() {
               File this claim in the public registry
             </button>
 
+            <button
+              onClick={handlePreregister}
+              disabled={busy || !supabaseConfigured}
+              className="w-full dark-mode:bg-slate-700 hover:dark-mode:bg-slate-600 light-mode:bg-slate-200 hover:light-mode:bg-slate-300 coffee-mode:bg-slate-700 hover:coffee-mode:bg-slate-600 disabled:opacity-40 dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-amber-100 rounded-lg px-3 py-2.5 text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+            >
+              <BookmarkCheck className="w-4 h-4" />
+              Pre-register this prediction (before you run the experiment)
+            </button>
+
+            {preregNote && (
+              <p className="text-xs text-sky-300 bg-sky-900/20 rounded px-3 py-2 leading-relaxed">
+                {preregNote}
+              </p>
+            )}
+
             {!supabaseConfigured && (
               <p className="text-xs text-red-400 bg-red-900/20 rounded px-3 py-2">
                 Cloud registry is unavailable: Supabase is not configured. The
@@ -354,13 +431,9 @@ export default function ClaimRegistryPanel() {
                 sub="summed mundane channels"
               />
               <MetricCard
-                label="Unexplained residual"
-                value={budget.format(Math.max(budget.residual, 0))}
-                sub={
-                  Number.isFinite(budget.residualFrac)
-                    ? `${(budget.residualFrac * 100).toFixed(1)}% of claim`
-                    : "claim exceeds budget entirely"
-                }
+                label="Unexplained residual ± σ"
+                value={`${budget.format(Math.max(budget.residual, 0))} ± ${budget.format(budget.sigma)}`}
+                sub="25% channel uncertainty, RSS"
                 color="dark-mode:text-amber-400 light-mode:text-amber-600 coffee-mode:text-amber-400"
               />
               <MetricCard
@@ -368,6 +441,14 @@ export default function ClaimRegistryPanel() {
                 value={`${Object.keys(budget.params).length} params`}
                 sub="all filed with the claim"
               />
+            </div>
+            <div className="mt-4 rounded-lg border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700 px-3.5 py-3">
+              <div className="text-xs font-semibold dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-amber-100">
+                With error bars: {budget.sigmaAssessment.label}
+              </div>
+              <p className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700 mt-1 leading-relaxed">
+                {budget.sigmaAssessment.description}
+              </p>
             </div>
           </Panel>
 
@@ -414,6 +495,11 @@ export default function ClaimRegistryPanel() {
                     </div>
                     <div className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700/80 mt-1">
                       claims {c.claimed_value.toExponential(2)} {c.claimed_unit} ·{" "}
+                      {matchedClaimIds.has(c.id) && (
+                        <span className="text-sky-400 mr-1" title="Matches a prior pre-registration">
+                          pre-registered ✓
+                        </span>
+                      )}
                       <span
                         className={
                           c.verdict_key === "explained" ||

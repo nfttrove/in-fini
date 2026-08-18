@@ -207,3 +207,72 @@ export async function fileClaim(entry: {
   if (error) throw error;
   return data as ClaimEntry;
 }
+
+// ---------------------------------------------------------------------------
+// Pre-registrations (registry v2)
+// ---------------------------------------------------------------------------
+
+export interface Preregistration {
+  id: string;
+  claim_type: "power" | "thrust";
+  title: string;
+  claimed_value: number;
+  claimed_unit: string;
+  param_hash: string;
+  created_at: string;
+}
+
+/**
+ * Canonical commitment string: title + type + magnitude at 6 significant
+ * digits. Shared by pre-registering and by matching a later filed claim,
+ * so both sides compute the identical hash. Not secret — verifiable.
+ */
+export function canonicalClaimString(
+  title: string,
+  claim_type: "power" | "thrust",
+  claimed_value: number
+): string {
+  const t = title.trim().toLowerCase().replace(/\s+/g, " ");
+  return `${t}|${claim_type}|${claimed_value.toPrecision(6)}`;
+}
+
+export async function claimHash(
+  title: string,
+  claim_type: "power" | "thrust",
+  claimed_value: number
+): Promise<string> {
+  const data = new TextEncoder().encode(
+    canonicalClaimString(title, claim_type, claimed_value)
+  );
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+export async function listPreregistrations(): Promise<Preregistration[]> {
+  const { data, error } = await requireClient()
+    .from("preregistrations")
+    .select("id,claim_type,title,claimed_value,claimed_unit,param_hash,created_at")
+    .order("created_at", { ascending: false })
+    .limit(100);
+  if (error) throw error;
+  return (data ?? []) as Preregistration[];
+}
+
+export async function savePreregistration(entry: {
+  claim_type: "power" | "thrust";
+  title: string;
+  claimed_value: number;
+  claimed_unit: string;
+  param_hash: string;
+  params: Record<string, number>;
+}): Promise<Preregistration> {
+  const { data, error } = await requireClient()
+    .from("preregistrations")
+    .insert(entry)
+    .select("id,claim_type,title,claimed_value,claimed_unit,param_hash,created_at")
+    .maybeSingle();
+  if (error) throw error;
+  return data as Preregistration;
+}
