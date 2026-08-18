@@ -14,7 +14,7 @@ test: if a discovery disappears when you halve the timestep, it was never real.
 
 ## What's inside
 
-The app is organised as thirteen tabs, each a self-contained mini-experiment:
+The app is organised as fifteen tabs, each a self-contained mini-experiment:
 
 | Tab | What it shows |
 | --- | --- |
@@ -29,15 +29,17 @@ The app is organised as thirteen tabs, each a self-contained mini-experiment:
 | **Device Model — Power from Vacuum** | End-to-end prediction combining Casimir gap, rotor drive and Bessel up-conversion, compared against a claimed 1.3 W output |
 | **Leakage & Artifact Diagnostic** | A claimed power output vs. joule, RF, blackbody, mechanical and triboelectric leakage channels |
 | **Thrust & Weight Diagnostic** | A claimed weight change vs. ion wind, vibration, electrostatic and thermal-convection channels, with historical-claim presets |
-| **Circuit QED (microwave DCE)** | The regime where the dynamical Casimir effect was actually measured (Wilson et al., Nature 2011): parametric pumping at 2·f₀, thermal noise floor, parametric-oscillation threshold |
-| **Claim Registry** | File an anomalous power/thrust claim together with its computed artifact budget into a public, reproducible record |
+| **Circuit QED (microwave DCE)** | The regime where the dynamical Casimir effect was actually measured (Wilson et al., Nature 2011): parametric pumping at 2·f₀, thermal noise floor, parametric-oscillation threshold, pump-frequency scan, and g² correlation spectroscopy with the Cauchy–Schwarz test |
+| **Claim Registry** | File an anomalous power/thrust claim together with its computed artifact budget and uncertainty into a public, reproducible record; pre-register predictions before running the experiment |
+| **Experiment Design** | The budget engines inverted: state the effect you want to detect and at how many σ, get the rig requirements (vibration floor, pressure, shielding, temperature stability) — round-trip tested against the forward engines |
+| **Data Lab & Challenge** | Paste your own measurement series: drift removal, mains-comb identification, FFT spectrum and residual statistics — plus a blind "artifact or anomaly?" training game |
 
 Diagnostic panels end in a colour-coded verdict — *explained / partial / excess /
 gross-excess* — based on how much of the claim the mundane channels account for.
 
 ### The physics modules
 
-All numerical models live in `src/utils/` and are unit-tested (63 tests, Vitest):
+All numerical models live in `src/utils/` and are unit-tested (99 tests, Vitest):
 
 - `physics.ts` — Casimir pressure `−π²ħc/240d⁴`, force and energy; cavity mode
   frequencies `fₙ = n·c/2L`; Lorentzian cavity response.
@@ -54,6 +56,18 @@ All numerical models live in `src/utils/` and are unit-tested (63 tests, Vitest)
   pair rate λ²/κ, oscillation threshold 2λ ≥ κ, and counting SNR. Order-of-
   magnitude forms with O(1) prefactors dropped, same convention as the device
   model.
+- `uncertainty.ts` — per-channel uncertainty propagation (RSS) and
+  σ-aware residual classification; both budget engines now report
+  `sigmaW`/`sigmaG` and a `sigmaAssessment` alongside the verdict.
+- `experimentDesign.ts` — the inverter: solves each artifact channel's
+  formula for the physical parameter that keeps it under a per-channel
+  allowance S/(k·√N). Round-trip tests plug the limits back into the
+  forward engines.
+- `residuals.ts` — robust series parsing, least-squares detrending, an
+  in-place radix-2 FFT, mains-family identification, residual statistics,
+  and a seeded synthetic-trace generator for the blind challenge.
+- `correlation.ts` — Gaussian-moment g² correlations for thermal + pair
+  states and the Cauchy–Schwarz violation criterion.
 - `format.ts` — SI-prefixed formatting helpers.
 
 A note on intellectual honesty, since it's the point of the project: analytic panels are
@@ -105,7 +119,7 @@ The unit tests never touch the network and need no environment at all.
 npm run dev        # start the dev server
 npm run build      # production build to dist/
 npm run preview    # serve the production build
-npm test           # run the Vitest suite (65 tests)
+npm test           # run the Vitest suite (99 tests)
 npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
 ```
@@ -113,7 +127,7 @@ npm run lint       # eslint
 ## Supabase backend
 
 SQL migrations are in `supabase/migrations/` (apply them with the Supabase CLI or by
-pasting them into the SQL editor in creation order). Four tables:
+pasting them into the SQL editor in creation order). Five tables:
 
 - **`simulation_presets`** — user-saved parameter sets per panel. Anonymous by design:
   inserts are open, but deletion is authorised by a per-preset `owner_token` generated
@@ -124,8 +138,13 @@ pasting them into the SQL editor in creation order). Four tables:
 - **`diagnostic_runs`** — saved leakage-diagnostic results (params + verdict).
 - **`thrust_presets`** — the built-in historical-claim presets.
 - **`claim_registry`** — public claim filings (claim + parameters + computed
-  verdict). Public read, bounded anonymous insert, intentionally no delete in
-  v1: it is a record, not a scratchpad.
+  verdict + uncertainty). Public read, bounded anonymous insert, intentionally
+  no delete in v1: it is a record, not a scratchpad. Seeded with the famous
+  historical cases, their verdicts computed by these same engines.
+- **`preregistrations`** — timestamped predictions committed before an
+  experiment (client-side SHA-256 over a canonical title/type/magnitude
+  string). Filed claims matching a prior pre-registration are flagged
+  "pre-registered" in the registry list.
 
 Two later migrations are security fixes worth knowing about before forking the schema:
 `20260710002212` hides `owner_token` from the API (it was previously readable by
@@ -146,6 +165,27 @@ src/
   utils/                  # the physics and formatting modules (unit-tested)
 supabase/migrations/      # database schema and policies
 ```
+
+## Sharing and permalinks
+
+Every tab lives in the URL (`?tab=cqed`), and the parameter-backed panels
+(Circuit QED, both diagnostics) encode their full slider state in the query
+string — copy the address bar to share an exact, reproducible configuration.
+
+## Using the physics modules
+
+All pure calculation modules are re-exported, namespaced, from
+`src/physics.ts` — no React, no DOM, no network:
+
+```ts
+import { casimir, thrust, cqed, residuals } from "./physics";
+casimir.casimirForce(100e-9, 1e-4);
+residuals.analyzeSeries(t, y, { mainsHz: 50 });
+```
+
+Publishing this as an npm package is one command away (`physics.ts` is the
+entry point); it needs the repo owner's npm login, so it has deliberately
+not been published from here.
 
 ## Deployment
 
