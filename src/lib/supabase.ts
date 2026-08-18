@@ -3,7 +3,23 @@ import { createClient } from "@supabase/supabase-js";
 const url = import.meta.env.VITE_SUPABASE_URL;
 const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(url, anon);
+/**
+ * Null when VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are not set (e.g. a
+ * fresh clone without .env.local). The app must still render and compute —
+ * only cloud-backed features (saving/loading presets, run history) report
+ * themselves as unavailable.
+ */
+export const supabase = url && anon ? createClient(url, anon) : null;
+
+export const supabaseConfigured = supabase !== null;
+
+const NOT_CONFIGURED_MESSAGE =
+  "Cloud presets are unavailable: Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local to enable them.";
+
+function requireClient() {
+  if (!supabase) throw new Error(NOT_CONFIGURED_MESSAGE);
+  return supabase;
+}
 
 export interface SimulationPreset {
   id: string;
@@ -67,7 +83,7 @@ function makeOwnerToken(): string {
 }
 
 export async function listPresets(panel: string): Promise<SimulationPreset[]> {
-  const { data, error } = await supabase
+  const { data, error } = await requireClient()
     .from("simulation_presets")
     .select("id,panel,name,params,created_at")
     .eq("panel", panel)
@@ -83,7 +99,7 @@ export async function savePreset(
   params: Record<string, number | boolean | string>
 ): Promise<SimulationPreset> {
   const ownerToken = makeOwnerToken();
-  const { data, error } = await supabase
+  const { data, error } = await requireClient()
     .from("simulation_presets")
     .insert({ panel, name, params, owner_token: ownerToken })
     .select("id,panel,name,params,created_at")
@@ -99,7 +115,7 @@ export async function deletePreset(id: string): Promise<void> {
   if (!token) {
     throw new Error("You can only delete presets you created on this device.");
   }
-  const { data, error } = await supabase.rpc("delete_preset", {
+  const { data, error } = await requireClient().rpc("delete_preset", {
     p_id: id,
     p_token: token,
   });
@@ -124,7 +140,7 @@ export interface DiagnosticRun {
 }
 
 export async function listDiagnosticRuns(): Promise<DiagnosticRun[]> {
-  const { data, error } = await supabase
+  const { data, error } = await requireClient()
     .from("diagnostic_runs")
     .select("*")
     .order("created_at", { ascending: false })
@@ -138,7 +154,7 @@ export async function saveDiagnosticRun(
   params: Record<string, number>,
   results: DiagnosticRun["results"]
 ): Promise<DiagnosticRun> {
-  const { data, error } = await supabase
+  const { data, error } = await requireClient()
     .from("diagnostic_runs")
     .insert({ label, params, results })
     .select()

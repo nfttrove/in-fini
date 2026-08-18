@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Beaker, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import Panel from "../ui/Panel";
 import { ThrustParams } from "../../utils/thrustLeakage";
-import { supabase } from "../../lib/supabase";
+import { supabase, supabaseConfigured } from "../../lib/supabase";
+import { THRUST_PRESETS } from "../../data/thrustPresets";
 
 interface ThrustPresetRow {
   name: string;
@@ -31,6 +32,13 @@ interface Props {
   onLoad: (params: ThrustParams) => void;
 }
 
+interface PresetItem {
+  name: string;
+  tagline: string;
+  verdict: string;
+  params: ThrustParams;
+}
+
 function rowToParams(row: ThrustPresetRow): ThrustParams {
   return {
     claimedDeltaG: row.claimed_delta_g,
@@ -53,13 +61,29 @@ function rowToParams(row: ThrustPresetRow): ThrustParams {
   };
 }
 
+function rowToItem(row: ThrustPresetRow): PresetItem {
+  return {
+    name: row.name,
+    tagline: row.tagline,
+    verdict: row.verdict,
+    params: rowToParams(row),
+  };
+}
+
+function builtInPresets(): PresetItem[] {
+  return Object.entries(THRUST_PRESETS).map(([name, preset]) => ({
+    name,
+    tagline: preset.tagline,
+    verdict: preset.verdict,
+    params: preset.params,
+  }));
+}
+
 function PresetCard({
-  name,
-  row,
+  item,
   onLoad,
 }: {
-  name: string;
-  row: ThrustPresetRow;
+  item: PresetItem;
   onLoad: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -73,9 +97,9 @@ function PresetCard({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <div className="text-sm font-medium dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200 group-hover:text-cyan-300 transition-colors truncate">
-              {name}
+              {item.name}
             </div>
-            <div className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 mt-0.5">{row.verdict}</div>
+            <div className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 mt-0.5">{item.verdict}</div>
           </div>
           <Beaker className="w-4 h-4 dark-mode:text-slate-600 light-mode:text-slate-400 coffee-mode:text-slate-600 group-hover:text-cyan-400 transition-colors flex-shrink-0 mt-0.5" />
         </div>
@@ -96,7 +120,7 @@ function PresetCard({
 
         {expanded && (
           <p className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400 italic mt-2 leading-relaxed pb-1">
-            "{row.tagline}"
+            "{item.tagline}"
           </p>
         )}
       </div>
@@ -105,28 +129,39 @@ function PresetCard({
 }
 
 export default function ThrustPresetPicker({ onLoad }: Props) {
-  const [presets, setPresets] = useState<ThrustPresetRow[]>([]);
+  const [presets, setPresets] = useState<PresetItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPresets = async () => {
+      if (!supabaseConfigured) {
+        setPresets(builtInPresets());
+        setLoading(false);
+        return;
+      }
       try {
         setLoading(true);
         setError(null);
-        const { data, error: err } = await supabase
+        const { data, error: err } = await supabase!
           .from("thrust_presets")
           .select("*")
           .order("name");
 
         if (err) {
-          setError(err.message);
-          return;
+          throw err;
         }
 
-        setPresets(data || []);
+        setPresets((data || []).map(rowToItem));
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Unknown error");
+        // Cloud list failed (outage, bad env): the show goes on with the
+        // built-in copy of the presets instead of an empty panel.
+        setPresets(builtInPresets());
+        setError(
+          `Cloud presets unavailable (${
+            e instanceof Error ? e.message : "unknown error"
+          }) — showing built-in presets.`
+        );
       } finally {
         setLoading(false);
       }
@@ -160,9 +195,8 @@ export default function ThrustPresetPicker({ onLoad }: Props) {
           {presets.map((preset) => (
             <PresetCard
               key={preset.name}
-              name={preset.name}
-              row={preset}
-              onLoad={() => onLoad(rowToParams(preset))}
+              item={preset}
+              onLoad={() => onLoad(preset.params)}
             />
           ))}
         </div>
