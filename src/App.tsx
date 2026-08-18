@@ -13,6 +13,8 @@ import NonlinearCouplingPanel from "./components/NonlinearCouplingPanel";
 import DeviceModelPanel from "./components/DeviceModelPanel";
 import DiagnosticPanel from "./components/DiagnosticPanel";
 import ThrustDiagnosticPanel from "./components/ThrustDiagnosticPanel";
+import CircuitQEDPanel from "./components/CircuitQEDPanel";
+import ClaimRegistryPanel from "./components/ClaimRegistryPanel";
 
 const TABS = [
   {
@@ -75,6 +77,18 @@ const TABS = [
     description:
       "Quantitative force-artifact budget: compare a claimed weight change against ion wind, vibration, electrostatic, and thermal convection channels",
   },
+  {
+    id: "cqed",
+    label: "Circuit QED (microwave DCE)",
+    description:
+      "The regime where the dynamical Casimir effect was actually measured: parametric pumping at 2·f₀ in a cryogenic microwave resonator",
+  },
+  {
+    id: "registry",
+    label: "Claim Registry",
+    description:
+      "File an anomalous power or thrust claim together with its computed artifact budget — a public, reproducible record",
+  },
 ];
 
 function AppContent() {
@@ -136,6 +150,8 @@ function AppContent() {
           {activeTab === "device" && <DeviceModelPanel />}
           {activeTab === "diagnostic" && <DiagnosticPanel />}
           {activeTab === "thrust" && <ThrustDiagnosticPanel />}
+          {activeTab === "cqed" && <CircuitQEDPanel />}
+          {activeTab === "registry" && <ClaimRegistryPanel />}
         </section>
 
         <footer className="mt-20 pt-8 dark-mode:border-slate-800/50 light-mode:border-slate-200 coffee-mode:border-amber-800/40 border-t">

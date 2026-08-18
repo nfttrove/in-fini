@@ -14,7 +14,7 @@ test: if a discovery disappears when you halve the timestep, it was never real.
 
 ## What's inside
 
-The app is organised as eleven tabs, each a self-contained mini-experiment:
+The app is organised as thirteen tabs, each a self-contained mini-experiment:
 
 | Tab | What it shows |
 | --- | --- |
@@ -29,13 +29,15 @@ The app is organised as eleven tabs, each a self-contained mini-experiment:
 | **Device Model — Power from Vacuum** | End-to-end prediction combining Casimir gap, rotor drive and Bessel up-conversion, compared against a claimed 1.3 W output |
 | **Leakage & Artifact Diagnostic** | A claimed power output vs. joule, RF, blackbody, mechanical and triboelectric leakage channels |
 | **Thrust & Weight Diagnostic** | A claimed weight change vs. ion wind, vibration, electrostatic and thermal-convection channels, with historical-claim presets |
+| **Circuit QED (microwave DCE)** | The regime where the dynamical Casimir effect was actually measured (Wilson et al., Nature 2011): parametric pumping at 2·f₀, thermal noise floor, parametric-oscillation threshold |
+| **Claim Registry** | File an anomalous power/thrust claim together with its computed artifact budget into a public, reproducible record |
 
 Diagnostic panels end in a colour-coded verdict — *explained / partial / excess /
 gross-excess* — based on how much of the claim the mundane channels account for.
 
 ### The physics modules
 
-All numerical models live in `src/utils/` and are unit-tested (46 tests, Vitest):
+All numerical models live in `src/utils/` and are unit-tested (63 tests, Vitest):
 
 - `physics.ts` — Casimir pressure `−π²ħc/240d⁴`, force and energy; cavity mode
   frequencies `fₙ = n·c/2L`; Lorentzian cavity response.
@@ -47,6 +49,11 @@ All numerical models live in `src/utils/` and are unit-tested (46 tests, Vitest)
 - `leakage.ts` — five-channel power leakage budget.
 - `thrustLeakage.ts` — force-artifact budget in units of Δg, including the DCE thrust
   limit with the `2·J₁(β)²` sideband weight.
+- `circuitQED.ts` — the microwave DCE panel's model: Bose–Einstein thermal
+  occupation, parametric coupling λ = (δx/L)·f₀·ℒ(fₘ − 2f₀), below-threshold
+  pair rate λ²/κ, oscillation threshold 2λ ≥ κ, and counting SNR. Order-of-
+  magnitude forms with O(1) prefactors dropped, same convention as the device
+  model.
 - `format.ts` — SI-prefixed formatting helpers.
 
 A note on intellectual honesty, since it's the point of the project: analytic panels are
@@ -98,7 +105,7 @@ The unit tests never touch the network and need no environment at all.
 npm run dev        # start the dev server
 npm run build      # production build to dist/
 npm run preview    # serve the production build
-npm test           # run the Vitest suite (49 tests)
+npm test           # run the Vitest suite (65 tests)
 npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
 ```
@@ -106,7 +113,7 @@ npm run lint       # eslint
 ## Supabase backend
 
 SQL migrations are in `supabase/migrations/` (apply them with the Supabase CLI or by
-pasting them into the SQL editor in creation order). Three tables:
+pasting them into the SQL editor in creation order). Four tables:
 
 - **`simulation_presets`** — user-saved parameter sets per panel. Anonymous by design:
   inserts are open, but deletion is authorised by a per-preset `owner_token` generated
@@ -116,6 +123,9 @@ pasting them into the SQL editor in creation order). Three tables:
   REST API.
 - **`diagnostic_runs`** — saved leakage-diagnostic results (params + verdict).
 - **`thrust_presets`** — the built-in historical-claim presets.
+- **`claim_registry`** — public claim filings (claim + parameters + computed
+  verdict). Public read, bounded anonymous insert, intentionally no delete in
+  v1: it is a record, not a scratchpad.
 
 Two later migrations are security fixes worth knowing about before forking the schema:
 `20260710002212` hides `owner_token` from the API (it was previously readable by
