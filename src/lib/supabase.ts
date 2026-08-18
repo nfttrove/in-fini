@@ -162,3 +162,48 @@ export async function saveDiagnosticRun(
   if (error) throw error;
   return data as DiagnosticRun;
 }
+
+export interface ClaimEntry {
+  id: string;
+  claim_type: "power" | "thrust";
+  title: string;
+  claimed_value: number;
+  claimed_unit: string;
+  verdict_key: string;
+  verdict_label: string;
+  residual_fraction: number;
+  params: Record<string, number>;
+  created_at: string;
+}
+
+const CLAIM_COLUMNS =
+  "id,claim_type,title,claimed_value,claimed_unit,verdict_key,verdict_label,residual_fraction,params,created_at";
+
+export async function listClaims(): Promise<ClaimEntry[]> {
+  const { data, error } = await requireClient()
+    .from("claim_registry")
+    .select(CLAIM_COLUMNS)
+    .order("created_at", { ascending: false })
+    .limit(25);
+  if (error) throw error;
+  return (data ?? []) as ClaimEntry[];
+}
+
+export async function fileClaim(entry: {
+  claim_type: "power" | "thrust";
+  title: string;
+  claimed_value: number;
+  claimed_unit: string;
+  verdict_key: string;
+  verdict_label: string;
+  residual_fraction: number;
+  params: Record<string, number>;
+}): Promise<ClaimEntry> {
+  const { data, error } = await requireClient()
+    .from("claim_registry")
+    .insert(entry)
+    .select(CLAIM_COLUMNS)
+    .maybeSingle();
+  if (error) throw error;
+  return data as ClaimEntry;
+}
