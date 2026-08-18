@@ -1,0 +1,32 @@
+/*
+  # Seed the Claim Registry with the famous historical cases
+
+  Every seed row's verdict and residual was computed by the app's own
+  budget engines (the same tested code paths the UI runs) at generation
+  time — see the repo history for the codegen test. Titles carry a
+  "[seed]" suffix to distinguish them from user filings.
+
+  Idempotent: rows are only inserted when the table holds no seeds yet,
+  so re-running against an existing database will not duplicate them.
+*/
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM claim_registry WHERE title LIKE '%[seed]') THEN
+    INSERT INTO claim_registry
+      (title, claim_type, claimed_value, claimed_unit, verdict_key, verdict_label, residual_fraction, params)
+    VALUES
+('Manchester Sphere (2000) [seed]', 'thrust', 0.18, 'Δg', 'explained', 'Fully explained by mundane forces', -4.161728287624559, '{"claimedDeltaG":0.18,"driveVoltageV":50000,"ambientPressurePa":101325,"electrodeGapM":0.05,"deviceMassKg":0.5,"vibrationAmpNm":500,"vibrationFreqHz":30,"tempGradientKPerM":0.2,"deviceHeightM":0.15,"plateAreaM2":0.02,"electrostaticFieldVPerM":50000,"cavityGap_nm":100,"rotorRadius_um":50,"modulationDepth_beta":0.5,"cavityQ":10000,"activeArea_cm2":1,"driveFrequency_Hz":1000000}'::jsonb),
+('Lifter (Ionocraft) Classic [seed]', 'thrust', 30, 'Δg', 'explained', 'Fully explained by mundane forces', -1.0314724657999093, '{"claimedDeltaG":30,"driveVoltageV":30000,"ambientPressurePa":101325,"electrodeGapM":0.02,"deviceMassKg":0.003,"vibrationAmpNm":1,"vibrationFreqHz":60,"tempGradientKPerM":0,"deviceHeightM":0.03,"plateAreaM2":0.06,"electrostaticFieldVPerM":1500000,"cavityGap_nm":100,"rotorRadius_um":50,"modulationDepth_beta":0.5,"cavityQ":10000,"activeArea_cm2":1,"driveFrequency_Hz":1000000}'::jsonb),
+('Shaken, Not Stirred [seed]', 'thrust', 10, 'Δg', 'explained', 'Fully explained by mundane forces', -9.064195623469589, '{"claimedDeltaG":10,"driveVoltageV":0,"ambientPressurePa":101325,"electrodeGapM":0.01,"deviceMassKg":5,"vibrationAmpNm":2000,"vibrationFreqHz":50,"tempGradientKPerM":0,"deviceHeightM":0.1,"plateAreaM2":0.01,"electrostaticFieldVPerM":1,"cavityGap_nm":100,"rotorRadius_um":50,"modulationDepth_beta":0.5,"cavityQ":10000,"activeArea_cm2":1,"driveFrequency_Hz":1000000}'::jsonb),
+('Hot Air Balloon Mode [seed]', 'thrust', 5, 'Δg', 'excess', 'Unexplained excess', 0.9397952218393918, '{"claimedDeltaG":5,"driveVoltageV":0,"ambientPressurePa":101325,"electrodeGapM":0.01,"deviceMassKg":0.2,"vibrationAmpNm":0,"vibrationFreqHz":1,"tempGradientKPerM":10,"deviceHeightM":0.3,"plateAreaM2":0.04,"electrostaticFieldVPerM":1,"cavityGap_nm":100,"rotorRadius_um":50,"modulationDepth_beta":0.5,"cavityQ":10000,"activeArea_cm2":1,"driveFrequency_Hz":1000000}'::jsonb),
+('Electrostatic Levitation (Tiny) [seed]', 'thrust', 0.5, 'Δg', 'explained', 'Fully explained by mundane forces', -3.5143794352344253, '{"claimedDeltaG":0.5,"driveVoltageV":100,"ambientPressurePa":101325,"electrodeGapM":0.01,"deviceMassKg":0.05,"vibrationAmpNm":0,"vibrationFreqHz":1,"tempGradientKPerM":0,"deviceHeightM":0.02,"plateAreaM2":0.02,"electrostaticFieldVPerM":500000,"cavityGap_nm":100,"rotorRadius_um":50,"modulationDepth_beta":0.5,"cavityQ":10000,"activeArea_cm2":1,"driveFrequency_Hz":1000000}'::jsonb),
+('Cryogenic Ideal (Antigravity Dream) [seed]', 'thrust', 1, 'Δg', 'excess', 'Unexplained excess', 0.9579135395166549, '{"claimedDeltaG":1,"driveVoltageV":1000,"ambientPressurePa":0.000001,"electrodeGapM":0.01,"deviceMassKg":0.1,"vibrationAmpNm":0.1,"vibrationFreqHz":1000,"tempGradientKPerM":0,"deviceHeightM":0.1,"plateAreaM2":0.01,"electrostaticFieldVPerM":1,"cavityGap_nm":100,"rotorRadius_um":50,"modulationDepth_beta":0.5,"cavityQ":10000,"activeArea_cm2":1,"driveFrequency_Hz":1000000}'::jsonb),
+('Podkletnov Effect (1992) [seed]', 'thrust', 2, 'Δg', 'partial', 'Partially explained', 0.493290661976574, '{"claimedDeltaG":2,"driveVoltageV":10000,"ambientPressurePa":101325,"electrodeGapM":0.03,"deviceMassKg":0.1,"vibrationAmpNm":1000,"vibrationFreqHz":50,"tempGradientKPerM":1,"deviceHeightM":0.15,"plateAreaM2":0.03,"electrostaticFieldVPerM":10000,"cavityGap_nm":100,"rotorRadius_um":50,"modulationDepth_beta":0.5,"cavityQ":10000,"activeArea_cm2":1,"driveFrequency_Hz":1000000}'::jsonb),
+('Searl Effect Generator (SEG) [seed]', 'thrust', 100, 'Δg', 'explained', 'Fully explained by mundane forces', -643.1276226506359, '{"claimedDeltaG":100,"driveVoltageV":5000,"ambientPressurePa":101325,"electrodeGapM":0.005,"deviceMassKg":10,"vibrationAmpNm":10000,"vibrationFreqHz":400,"tempGradientKPerM":2,"deviceHeightM":0.25,"plateAreaM2":0.1,"electrostaticFieldVPerM":200000,"cavityGap_nm":100,"rotorRadius_um":50,"modulationDepth_beta":0.5,"cavityQ":10000,"activeArea_cm2":1,"driveFrequency_Hz":1000000}'::jsonb),
+('Biefeld-Brown Capacitor [seed]', 'thrust', 0.5, 'Δg', 'explained', 'Fully explained by mundane forces', -224.74224993796895, '{"claimedDeltaG":0.5,"driveVoltageV":50000,"ambientPressurePa":101325,"electrodeGapM":0.01,"deviceMassKg":0.02,"vibrationAmpNm":10,"vibrationFreqHz":120,"tempGradientKPerM":0,"deviceHeightM":0.02,"plateAreaM2":0.01,"electrostaticFieldVPerM":5000000,"cavityGap_nm":100,"rotorRadius_um":50,"modulationDepth_beta":0.5,"cavityQ":10000,"activeArea_cm2":1,"driveFrequency_Hz":1000000}'::jsonb),
+('The Lazy Scientist [seed]', 'thrust', 100, 'Δg', 'gross-excess', 'Unexplained excess', 0.9999999999999954, '{"claimedDeltaG":100,"driveVoltageV":0,"ambientPressurePa":101325,"electrodeGapM":0.01,"deviceMassKg":0.001,"vibrationAmpNm":0,"vibrationFreqHz":1,"tempGradientKPerM":0,"deviceHeightM":0.01,"plateAreaM2":0.001,"electrostaticFieldVPerM":1,"cavityGap_nm":100,"rotorRadius_um":50,"modulationDepth_beta":0.5,"cavityQ":10000,"activeArea_cm2":1,"driveFrequency_Hz":1000000}'::jsonb),
+('Desktop Casimir generator, 1.3 W claim [seed]', 'power', 1.3, 'W', 'excess', 'Unexplained excess', 0.9720423684610406, '{"pClaimW":1.3,"vDriveV":10,"rDriveOhm":50,"shieldDb":40,"iBiasA":0.1,"rResOhm":0.1,"tHotK":350,"tColdK":300,"aRadM2":0.0001,"emissivity":0.9,"rotorMassKg":1e-9,"rotorAmpNm":1,"fmHz":500000,"mechQ":10000}'::jsonb)
+    ON CONFLICT DO NOTHING;
+  END IF;
+END $$;
