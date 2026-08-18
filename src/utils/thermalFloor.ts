@@ -79,14 +79,14 @@ export function assessDecidability(
   const floorG = thermalFloorDeltaG(p);
   const ratio = floorG > 0 ? claimDeltaG / floorG : Infinity;
 
-  if (ratio >= 100) {
+  if (ratio >= 10) {
     return {
       floorG,
       ratio,
       verdict: {
         key: "comfortable",
         label: "Decidable in principle",
-        description: `The claim sits ${ratio.toExponential(1)}× above the thermal noise of its own test mass. Matter can arbitrate this one — the only question is whether your artifacts (see the requirements above) let it.`,
+        description: `The claim sits ${ratio.toExponential(1)}× above the thermal noise of its own test mass. Matter can arbitrate this one — the only question is whether your artifacts (see the requirements above) let it. (Working ~10× above a fundamental noise floor is routine metrology.)`,
         tone: "emerald",
         requiredTempK: null,
       },
@@ -100,7 +100,7 @@ export function assessDecidability(
       verdict: {
         key: "marginal",
         label: "Marginal against the thermal floor",
-        description: `Only ${ratio.toFixed(1)}× above the thermal noise of the test mass. Cryogenic operation buys headroom (as √T), and long integration buys √τ — but you are now fighting the apparatus itself, not just artifacts.`,
+        description: `Only ${ratio.toFixed(1)}× above the thermal noise of the test mass — genuinely fighting the apparatus itself, not just artifacts. Cryogenic operation buys headroom (as √T), long integration buys √τ.`,
         tone: "amber",
         requiredTempK: null,
       },

@@ -55,10 +55,10 @@ describe("assessDecidability", () => {
     expect(r.verdict.requiredTempK!).toBeLessThan(2.7);
   });
 
-  it("has a marginal band between 1× and 100× of the floor", () => {
+  it("has a marginal band between 1× and 10× of the floor", () => {
     const floorG = thermalFloorDeltaG(BASE);
-    const r = assessDecidability(floorG * 10, BASE);
-    expect(r.verdict.key).toBe("marginal");
+    expect(assessDecidability(floorG * 10, BASE).verdict.key).toBe("comfortable");
+    expect(assessDecidability(floorG * 5, BASE).verdict.key).toBe("marginal");
   });
 
   it("required temperature really would restore decidability", () => {
