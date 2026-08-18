@@ -1,7 +1,9 @@
 {
-  "name": "vite-react-typescript-starter",
+  "name": "in-fini",
+  "description": "Interactive quantum vacuum & cavity physics simulator with honest artifact diagnostics for anomalous thrust and energy claims",
+  "license": "MIT",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
