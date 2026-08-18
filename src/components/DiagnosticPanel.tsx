@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { usePanelUrlState } from "../hooks/usePanelUrlState";
 import DiagnosticControls from "./diagnostic/DiagnosticControls";
 import DiagnosticBudget from "./diagnostic/DiagnosticBudget";
 import DiagnosticVerdict from "./diagnostic/DiagnosticVerdict";
@@ -28,7 +29,7 @@ const DEFAULT_PARAMS: LeakageParams = {
 };
 
 export default function DiagnosticPanel() {
-  const [params, setParams] = useState<LeakageParams>(DEFAULT_PARAMS);
+  const [params, setParams] = usePanelUrlState<LeakageParams>("leak", DEFAULT_PARAMS);
   const budget = useMemo(() => computeBudget(params), [params]);
 
   const explainerStatus =

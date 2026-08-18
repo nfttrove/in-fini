@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { usePanelUrlState } from "../hooks/usePanelUrlState";
 import ThrustControls from "./thrust/ThrustControls";
 import ThrustBudgetPanel from "./thrust/ThrustBudget";
 import ThrustVerdict from "./thrust/ThrustVerdict";
@@ -34,7 +35,7 @@ const DEFAULT_PARAMS: ThrustParams = {
 };
 
 export default function ThrustDiagnosticPanel() {
-  const [params, setParams] = useState<ThrustParams>(DEFAULT_PARAMS);
+  const [params, setParams] = usePanelUrlState<ThrustParams>("thrust", DEFAULT_PARAMS);
   const budget = useMemo(() => computeThrustBudget(params), [params]);
   const dceThrustLimit = useMemo(() => dceThrustLimitG(params), [params]);
 

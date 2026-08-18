@@ -15,6 +15,9 @@ import DiagnosticPanel from "./components/DiagnosticPanel";
 import ThrustDiagnosticPanel from "./components/ThrustDiagnosticPanel";
 import CircuitQEDPanel from "./components/CircuitQEDPanel";
 import ClaimRegistryPanel from "./components/ClaimRegistryPanel";
+import ExperimentDesignPanel from "./components/ExperimentDesignPanel";
+import DataLabPanel from "./components/DataLabPanel";
+import { readUrlParam, writeUrlParam } from "./hooks/usePanelUrlState";
 
 const TABS = [
   {
@@ -89,10 +92,30 @@ const TABS = [
     description:
       "File an anomalous power or thrust claim together with its computed artifact budget — a public, reproducible record",
   },
+  {
+    id: "design",
+    label: "Experiment Design",
+    description:
+      "Invert the physics: given the effect you hope to detect and how many sigma you insist on, what must your rig achieve?",
+  },
+  {
+    id: "datalab",
+    label: "Data Lab & Challenge",
+    description:
+      "Paste your own measurement series, strip drift and mains pickup, and hunt the residual — then test yourself in the blind artifact-or-anomaly challenge",
+  },
 ];
 
 function AppContent() {
-  const [activeTab, setActiveTab] = useState("home");
+  const [activeTab, setActiveTab] = useState(() => {
+    const fromUrl = readUrlParam("tab");
+    return fromUrl && TABS.some((t) => t.id === fromUrl) ? fromUrl : "home";
+  });
+
+  function selectTab(id: string) {
+    setActiveTab(id);
+    writeUrlParam("tab", id);
+  }
 
   return (
     <div className="min-h-screen">
@@ -115,7 +138,7 @@ function AppContent() {
           {TABS.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => selectTab(tab.id)}
               role="tab"
               aria-selected={activeTab === tab.id}
               aria-controls={`panel-${tab.id}`}
@@ -152,6 +175,8 @@ function AppContent() {
           {activeTab === "thrust" && <ThrustDiagnosticPanel />}
           {activeTab === "cqed" && <CircuitQEDPanel />}
           {activeTab === "registry" && <ClaimRegistryPanel />}
+          {activeTab === "design" && <ExperimentDesignPanel />}
+          {activeTab === "datalab" && <DataLabPanel />}
         </section>
 
         <footer className="mt-20 pt-8 dark-mode:border-slate-800/50 light-mode:border-slate-200 coffee-mode:border-amber-800/40 border-t">
