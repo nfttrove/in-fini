@@ -29,6 +29,9 @@ export interface LeakageBudget {
   residualW: number;
   residualFrac: number;
   verdict: Verdict;
+  /** Combined 1σ uncertainty of the summed channels (25% per channel, RSS). */
+  sigmaW: number;
+  sigmaAssessment: SigmaAssessment;
 }
 
 export type VerdictKey =
@@ -37,6 +40,8 @@ export type VerdictKey =
   | "partial"
   | "excess"
   | "gross-excess";
+
+import { SigmaAssessment, assessResidual, combinedSigma } from "./uncertainty";
 
 export interface Verdict {
   key: VerdictKey;
@@ -130,6 +135,8 @@ export function computeBudget(p: LeakageParams): LeakageBudget {
     p.pClaimW > 0 ? residualW / p.pClaimW : residualW === 0 ? 0 : 1;
 
   const verdict = classifyVerdict(p.pClaimW, totalLeakageW, residualW);
+  const sigmaW = combinedSigma(channels.map((c) => c.valueW));
+  const sigmaAssessment = assessResidual(residualW, sigmaW);
 
   return {
     channels,
@@ -138,6 +145,8 @@ export function computeBudget(p: LeakageParams): LeakageBudget {
     residualW,
     residualFrac,
     verdict,
+    sigmaW,
+    sigmaAssessment,
   };
 }
 

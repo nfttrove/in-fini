@@ -18,6 +18,8 @@ export interface ThrustParams {
   driveFrequency_Hz: number;
 }
 
+import { SigmaAssessment, assessResidual, combinedSigma } from "./uncertainty";
+
 export interface ThrustChannel {
   key: string;
   label: string;
@@ -45,10 +47,13 @@ export interface ThrustBudget {
   residualG: number;
   residualFrac: number;
   verdict: ThrustVerdict;
+  /** Combined 1σ uncertainty of the summed channels (25% per channel, RSS). */
+  sigmaG: number;
+  sigmaAssessment: SigmaAssessment;
 }
 
 const EPS0 = 8.854187817e-12;
-const G = 9.80665;
+export const G = 9.80665;
 const RHO_AIR_STP = 1.225;
 const BETA_AIR = 1 / 293;
 
@@ -229,8 +234,10 @@ export function computeThrustBudget(p: ThrustParams): ThrustBudget {
     p.claimedDeltaG > 0 ? residualG / p.claimedDeltaG : residualG === 0 ? 0 : 1;
 
   const verdict = classifyThrustVerdict(p.claimedDeltaG, totalLeakageG, residualG);
+  const sigmaG = combinedSigma(channels.map((c) => c.valueG));
+  const sigmaAssessment = assessResidual(residualG, sigmaG);
 
-  return { channels, totalLeakageG, claimedG: p.claimedDeltaG, residualG, residualFrac, verdict };
+  return { channels, totalLeakageG, claimedG: p.claimedDeltaG, residualG, residualFrac, verdict, sigmaG, sigmaAssessment };
 }
 
 function classifyThrustVerdict(
