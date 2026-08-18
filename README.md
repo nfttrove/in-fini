@@ -189,7 +189,7 @@ not been published from here.
 
 ## Deployment
 
-The live site (infini.dev) is published through the Bolt.new pipeline — this repo
+The live site (in-fini.com) is published through the Bolt.new pipeline — this repo
 has **no CI/CD**: pushing to GitHub does not redeploy it. After merging changes
 here, redeploy from the Bolt workspace (or wire up Netlify/Vercel against the
 repo and `npm run build` to change that).
