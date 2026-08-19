@@ -20,6 +20,7 @@ import DataLabPanel from "./components/DataLabPanel";
 import NetworkPanel from "./components/NetworkPanel";
 import AcousticCasimirPanel from "./components/AcousticCasimirPanel";
 import DarkCornersPanel from "./components/DarkCornersPanel";
+import BoundaryAtlasPanel from "./components/BoundaryAtlasPanel";
 import { readUrlParam, writeUrlParam } from "./hooks/usePanelUrlState";
 
 const TABS = [
@@ -120,6 +121,12 @@ const TABS = [
       "Radiation pressure from sound side-by-side with the vacuum Casimir force — the one fluctuation force you can measure tonight for €25",
   },
   {
+    id: "atlas",
+    label: "Boundary Atlas",
+    description:
+      "The honesty terrain: where every verdict flips, mapped by the same permutation sweeps that found the double-counted channel",
+  },
+  {
     id: "dark",
     label: "Dark Corners (the 95%)",
     description:
@@ -200,6 +207,7 @@ function AppContent() {
           {activeTab === "datalab" && <DataLabPanel />}
           {activeTab === "network" && <NetworkPanel />}
           {activeTab === "acoustic" && <AcousticCasimirPanel />}
+          {activeTab === "atlas" && <BoundaryAtlasPanel />}
           {activeTab === "dark" && <DarkCornersPanel />}
         </section>
 
