@@ -22,6 +22,7 @@ import AcousticCasimirPanel from "./components/AcousticCasimirPanel";
 import DarkCornersPanel from "./components/DarkCornersPanel";
 import BoundaryAtlasPanel from "./components/BoundaryAtlasPanel";
 import { readUrlParam, writeUrlParam } from "./hooks/usePanelUrlState";
+import { useEffect } from "react";
 
 const TABS = [
   {
@@ -144,6 +145,17 @@ function AppContent() {
     setActiveTab(id);
     writeUrlParam("tab", id);
   }
+
+  // Give every experiment its own tab-bar / history / bookmark title.
+  useEffect(() => {
+    const tab = TABS.find((t) => t.id === activeTab);
+    if (typeof document !== "undefined" && tab) {
+      document.title =
+        tab.id === "home"
+          ? "In Fini – Quantum Vacuum & Cavity Physics Simulator"
+          : `${tab.label} — In Fini`;
+    }
+  }, [activeTab]);
 
   return (
     <div className="min-h-screen">
