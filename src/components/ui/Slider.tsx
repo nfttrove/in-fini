@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 interface SliderProps {
   label: string;
   value: number;
@@ -21,13 +23,19 @@ export default function Slider({
   minLabel,
   maxLabel,
 }: SliderProps) {
+  const id = useId();
   return (
     <div className="space-y-2">
-      <label className="block text-sm dark-mode:text-slate-400 light-mode:text-slate-700 coffee-mode:text-amber-700">
+      <label
+        htmlFor={id}
+        className="block text-sm dark-mode:text-slate-400 light-mode:text-slate-700 coffee-mode:text-amber-700"
+      >
         {label}: <span className="dark-mode:text-cyan-400 light-mode:text-slate-800 coffee-mode:text-amber-400 font-mono">{displayValue}</span>
       </label>
       <input
+        id={id}
         type="range"
+        aria-label={`${label}: ${displayValue}`}
         min={min}
         max={max}
         step={step}
