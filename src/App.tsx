@@ -174,7 +174,11 @@ function AppContent() {
           </div>
         </div>
 
-        <nav className="flex flex-wrap gap-2 mb-8 p-2 panel-bg rounded-xl border" role="tablist" aria-label="Simulator sections">
+        <nav
+          className="flex gap-2 mb-8 p-2 panel-bg rounded-xl border overflow-x-auto md:overflow-x-visible md:flex-wrap md:justify-center scrollbar-none"
+          role="tablist"
+          aria-label="Simulator sections"
+        >
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -182,7 +186,7 @@ function AppContent() {
               role="tab"
               aria-selected={activeTab === tab.id}
               aria-controls={`panel-${tab.id}`}
-              className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap shrink-0 ${
                 activeTab === tab.id
                   ? "button-primary shadow-lg"
                   : "dark-mode:text-slate-300 dark-mode:hover:text-slate-100 dark-mode:hover:bg-slate-800/50 light-mode:text-slate-600 light-mode:hover:text-slate-900 light-mode:hover:bg-slate-100 coffee-mode:text-amber-100 coffee-mode:hover:text-amber-50 coffee-mode:hover:bg-amber-900/40"

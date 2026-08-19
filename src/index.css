@@ -132,3 +132,11 @@
     @apply bg-amber-900/20 border border-amber-800/30 rounded-xl backdrop-blur-sm;
   }
 }
+
+/* Tab-strip mobile scroller: hide the bar, keep the scroll. */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
