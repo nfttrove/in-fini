@@ -1,12 +1,5 @@
 import { useEffect, useRef } from "react";
-import {
-  clearCanvas,
-  drawGrid,
-  drawVLine,
-  plotRect,
-  label,
-  drawPolyline,
-} from "../../utils/canvas";
+import { prepareCanvas, clearCanvas, drawGrid, drawVLine, plotRect, label, drawPolyline } from "../../utils/canvas";
 
 interface CombProps {
   f0Hz: number;
@@ -28,7 +21,7 @@ export default function NonlinearComb({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 780, 260);
     if (!ctx) return;
 
     const pad = { l: 60, r: 20, t: 28, b: 54 };
@@ -98,7 +91,7 @@ export default function NonlinearComb({
       ctx,
       `Spectrum: f₀ ± n·fₘ   (fₘ = ${fmHzStr}, spacing exaggerated)`,
       rect.x + rect.w / 2,
-      ctx.canvas.height - 8,
+      260 - 8,
       { color: "#94a3b8", align: "center" }
     );
 
@@ -130,8 +123,6 @@ export default function NonlinearComb({
       </h3>
       <canvas
         ref={canvasRef}
-        width={780}
-        height={260}
         className="w-full rounded-lg"
         style={{ maxHeight: 260 }}
       />

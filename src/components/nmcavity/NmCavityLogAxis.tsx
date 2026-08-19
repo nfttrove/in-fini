@@ -1,11 +1,5 @@
 import { useEffect, useRef } from "react";
-import {
-  clearCanvas,
-  drawGrid,
-  drawVLine,
-  plotRect,
-  label,
-} from "../../utils/canvas";
+import { prepareCanvas, clearCanvas, drawGrid, drawVLine, plotRect, label } from "../../utils/canvas";
 
 interface LogAxisProps {
   f0Hz: number;
@@ -20,7 +14,7 @@ export default function NmCavityLogAxis({ f0Hz, driveHz }: LogAxisProps) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 780, 160);
     if (!ctx) return;
 
     const pad = { l: 50, r: 20, t: 30, b: 46 };
@@ -101,7 +95,7 @@ export default function NmCavityLogAxis({ f0Hz, driveHz }: LogAxisProps) {
       ctx,
       "log₁₀ frequency (Hz)  —  full spectrum view",
       rect.x + rect.w / 2,
-      ctx.canvas.height - 8,
+      160 - 8,
       { color: "#94a3b8", align: "center" }
     );
   }, [f0Hz, driveHz]);
@@ -113,8 +107,6 @@ export default function NmCavityLogAxis({ f0Hz, driveHz }: LogAxisProps) {
       </h3>
       <canvas
         ref={canvasRef}
-        width={780}
-        height={160}
         className="w-full rounded-lg"
         style={{ maxHeight: 160 }}
       />

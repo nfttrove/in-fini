@@ -12,10 +12,47 @@ export interface PlotRect {
   h: number;
 }
 
+/**
+ * Logical canvas size: the CSS-pixel dimensions a chart is drawn in,
+ * independent of the retina backing store. All helpers below use this so
+ * drawing code works identically at 1× and 2× device pixel ratio.
+ */
+export function logicalSize(ctx: CanvasRenderingContext2D): { w: number; h: number } {
+  const scale = ctx.getTransform().a || 1;
+  return { w: ctx.canvas.width / scale, h: ctx.canvas.height / scale };
+}
+
+/**
+ * Prepare a canvas for sharp rendering on high-DPR displays: size the
+ * backing store by devicePixelRatio (capped at 2), scale the context so
+ * all drawing stays in logical pixels, and fix the element's aspect ratio
+ * so CSS sizing cannot distort it. Call once per redraw, before drawing.
+ * Returns the ready context, or null (no 2D support — same contract the
+ * components already handled).
+ */
+export function prepareCanvas(
+  canvas: HTMLCanvasElement,
+  w: number,
+  h: number
+): CanvasRenderingContext2D | null {
+  const dpr = Math.min(
+    typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1,
+    2
+  );
+  canvas.width = Math.round(w * dpr);
+  canvas.height = Math.round(h * dpr);
+  canvas.style.width = "100%";
+  canvas.style.aspectRatio = `${w} / ${h}`;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return ctx;
+}
+
 export function clearCanvas(ctx: CanvasRenderingContext2D, bg = "#0f172a") {
-  const { width, height } = ctx.canvas;
+  const { w, h } = logicalSize(ctx);
   ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, width, height);
+  ctx.fillRect(0, 0, w, h);
 }
 
 export function plotRect(
@@ -25,8 +62,8 @@ export function plotRect(
   return {
     x: pad.l,
     y: pad.t,
-    w: ctx.canvas.width - pad.l - pad.r,
-    h: ctx.canvas.height - pad.t - pad.b,
+    w: logicalSize(ctx).w - pad.l - pad.r,
+    h: logicalSize(ctx).h - pad.t - pad.b,
   };
 }
 

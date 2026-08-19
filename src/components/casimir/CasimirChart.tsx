@@ -1,13 +1,6 @@
 import { useEffect, useRef } from "react";
 import { casimirForce, formatScientific } from "../../utils/physics";
-import {
-  clearCanvas,
-  drawGrid,
-  drawPolyline,
-  horizontalGradient,
-  plotRect,
-  label,
-} from "../../utils/canvas";
+import { prepareCanvas, clearCanvas, drawGrid, drawPolyline, horizontalGradient, plotRect, label } from "../../utils/canvas";
 
 interface CasimirChartProps {
   sepNm: number;
@@ -24,7 +17,7 @@ export default function CasimirChart({ sepNm, areaM2 }: CasimirChartProps) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 600, 220);
     if (!ctx) return;
 
     const pad = { l: 56, r: 20, t: 20, b: 40 };
@@ -90,7 +83,7 @@ export default function CasimirChart({ sepNm, areaM2 }: CasimirChartProps) {
       font: "10px monospace",
       align: "right",
     });
-    label(ctx, "Separation (log scale)", rect.x + rect.w / 2, ctx.canvas.height - 4, {
+    label(ctx, "Separation (log scale)", rect.x + rect.w / 2, 220 - 4, {
       color: "#94a3b8",
       align: "center",
     });
@@ -103,8 +96,6 @@ export default function CasimirChart({ sepNm, areaM2 }: CasimirChartProps) {
       </h3>
       <canvas
         ref={canvasRef}
-        width={600}
-        height={220}
         className="w-full rounded-lg"
         style={{ maxHeight: 220 }}
       />

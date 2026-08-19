@@ -1,12 +1,5 @@
 import { useEffect, useRef } from "react";
-import {
-  clearCanvas,
-  drawGrid,
-  drawPolyline,
-  drawVLine,
-  plotRect,
-  label,
-} from "../../utils/canvas";
+import { prepareCanvas, clearCanvas, drawGrid, drawPolyline, drawVLine, plotRect, label } from "../../utils/canvas";
 
 interface SweepProps {
   f0Hz: number;
@@ -26,7 +19,7 @@ export default function NmCavitySweep({ f0Hz, driveHz, Q }: SweepProps) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 780, 260);
     if (!ctx) return;
 
     const pad = { l: 60, r: 24, t: 24, b: 46 };
@@ -148,7 +141,7 @@ export default function NmCavitySweep({ f0Hz, driveHz, Q }: SweepProps) {
       ctx,
       `Frequency (narrow sweep ±${(halfSpan / 1e12).toFixed(3)} THz around f₀)`,
       rect.x + rect.w / 2,
-      ctx.canvas.height - 6,
+      260 - 6,
       { color: "#94a3b8", align: "center" }
     );
 
@@ -169,8 +162,6 @@ export default function NmCavitySweep({ f0Hz, driveHz, Q }: SweepProps) {
       </h3>
       <canvas
         ref={canvasRef}
-        width={780}
-        height={260}
         className="w-full rounded-lg"
         style={{ maxHeight: 260 }}
       />

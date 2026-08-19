@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { clearCanvas, plotRect, label } from "../../utils/canvas";
+import { prepareCanvas, clearCanvas, plotRect, label } from "../../utils/canvas";
 
 const C = 2.99792458e8;
 const TWO_PI = 2 * Math.PI;
@@ -27,7 +27,7 @@ export default function CavityField({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 700, 160);
     if (!ctx) return;
 
     const omega = TWO_PI * drivingFreqHz;
@@ -91,7 +91,7 @@ export default function CavityField({
         ctx,
         `Cavity (L = ${cavityLength.toFixed(2)} m, mode n = ${modeNumber})`,
         rect.x + rect.w / 2,
-        ctx.canvas.height - 2,
+        160 - 2,
         { color: "#64748b", align: "center" }
       );
 
@@ -109,8 +109,6 @@ export default function CavityField({
       </h3>
       <canvas
         ref={canvasRef}
-        width={700}
-        height={160}
         className="w-full rounded-lg"
         style={{ maxHeight: 160 }}
       />

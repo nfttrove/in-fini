@@ -1,13 +1,6 @@
 import { useEffect, useRef } from "react";
 import { rotatingFieldEx, rotatingFieldEy } from "../../utils/physics";
-import {
-  clearCanvas,
-  drawGrid,
-  drawPolyline,
-  horizontalGradient,
-  plotRect,
-  label,
-} from "../../utils/canvas";
+import { prepareCanvas, clearCanvas, drawGrid, drawPolyline, horizontalGradient, plotRect, label } from "../../utils/canvas";
 
 interface RotatingCanvasProps {
   omega: number;
@@ -36,7 +29,7 @@ export default function RotatingCanvas({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 700, 220);
     if (!ctx) return;
 
     const pad = { l: 20, r: 20, t: 20, b: 20 };
@@ -108,8 +101,6 @@ export default function RotatingCanvas({
       </h3>
       <canvas
         ref={canvasRef}
-        width={700}
-        height={220}
         className="w-full rounded-lg"
         style={{ maxHeight: 220 }}
       />

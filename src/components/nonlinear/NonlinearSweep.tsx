@@ -1,12 +1,5 @@
 import { useEffect, useRef } from "react";
-import {
-  clearCanvas,
-  drawGrid,
-  drawPolyline,
-  drawVLine,
-  plotRect,
-  label,
-} from "../../utils/canvas";
+import { prepareCanvas, clearCanvas, drawGrid, drawPolyline, drawVLine, plotRect, label } from "../../utils/canvas";
 import { besselJ } from "../../utils/bessel";
 
 interface SweepProps {
@@ -22,7 +15,7 @@ export default function NonlinearSweep({ f0Hz, fmHz, beta, Q }: SweepProps) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 780, 240);
     if (!ctx) return;
 
     const pad = { l: 60, r: 22, t: 24, b: 54 };
@@ -130,7 +123,7 @@ export default function NonlinearSweep({ f0Hz, fmHz, beta, Q }: SweepProps) {
       ctx,
       "Modulation frequency fₘ (log, 1 kHz – 10 MHz)",
       rect.x + rect.w / 2,
-      ctx.canvas.height - 8,
+      240 - 8,
       { color: "#94a3b8", align: "center" }
     );
 
@@ -151,8 +144,6 @@ export default function NonlinearSweep({ f0Hz, fmHz, beta, Q }: SweepProps) {
       </h3>
       <canvas
         ref={canvasRef}
-        width={780}
-        height={240}
         className="w-full rounded-lg"
         style={{ maxHeight: 240 }}
       />

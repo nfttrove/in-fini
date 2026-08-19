@@ -1,13 +1,6 @@
 import { useEffect, useRef } from "react";
 import { couplingStrength } from "../../utils/physics";
-import {
-  clearCanvas,
-  drawGrid,
-  drawPolyline,
-  drawVLine,
-  plotRect,
-  label,
-} from "../../utils/canvas";
+import { prepareCanvas, clearCanvas, drawGrid, drawPolyline, drawVLine, plotRect, label } from "../../utils/canvas";
 
 interface CavitySpectrumProps {
   resonantFreqHz: number;
@@ -29,7 +22,7 @@ export default function CavitySpectrum({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 700, 220);
     if (!ctx) return;
 
     const resonantFreqMHz = resonantFreqHz / 1e6;
@@ -112,7 +105,7 @@ export default function CavitySpectrum({
       ctx,
       "Driving Frequency (MHz)",
       rect.x + rect.w / 2,
-      ctx.canvas.height - 4,
+      220 - 4,
       { color: "#94a3b8", align: "center" }
     );
 
@@ -133,8 +126,6 @@ export default function CavitySpectrum({
       </h3>
       <canvas
         ref={canvasRef}
-        width={700}
-        height={220}
         className="w-full rounded-lg"
         style={{ maxHeight: 220 }}
       />

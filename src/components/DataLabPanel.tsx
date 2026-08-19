@@ -5,6 +5,7 @@ import PlainExplainer from "./ui/PlainExplainer";
 import MetricCard from "./ui/MetricCard";
 import Slider from "./ui/Slider";
 import { useTheme } from "../contexts/theme-context";
+import { prepareCanvas } from "../utils/canvas";
 import {
   parseSeries,
   analyzeSeries,
@@ -31,11 +32,11 @@ function SpectrumCanvas({
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 640, 240);
     if (!ctx) return;
 
-    const W = canvas.width;
-    const H = canvas.height;
+    const W = 640;
+    const H = 240;
     const bg = isDark ? "#0f172a" : "#f8fafc";
     const fg = isDark ? "#e2e8f0" : "#1e293b";
     const grid = isDark ? "#1e3a5f" : "#dbe3ee";
@@ -111,8 +112,6 @@ function SpectrumCanvas({
   return (
     <canvas
       ref={ref}
-      width={640}
-      height={240}
       className="w-full rounded-lg border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700"
     />
   );

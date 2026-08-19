@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useTheme } from "../../contexts/theme-context";
 import { CircuitQEDParams, predictCqed } from "../../utils/circuitQED";
+import { prepareCanvas } from "../../utils/canvas";
 
 /**
  * Pair production rate vs pump frequency across the 2·f₀ resonance,
@@ -15,11 +16,11 @@ export default function CqedSweep({ base }: { base: CircuitQEDParams }) {
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 640, 220);
     if (!ctx) return;
 
-    const W = canvas.width;
-    const H = canvas.height;
+    const W = 640;
+    const H = 220;
     const bg = isDark ? "#0f172a" : "#f8fafc";
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, W, H);
@@ -115,8 +116,6 @@ export default function CqedSweep({ base }: { base: CircuitQEDParams }) {
   return (
     <canvas
       ref={ref}
-      width={640}
-      height={220}
       className="w-full rounded-lg border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700"
     />
   );

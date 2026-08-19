@@ -1,12 +1,5 @@
 import { useEffect, useRef } from "react";
-import {
-  clearCanvas,
-  drawGrid,
-  drawPolyline,
-  drawVLine,
-  plotRect,
-  label,
-} from "../../utils/canvas";
+import { prepareCanvas, clearCanvas, drawGrid, drawPolyline, drawVLine, plotRect, label } from "../../utils/canvas";
 import { besselJ } from "../../utils/bessel";
 
 interface EfficiencyProps {
@@ -20,7 +13,7 @@ export default function NonlinearEfficiency({ beta, maxBeta }: EfficiencyProps) 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 780, 220);
     if (!ctx) return;
 
     const pad = { l: 50, r: 20, t: 22, b: 46 };
@@ -83,7 +76,7 @@ export default function NonlinearEfficiency({ beta, maxBeta }: EfficiencyProps) 
       ctx,
       "Modulation depth β",
       rect.x + rect.w / 2,
-      ctx.canvas.height - 8,
+      220 - 8,
       { color: "#94a3b8", align: "center" }
     );
 
@@ -112,8 +105,6 @@ export default function NonlinearEfficiency({ beta, maxBeta }: EfficiencyProps) 
       </h3>
       <canvas
         ref={canvasRef}
-        width={780}
-        height={220}
         className="w-full rounded-lg"
         style={{ maxHeight: 220 }}
       />

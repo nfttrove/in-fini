@@ -1,12 +1,5 @@
 import { useEffect, useRef } from "react";
-import {
-  clearCanvas,
-  drawGrid,
-  drawPolyline,
-  drawVLine,
-  plotRect,
-  label,
-} from "../../utils/canvas";
+import { prepareCanvas, clearCanvas, drawGrid, drawPolyline, drawVLine, plotRect, label } from "../../utils/canvas";
 import { predictDevice, DeviceParams } from "../../utils/device";
 
 interface Props {
@@ -19,7 +12,7 @@ export default function DeviceSweepBeta({ base }: Props) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 780, 240);
     if (!ctx) return;
 
     const pad = { l: 64, r: 20, t: 26, b: 52 };
@@ -98,7 +91,7 @@ export default function DeviceSweepBeta({ base }: Props) {
       ctx,
       "Modulation depth β",
       rect.x + rect.w / 2,
-      ctx.canvas.height - 8,
+      240 - 8,
       { color: "#94a3b8", align: "center" }
     );
   }, [base]);
@@ -110,8 +103,6 @@ export default function DeviceSweepBeta({ base }: Props) {
       </h3>
       <canvas
         ref={canvasRef}
-        width={780}
-        height={240}
         className="w-full rounded-lg"
         style={{ maxHeight: 240 }}
       />

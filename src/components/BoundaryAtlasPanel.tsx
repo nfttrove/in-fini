@@ -3,6 +3,7 @@ import Panel from "./ui/Panel";
 import PlainExplainer from "./ui/PlainExplainer";
 import { AtlasMap, cellAt, allAtlases } from "../utils/boundaryAtlas";
 import { useTheme } from "../contexts/theme-context";
+import { prepareCanvas } from "../utils/canvas";
 
 function AtlasCanvas({ map }: { map: AtlasMap }) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -12,11 +13,11 @@ function AtlasCanvas({ map }: { map: AtlasMap }) {
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = prepareCanvas(canvas, 560, 320);
     if (!ctx) return;
 
-    const W = canvas.width;
-    const H = canvas.height;
+    const W = 560;
+    const H = 320;
     const padL = 56;
     const padB = 30;
     const padT = 8;
@@ -81,8 +82,6 @@ function AtlasCanvas({ map }: { map: AtlasMap }) {
   return (
     <canvas
       ref={ref}
-      width={560}
-      height={320}
       className="w-full rounded-lg border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700"
     />
   );
