@@ -21,6 +21,8 @@ export default function ThemeSwitcher() {
         onClick={() => setTheme("light")}
         className={`p-2 rounded-md transition-all ${getButtonClass(theme === "light")}`}
         title="Light mode"
+        aria-label="Light mode"
+        aria-pressed={theme === "light"}
       >
         <Sun className="w-4 h-4" />
       </button>
@@ -28,6 +30,8 @@ export default function ThemeSwitcher() {
         onClick={() => setTheme("coffee")}
         className={`p-2 rounded-md transition-all ${getButtonClass(theme === "coffee")}`}
         title="Coffee mode"
+        aria-label="Coffee mode"
+        aria-pressed={theme === "coffee"}
       >
         <Coffee className="w-4 h-4" />
       </button>
@@ -35,6 +39,8 @@ export default function ThemeSwitcher() {
         onClick={() => setTheme("dark")}
         className={`p-2 rounded-md transition-all ${getButtonClass(theme === "dark")}`}
         title="Dark mode"
+        aria-label="Dark mode"
+        aria-pressed={theme === "dark"}
       >
         <Moon className="w-4 h-4" />
       </button>
