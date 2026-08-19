@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Globe2, Play, Upload } from "lucide-react";
 import Panel from "./ui/Panel";
+import Skeleton from "./ui/Skeleton";
 import PlainExplainer from "./ui/PlainExplainer";
 import MetricCard from "./ui/MetricCard";
 import {
@@ -59,16 +60,22 @@ export default function NetworkPanel() {
   const [error, setError] = useState<string | null>(null);
   const [filed, setFiled] = useState<string | null>(null);
   const [fleet, setFleet] = useState<NetworkRun[]>([]);
+  const [fleetLoading, setFleetLoading] = useState(true);
 
   const samplesRef = useRef<Capture>({ t: [], y: [] });
   const stopRef = useRef<(() => void) | null>(null);
 
   const refresh = useCallback(async () => {
-    if (!supabaseConfigured) return;
+    if (!supabaseConfigured) {
+      setFleetLoading(false);
+      return;
+    }
     try {
       setFleet(await listNetworkRuns());
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setFleetLoading(false);
     }
   }, []);
 
@@ -322,7 +329,9 @@ export default function NetworkPanel() {
           </Panel>
 
           <Panel title="3 · The fleet">
-            {stats && stats.n > 0 ? (
+            {fleetLoading && fleet.length === 0 && supabaseConfigured ? (
+              <Skeleton rows={4} />
+            ) : stats && stats.n > 0 ? (
               <>
                 <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4 mb-4">
                   <div className="text-xs dark-mode:text-cyan-200 light-mode:text-cyan-900 coffee-mode:text-cyan-200 leading-relaxed">

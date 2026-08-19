@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import Skeleton from "./Skeleton";
 import { Save, Trash2, Download, RefreshCw } from "lucide-react";
 import {
   SimulationPreset,
@@ -114,7 +115,9 @@ export default function PresetBar({ panel, currentParams, onLoad }: PresetBarPro
         </div>
       )}
 
-      {presets.length === 0 ? (
+      {busy && presets.length === 0 && !error ? (
+        <Skeleton rows={3} />
+      ) : presets.length === 0 ? (
         <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 italic">
           No presets yet. Save current parameters above.
         </p>

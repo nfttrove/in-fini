@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BookmarkCheck, FileText, Gavel, RefreshCw, Send } from "lucide-react";
 import Panel from "./ui/Panel";
+import Skeleton from "./ui/Skeleton";
 import PlainExplainer from "./ui/PlainExplainer";
 import Slider from "./ui/Slider";
 import MetricCard from "./ui/MetricCard";
@@ -473,6 +474,8 @@ export default function ClaimRegistryPanel() {
                 Registry list needs the configured backend; the budget above is
                 fully local.
               </p>
+            ) : busy && claims.length === 0 && !error ? (
+              <Skeleton rows={4} />
             ) : claims.length === 0 ? (
               <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 italic">
                 Nothing filed yet. The first claim is yours.
