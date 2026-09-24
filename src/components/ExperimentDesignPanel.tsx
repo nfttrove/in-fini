@@ -6,6 +6,7 @@ import MetricCard from "./ui/MetricCard";
 import {
   thrustRequirements,
   powerRequirements,
+  requirementStatus,
   ThrustDesignContext,
   PowerDesignContext,
 } from "../utils/experimentDesign";
@@ -364,10 +365,8 @@ export default function ExperimentDesignPanel() {
             </div>
             <ul className="space-y-2.5">
               {result.requirements.map((r) => {
-                const ratio = r.ratio;
-                const alreadyOk = ratio !== null && ratio >= 1;
-                // Near 1, one decimal would print 0.9987 as "1.0e+0".
-                const fmtRatio = (x: number) => x.toExponential(x > 0.9 && x < 1.1 ? 3 : 1);
+                const status = requirementStatus(r);
+                const alreadyOk = status.met;
                 return (
                   <li
                     key={r.key}
@@ -392,11 +391,7 @@ export default function ExperimentDesignPanel() {
                       </span>
                     </div>
                     <div className="text-[10px] dark-mode:text-slate-500 light-mode:text-slate-500 coffee-mode:text-amber-700 mt-1">
-                      {alreadyOk
-                        ? `your current setup already satisfies this${isFinite(ratio!) ? ` (${fmtRatio(ratio!)}× headroom)` : ""}`
-                        : ratio === null
-                          ? "absolute requirement"
-                          : `need ${fmtRatio(ratio)}× today's value`}
+                      {status.text}
                     </div>
                   </li>
                 );

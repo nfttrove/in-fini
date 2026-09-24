@@ -37,7 +37,6 @@ describe("built-in thrust presets (offline fallback data)", () => {
         ).toBe(true);
       }
       expect(preset.tagline.length, `${name}: tagline`).toBeGreaterThan(0);
-      expect(preset.verdict.length, `${name}: verdict`).toBeGreaterThan(0);
     }
   });
 

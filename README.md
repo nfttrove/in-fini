@@ -43,7 +43,7 @@ gross-excess* — based on how much of the claim the mundane channels account fo
 
 ### The physics modules
 
-All numerical models live in `src/utils/` and are unit-tested (168 tests, Vitest):
+All numerical models live in `src/utils/` and are unit-tested (Vitest):
 
 - `physics.ts` — Casimir pressure `−π²ħc/240d⁴`, force and energy; cavity mode
   frequencies `fₙ = n·c/2L`; Lorentzian cavity response.
@@ -139,7 +139,7 @@ The unit tests never touch the network and need no environment at all.
 npm run dev        # start the dev server
 npm run build      # production build to dist/
 npm run preview    # serve the production build
-npm test           # run the Vitest suite (168 tests)
+npm test           # run the Vitest suite
 npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
 ```
@@ -217,16 +217,36 @@ Publishing this as an npm package is one command away (`physics.ts` is the
 entry point); it needs the repo owner's npm login, so it has deliberately
 not been published from here.
 
+## Conventions
+
+Rules that exist because breaking them has already shipped bugs here:
+
+- **Every thrust quantity is a grams-equivalent weight change** (F/g × 1000),
+  typed `Grams` (`src/utils/units.ts`). Forces are `Newtons`. Crossing units
+  takes a named conversion (`gramsToNewtons`, `newtonsToGrams`); a bare number
+  or the wrong brand does not type-check at a formatter. Three 10–1000× display
+  bugs came from skipping this.
+- **Numbers in prose are computed, not typed.** Worksheet answers, guide
+  examples, preset verdicts and panel comparisons are derived from the same
+  engines the panels use (`DEVICE_DEFAULTS`, `summarizePreset`, …) and pinned
+  by render tests. Hand-typed values drifted: "~5 µW" where the model gives
+  18 fW, "Fully explained" where the budget said "Partially explained".
+- **Assumptions are knobs, not constants.** Where a channel depends on a
+  modelling choice (ion-wind discharge area, the rectified share of
+  vibration), it is a slider with a stated default, not a hidden number.
+- **A channel labelled an upper bound must be one** — say "heuristic" when it
+  isn't.
+
 ## Deployment
 
 The live site (in-fini.com) is published through the Bolt.new pipeline — this repo
-has **no CI/CD**: pushing to GitHub does not redeploy it. After merging changes
+has CI but **no continuous deployment**: pushing to GitHub does not redeploy it. After merging changes
 here, redeploy from the Bolt workspace (or wire up Netlify/Vercel against the
 repo and `npm run build` to change that).
 
 ## Status and known caveats
 
-- Tests (49), typecheck, lint and build all pass as of this writing.
+- CI (typecheck, lint, tests, build) is the source of truth for whether they pass; this file deliberately quotes no counts.
 - Dependencies are current within their declared semver ranges. Deliberately
   *not* upgraded: React 19, Vite 6+, TypeScript 7, Tailwind 4, ESLint 10 are
   available as majors; the two remaining `npm audit` findings live in the dev

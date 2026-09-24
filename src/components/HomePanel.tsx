@@ -21,7 +21,7 @@ export default function HomePanel() {
       <section className="space-y-3">
         <h2 className="text-xl font-semibold dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-slate-100">What's on the desk</h2>
         <ul className="list-disc pl-6 space-y-2 dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <li><strong>Eighteen interactive tabs</strong>: from Casimir forces to the only experiment that ever coaxed photon pairs out of empty space (microwave circuit QED), to the 95% of the universe your instruments can't reach.</li>
+          <li><strong>Interactive tabs</strong>, from Casimir forces to the only experiment that ever coaxed photon pairs out of empty space (microwave circuit QED), to the 95% of the universe your instruments can't reach.</li>
           <li><strong>Real mathematics, not vignettes</strong>: logarithmic sweeps, Lorentzian resonances, Bessel sidebands, g² correlation spectroscopy, FFT residual hunting — the same machinery used in real quantum electrodynamics.</li>
           <li><strong>Artifact budgets with error bars</strong>: load a famous claim (Podkletnov, Searl, Biefeld–Brown, the Manchester spheres) and watch the mundane channels — vibration, ion wind, electrostatics, thermal buoyancy — account for it, with uncertainties.</li>
           <li><strong>The experiment-design inverter</strong>: don't just judge claims — state the effect you want to detect and learn what your rig must achieve, down to the thermal noise floor of matter itself.</li>

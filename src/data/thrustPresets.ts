@@ -3,7 +3,9 @@ import { ThrustParams, computeThrustBudget } from "../utils/thrustLeakage";
 export interface ThrustPreset {
   params: ThrustParams;
   tagline: string;
-  verdict: string;
+  // No stored verdict: cards and copy show computeThrustBudget's own label.
+  // Hand-written verdicts drifted (Podkletnov read "Fully explained" while
+  // the engine said "Partially explained").
 }
 
 export const THRUST_PRESETS: Record<string, ThrustPreset> = {
@@ -28,7 +30,6 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "Sorry, the spheres were likely just corona discharge and shaking.",
-    verdict: "Fully explained by ion wind + vibration",
   },
 
   "Lifter (Ionocraft) Classic": {
@@ -52,7 +53,6 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "It flies, but it's not antigravity -- it's just pushing air.",
-    verdict: "Fully explained (ion wind)",
   },
 
   "Shaken, Not Stirred": {
@@ -76,7 +76,6 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "Your scale is shaking, not your device levitating.",
-    verdict: "Fully explained (vibration)",
   },
 
   "Hot Air Balloon Mode": {
@@ -100,7 +99,6 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "You've just built a tiny heater, not an antigravity drive.",
-    verdict: "Fully explained (thermal convection)",
   },
 
   "Electrostatic Levitation (Tiny)": {
@@ -124,7 +122,6 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "You're sticking to the ceiling like a balloon, not defying gravity.",
-    verdict: "Fully explained (electrostatic image force)",
   },
 
   "Cryogenic Ideal (Antigravity Dream)": {
@@ -149,7 +146,6 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
     },
     tagline:
       "If you actually achieve these conditions and still see thrust, call a physicist.",
-    verdict: "Unexplained excess",
   },
 
   "Podkletnov Effect (1992)": {
@@ -173,7 +169,6 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "Podkletnov's result is likely just vibration and corona discharge.",
-    verdict: "Fully explained (vibration + ion wind)",
   },
 
   "Searl Effect Generator (SEG)": {
@@ -197,7 +192,6 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "The SEG 'levitates' because it shakes itself apart.",
-    verdict: "Fully explained (vibration dominates)",
   },
 
   "Biefeld-Brown Capacitor": {
@@ -221,7 +215,6 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "It works, but not because of gravity modification.",
-    verdict: "Fully explained (ion wind + vibration)",
   },
 
   "The Lazy Scientist": {
@@ -245,7 +238,6 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "Garbage in, garbage out. Measure something first.",
-    verdict: "Unexplained excess (no data entered)",
   },
 };
 

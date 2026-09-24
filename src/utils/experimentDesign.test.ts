@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  requirementStatus,
   thrustRequirements,
   powerRequirements,
   ThrustDesignContext,
@@ -132,6 +133,21 @@ describe("requirement ratio — compare the number, not its rounded label", () =
     expect(ion.ratio).not.toBeNull();
     expect(ion.ratio!).toBeLessThan(1);
     expect(ion.ratio!).toBeCloseTo(ion.value / 1400, 12);
+  });
+
+  it("the panel's status text calls it unmet, with enough digits to show why", () => {
+    const res = thrustRequirements({ ...TCTX, claimedDeltaG: 10 ** -1.1, driveVoltageV: 1400 });
+    const st = requirementStatus(res.requirements.find((r) => r.key === "ion-wind")!);
+    expect(st.met).toBe(false);
+    expect(st.text).toMatch(/^need 9\.9\d\de-1× today's value$/);
+  });
+
+  it("met limits show headroom; absolute limits say so", () => {
+    const res = thrustRequirements(TCTX);
+    const thermal = requirementStatus(res.requirements.find((r) => r.key === "thermal")!);
+    expect(thermal.met).toBe(true);
+    expect(thermal.text).toMatch(/already satisfies this \([\d.]+e[+-]\d+× headroom\)/);
+    expect(requirementStatus(res.requirements.find((r) => r.key === "electrostatic")!).text).toBe("absolute requirement");
   });
 
   it("is null only for absolute limits", () => {

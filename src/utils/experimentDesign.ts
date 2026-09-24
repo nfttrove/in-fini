@@ -56,6 +56,24 @@ export interface DesignResult {
   requirements: Requirement[];
 }
 
+/**
+ * How a requirement reads against today's rig: met (with its headroom),
+ * unmet (with the factor still needed) or absolute. Decided on the numeric
+ * ratio; near 1 it prints enough digits that 0.9987 never reads as 1.0.
+ */
+export function requirementStatus(r: Requirement): { met: boolean; text: string } {
+  const x = r.ratio;
+  if (x === null) return { met: false, text: "absolute requirement" };
+  const fmt = (v: number) => v.toExponential(v > 0.9 && v < 1.1 ? 3 : 1);
+  if (x >= 1) {
+    return {
+      met: true,
+      text: `your current setup already satisfies this${isFinite(x) ? ` (${fmt(x)}× headroom)` : ""}`,
+    };
+  }
+  return { met: false, text: `need ${fmt(x)}× today's value` };
+}
+
 function ratioOf(reference: number, limit: number): number | null {
   return reference > 0 && limit >= 0 ? limit / reference : null;
 }
