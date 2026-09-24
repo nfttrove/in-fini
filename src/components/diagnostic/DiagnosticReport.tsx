@@ -53,15 +53,16 @@ function buildReport(budget: LeakageBudget, params: LeakageParams): string {
     );
   } else if (budget.verdict.key === "explained") {
     lines.push(
-      "The claimed output is fully explained by the sum of mundane " +
-        "leakage channels. No anomalous source is required, and the " +
-        "measurement is consistent with known physics."
+      "The modelled leakage channels are large enough to produce the whole " +
+        "claimed output, so no anomalous source is needed to explain it. " +
+        "The budget does not say which artifact produced the reading."
     );
   } else if (budget.verdict.key === "partial") {
     lines.push(
-      "The residual is within the uncertainty of the leakage estimate. " +
-        "The data does not clearly indicate an anomaly nor rule it out " +
-        "-- further refinement of the measurement is needed."
+      "Between 5% and 50% of the claim is left after the modelled " +
+        "channels. The error-bar line above says whether that residual " +
+        "survives their uncertainty; either way, refine the measurement " +
+        "before concluding anything."
     );
   } else {
     lines.push(

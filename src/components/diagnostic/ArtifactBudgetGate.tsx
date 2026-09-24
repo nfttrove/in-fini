@@ -17,8 +17,8 @@ import { PRESETS, computeGate, type ChannelDef, type GateValues } from "./artifa
 
   A claimed thrust that sits inside the summed budget is not a discovery.
   A claim needs to clear the budget by ~5× before it earns the word "anomaly".
-  This is the gate the EmDrive failed (Tajmar, Neunzig & Weikert, SpaceDrive
-  project, TU Dresden; CEAS Space J. 14, 31, 2022).
+  This is the kind of budget the EmDrive failed when TU Dresden measured it
+  (Tajmar, Neunzig & Weikert, SpaceDrive project; CEAS Space J. 14, 31, 2022).
 */
 
 const PALETTE = {
@@ -203,10 +203,10 @@ export default function ArtifactBudgetGate() {
 
   let verdict: string, verdictColor: string, verdictDetail: string;
   if (verdictKey === "inside") {
-    verdict = "INSIDE BUDGET — NO ANOMALY";
+    verdict = "INSIDE BUDGET — NO ANOMALY SHOWN";
     verdictColor = PALETTE.fail;
     verdictDetail =
-      "The claimed thrust is fully reproducible by known artifacts. This is a null result, and null results are findings: publish the budget, not the claim.";
+      "The summed budget (allowances plus the balance's own noise floor) is at least as large as the claimed thrust, so the claim does not stand out from it. This is a null result, and null results are findings: publish the budget, not the claim.";
   } else if (verdictKey === "marginal") {
     verdict = "MARGINAL — INDISTINGUISHABLE";
     verdictColor = PALETTE.warn;
@@ -244,8 +244,8 @@ export default function ArtifactBudgetGate() {
             Artifact Budget Gate
           </h1>
           <p style={{ color: PALETTE.dim, maxWidth: 640, fontSize: 14, lineHeight: 1.55, marginTop: 8 }}>
-            Enter an anomalous-thrust experiment. The gate computes every known
-            artifact channel and tells you whether the claimed signal survives.
+            Enter an anomalous-thrust experiment. The gate sums six standard
+            artifact channels and tells you whether the claimed signal clears them.
             A claim that lives inside the budget is not a discovery — the budget is.
           </p>
           <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>

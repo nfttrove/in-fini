@@ -16,7 +16,7 @@
  */
 
 import { ThrustParams, computeThrustBudget } from "./thrustLeakage";
-import { predictDevice } from "./device";
+import { IDEAL_MIRROR_MIN_NM, RIM_SPEED_LIMIT_M_S, predictDevice } from "./device";
 import { predictCqed } from "./circuitQED";
 import { assessDecidability } from "./thermalFloor";
 
@@ -160,13 +160,13 @@ export function atlasDevice(): AtlasMap {
       const areaMm2 = yAt(j, meta);
       const p = predictDevice({ ...ATLAS_DEVICE, dNm, areaMm2 });
       // 0: far below ceiling; 1: within 10× of claim; 2: ceiling ≥ claim
-      // (the "plausible under the generous bound" corner); 3: ditto AND the
-      // rotor would already be beyond demonstrated material limits.
+      // where the model holds; 3: ceiling ≥ claim, but only outside it — a
+      // gap below the ideal-mirror regime, or a rim past the burst speed.
       const ratio = CLAIM_W / Math.max(p.P_output, 1e-300);
       let code = 0;
       if (ratio <= 10) code = 1;
       if (ratio <= 1) code = 2;
-      if (code === 2 && p.rimAccelerationG > 1e6) code = 3;
+      if (code === 2 && (dNm < IDEAL_MIRROR_MIN_NM || p.v > RIM_SPEED_LIMIT_M_S)) code = 3;
       cells.push(code);
     }
   }
@@ -176,12 +176,12 @@ export function atlasDevice(): AtlasMap {
     ...meta,
     cells,
     fixed:
-      `Fixed: ${ATLAS_DEVICE.fmHz / 1e6} MHz drive, β = ${ATLAS_DEVICE.beta} (beyond the Device Model's 0–1 slider, near J₁'s peak), ${ATLAS_DEVICE.rotorRadiusNm / 1000} µm rotor (${ATLAS_RIM.v.toFixed(0)} m/s rim, ${ATLAS_RIM.rimAccelerationG.toExponential(1)} g — past the 10⁶ g material veto, so every cell that meets the claim is dark red), Q ≈ ${(ATLAS_DEVICE.Q / 1000).toFixed(1)}k. Ceiling deliberately generous (π²/720 dropped).`,
+      `Fixed: ${ATLAS_DEVICE.fmHz / 1e6} MHz drive, β = ${ATLAS_DEVICE.beta} (beyond the Device Model's 0–1 slider, near J₁'s peak), ${ATLAS_DEVICE.rotorRadiusNm / 1000} µm rotor (${ATLAS_RIM.v.toFixed(0)} m/s rim — under the ~${RIM_SPEED_LIMIT_M_S.toFixed(0)} m/s burst speed, so it survives), Q ≈ ${(ATLAS_DEVICE.Q / 1000).toFixed(1)}k. Ceiling deliberately generous (π²/720 dropped). Every cell that meets the claim sits below ${IDEAL_MIRROR_MIN_NM} nm, where real metals give much less than the ideal-mirror law: dark red.`,
     legend: [
       { code: 0, label: "claim ≫ ceiling", color: "#1e3a5f" },
       { code: 1, label: "within 10× of ceiling", color: "#f59e0b" },
-      { code: 2, label: "ceiling ≥ claim", color: "#ef4444" },
-      { code: 3, label: "ceiling ≥ claim, but rotor shatters", color: "#7f1d1d" },
+      { code: 2, label: "ceiling ≥ claim where the model holds", color: "#ef4444" },
+      { code: 3, label: `ceiling ≥ claim, only below ~${IDEAL_MIRROR_MIN_NM} nm or with a bursting rotor`, color: "#7f1d1d" },
     ],
   };
 }

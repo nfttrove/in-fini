@@ -41,8 +41,10 @@ export default function DiagnosticNotes() {
           cannot be closed with the artefacts this budget models — a channel
           it leaves out, a measurement error, or something interesting.
           Check the energy balance first. A
-          verdict of <strong>Fully explained</strong> means the claim is
-          quantitatively reproduced by leakage; no new physics is required.
+          verdict of <strong>Fully explained</strong> means the modelled
+          leaks are large enough to produce the whole claim, so no new physics
+          is needed to explain it — though the budget cannot say which leak
+          did.
         </p>
       </div>
     </Panel>

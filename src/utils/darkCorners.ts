@@ -87,8 +87,11 @@ export interface DarkMatterFlux {
   hypotheticalPressurePa: number;
 }
 
+/** Assumed dark-matter particle mass [GeV] for the counts (the density itself does not depend on it). */
+export const DM_PARTICLE_GEV = 100;
+
 export function darkMatterFlux(): DarkMatterFlux {
-  const massPerParticle = 100 * EV_J * 1e9 / (C * C); // ≈ 1.78e-25 kg
+  const massPerParticle = DM_PARTICLE_GEV * EV_J * 1e9 / (C * C); // ≈ 1.78e-25 kg
   const numberDensity = RHO_DM / massPerParticle;
   const massFlux = RHO_DM * V_HALO; // kg/(m²·s)
   return {
@@ -134,7 +137,8 @@ export const LISA_PF_YEAR_FLOOR = LISA_PF_ASD / Math.sqrt(YEAR_S);
 /** Compare an acceleration to what instruments can do. */
 export function accelerationVerdict(a: number): DeskVerdict {
   const mg = a / G_ACC * 1e6;
-  if (a < QUIETEST_RIG_ACCEL) {
+  // Below both this app's quietest rig and a year of LISA Pathfinder.
+  if (a < Math.min(QUIETEST_RIG_ACCEL, LISA_PF_YEAR_FLOOR)) {
     const r = QUIETEST_ED_RIG;
     return {
       key: "thermal-floored",

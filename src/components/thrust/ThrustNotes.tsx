@@ -51,9 +51,10 @@ export default function ThrustNotes() {
           cannot be closed with the artifact forces this budget models -- a
           channel it leaves out, a measurement error, or something
           interesting. A
-          verdict of <strong>Fully explained</strong> means the claim is
-          quantitatively reproduced by mundane forces; no anomalous thrust is
-          required.
+          verdict of <strong>Fully explained</strong> means the modelled
+          channels are large enough to produce the whole claim, so no
+          anomalous thrust is needed to explain it -- though the budget
+          cannot say which artifact did.
         </p>
       </div>
     </Panel>

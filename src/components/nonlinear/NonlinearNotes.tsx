@@ -62,8 +62,9 @@ export default function NonlinearNotes({
             <li>
               <span className="dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">Dynamical Casimir</span>: a
               boundary modulated at Ω converts virtual pairs to real photons
-              at ω₁ + ω₂ = Ω — but the conversion rate is set by ℏΩ, so a
-              500 kHz drive yields microwave photons, not optical ones.
+              at ω₁ + ω₂ = Ω — so ℏΩ fixes the photons' energies, and a
+              500 kHz drive yields radio-frequency photons (below 500 kHz),
+              not optical ones.
             </li>
           </ul>
         </InfoNote>

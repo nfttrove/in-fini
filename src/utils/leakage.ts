@@ -220,9 +220,9 @@ function classifyVerdict(
   if (absClaim > 0 && absClaim < 1e-9 && absResidual < 10 * leak + 1e-15) {
     return {
       key: "consistent",
-      label: "Consistent with known physics (DCE regime)",
+      label: "Sub-nanowatt, near the leakage floor",
       description:
-        "Claim is at or below the nanowatt scale and matches the expected dynamical Casimir / thermal budget — no unexplained excess.",
+        "The claim is below a nanowatt and within about 10× of the modelled leakage. This budget has no dynamical-Casimir term, so it cannot say more: nothing here stands out from the known channels, and nothing is confirmed either.",
       tone: "sky",
     };
   }
@@ -239,12 +239,14 @@ function classifyVerdict(
 
   const frac = residual / absClaim;
 
-  if (frac < 0.05 && frac > -0.05) {
+  // Leakage at or above the claim (frac ≤ 0) is explained too: the budget
+  // covers the reading. (It once fell through to the red "gross excess".)
+  if (frac < 0.05) {
     return {
       key: "explained",
       label: "Fully explained by mundane leakage",
       description:
-        "The summed leakage channels account for essentially the entire claimed output. No residual signal remains.",
+        "The modelled leakage channels are large enough to produce the whole claimed output, so no anomalous source is needed to explain it. That says the artifacts could produce the reading, not which one did.",
       tone: "emerald",
     };
   }
@@ -273,7 +275,7 @@ function classifyVerdict(
     key: "gross-excess",
     label: "Unexplained excess",
     description:
-      "Claimed output exceeds every plausible leakage channel by many orders of magnitude. This is the signature of either a measurement artifact, an unaccounted drive coupling, or unknown physics.",
+      "The claimed output exceeds every modelled leakage channel by more than a million times. First suspects: a channel this budget leaves out (an unaccounted drive coupling), or a measurement artifact; only after those, unknown physics.",
     tone: "red",
   };
 }

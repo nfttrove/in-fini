@@ -117,8 +117,10 @@ export default function ThrustDiagnosticPanel() {
           Force Artifact Budget Gate
         </h3>
         <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-400 mb-4">
-          The comprehensive referee for anomalous thrust claims. Compute all known artifact channels
-          and see if the signal survives. This is the gate the EmDrive failed.
+          A referee for anomalous thrust claims: six standard artifact channels, summed, against
+          the claim. The EmDrive failed this kind of budget when TU Dresden measured it: a thermal
+          artifact the size of the original claims, and no thrust once it was removed (SpaceDrive
+          project; CEAS Space J. 14, 31, 2022).
         </p>
         <ArtifactBudgetGate />
       </div>

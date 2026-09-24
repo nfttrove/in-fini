@@ -64,8 +64,8 @@ export default function DiagnosticPanel() {
         <p className="dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
           <span className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">Try this:</span>{" "}
           Enter a claimed output wattage and the device&rsquo;s drive
-          voltage. The verdict badge turns green only when the claim truly
-          exceeds every leakage channel.
+          voltage. The verdict badge turns green when the modelled leaks can
+          account for the claim, amber when they cover part of it, and orange or red when they cannot.
         </p>
       </PlainExplainer>
 

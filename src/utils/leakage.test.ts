@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { jouleW, rfLeakageW, blackbodyW, mechanicalW, energyBalance, type LeakageParams } from "./leakage";
+import { jouleW, rfLeakageW, blackbodyW, mechanicalW, energyBalance, computeBudget, type LeakageParams } from "./leakage";
 
 describe("jouleW", () => {
   it("is I²R", () => {
@@ -75,5 +75,27 @@ describe("energyBalance — does the output even exceed the input?", () => {
     expect(b.inputW).toBe(0);
     expect(b.ratio).toBe(Infinity);
     expect(b.key).toBe("exceeds-input");
+  });
+});
+
+describe("classifyVerdict — leakage above the claim", () => {
+  // 10 V into 50 Ω with no shield leaks 1 W of RF; every other channel off.
+  const over: LeakageParams = {
+    pClaimW: 0.5, vDriveV: 10, rDriveOhm: 50, shieldDb: 0, iBiasA: 0, rResOhm: 0,
+    tHotK: 300, tColdK: 300, emissivity: 0.1, aRadM2: 1e-4,
+    rotorMassKg: 0, rotorAmpNm: 0, fmHz: 5e5, mechQ: 1e4,
+  };
+
+  it("is explained, not a red 'gross excess', when leakage exceeds the claim", () => {
+    // It once fell through every branch to "exceeds every plausible leakage
+    // channel by many orders of magnitude" while the σ line said "Within budget".
+    const b = computeBudget(over);
+    expect(b.totalLeakageW).toBeGreaterThan(2 * b.claimedW - 1e-9);
+    expect(b.verdict.key).toBe("explained");
+    expect(b.sigmaAssessment.key).toBe("explained");
+  });
+
+  it("still calls a claim far above leakage a gross excess", () => {
+    expect(computeBudget({ ...over, pClaimW: 1e7 }).verdict.key).toBe("gross-excess");
   });
 });

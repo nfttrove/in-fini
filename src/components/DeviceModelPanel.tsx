@@ -41,8 +41,11 @@ export default function DeviceModelPanel() {
           Some inventors claim you can harvest energy from the quantum
           vacuum itself. This panel glues together honest textbook physics —
           the Casimir gap, a rotor drive, and the FM-style frequency comb —
-          to estimate the absolute best-case power such a device could
-          produce. Spoiler: the predicted numbers are astronomically small.
+          into a deliberately generous ceiling on the power such a device
+          could produce. Spoiler: at rotor speeds that survive and gaps where
+          the physics holds, it falls far short of what inventors claim; the
+          slider corners pass the claim only with rotors that would burst and
+          gaps a few atoms wide.
         </p>
         <p className="dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
           <span className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">Try this:</span>{" "}
@@ -77,7 +80,7 @@ export default function DeviceModelPanel() {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DeviceSweepBeta base={base} />
-        <DeviceSanity p={prediction} Q={Q} beta={beta} />
+        <DeviceSanity p={prediction} Q={Q} beta={beta} fmHz={fmKHz * 1e3} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

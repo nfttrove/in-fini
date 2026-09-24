@@ -1,11 +1,20 @@
 import Panel from "../ui/Panel";
 import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
-import { DevicePrediction, formatFreq } from "../../utils/device";
+import {
+  DevicePrediction,
+  IDEAL_MIRROR_MIN_NM,
+  RIM_SPEED_LIMIT_M_S,
+  SILICON_DENSITY_KG_M3,
+  formatFreq,
+} from "../../utils/device";
+
+const C = 299_792_458;
 
 interface Props {
   p: DevicePrediction;
   Q: number;
   beta: number;
+  fmHz: number;
 }
 
 type Status = "pass" | "warn" | "fail";
@@ -17,7 +26,7 @@ interface Check {
   status: Status;
 }
 
-export default function DeviceSanity({ p, Q, beta }: Props) {
+export default function DeviceSanity({ p, Q, beta, fmHz }: Props) {
   const checks: Check[] = [];
 
   checks.push({
@@ -39,7 +48,7 @@ export default function DeviceSanity({ p, Q, beta }: Props) {
   const Q_phys_limit = 1e6;
   checks.push({
     key: "Q",
-    label: "Physically achievable Q  (plasmonic ≲ 10⁴, dielectric ≲ 10⁶)",
+    label: "Achievable Q  (≲ 10⁴ generous for a nm-gap metal cavity; 10⁶ is dielectric-resonator territory)",
     detail: `Q = ${Q.toLocaleString()}  ·  γ = f₀/Q = ${formatFreq(p.gammaHz)}`,
     status: Q <= 1e4 ? "pass" : Q <= Q_phys_limit ? "warn" : "fail",
   });
@@ -47,33 +56,47 @@ export default function DeviceSanity({ p, Q, beta }: Props) {
   checks.push({
     key: "side",
     label: "Sideband fits inside cavity linewidth",
-    detail: `fₘ vs γ/2 — first sideband ${
-      p.gammaHz / 2 > 500e3 ? "comfortably inside" : "outside"
-    } linewidth`,
-    status: p.gammaHz / 2 > 500e3 ? "pass" : "warn",
+    detail: `fₘ = ${formatFreq(fmHz)} vs γ/2 = ${formatFreq(p.gammaHz / 2)} — first sideband ${
+      p.gammaHz / 2 > fmHz ? "inside" : "outside"
+    } the linewidth`,
+    status: p.gammaHz / 2 > fmHz ? "pass" : "warn",
   });
 
   checks.push({
     key: "energy",
-    label: "Energy conservation  (no over-unity)",
+    label: "Model vs claim  (predicted ÷ 1.3 W)",
     detail: `predicted ${p.P_output.toExponential(2)} W  vs  claimed 1.3 W  →  shortfall ${p.shortfall.toExponential(
       2
     )}×`,
     status: p.shortfall < 10 ? "pass" : "fail",
   });
 
+  // Hoop stress ρv² sets the burst speed, whatever the rotor's size.
+  const hoopGPa = (SILICON_DENSITY_KG_M3 * p.v * p.v) / 1e9;
   checks.push({
     key: "material",
-    label: "Rotor survives its own spin  (rim acceleration)",
-    detail: `a = v²/r = ${p.rimAccelerationG.toExponential(2)} g  ·  ${
-      p.rimAccelerationG > 1e6
-        ? "beyond any demonstrated micro-rotor — it shatters long before physics gets interesting"
-        : p.rimAccelerationG > 1e4
-          ? "extreme MEMS territory"
+    label: `Rotor survives its own spin  (rim speed; bursts near ${RIM_SPEED_LIMIT_M_S.toFixed(0)} m/s)`,
+    detail: `v = ${p.v < 10 ? p.v.toFixed(2) : p.v.toFixed(0)} m/s  ·  hoop stress ρv² ≈ ${hoopGPa.toExponential(1)} GPa in silicon  ·  ${
+      p.v > RIM_SPEED_LIMIT_M_S
+        ? "past even generously strong silicon — it bursts"
+        : p.v > RIM_SPEED_LIMIT_M_S / 2
+          ? "near silicon's strength"
           : "within material limits"
     }`,
     status:
-      p.rimAccelerationG > 1e6 ? "fail" : p.rimAccelerationG > 1e4 ? "warn" : "pass",
+      p.v > RIM_SPEED_LIMIT_M_S ? "fail" : p.v > RIM_SPEED_LIMIT_M_S / 2 ? "warn" : "pass",
+  });
+
+  const dNm = (C / (2 * p.f0Hz)) * 1e9;
+  checks.push({
+    key: "gap",
+    label: `Ideal-mirror regime  (d⁻⁴ holds for d ≳ ${IDEAL_MIRROR_MIN_NM} nm)`,
+    detail: `d = ${dNm.toFixed(0)} nm  ·  ${
+      dNm < IDEAL_MIRROR_MIN_NM
+        ? "real metals give much less than the ideal-mirror ceiling here"
+        : "ideal-mirror scaling is a fair ceiling"
+    }`,
+    status: dNm < 10 ? "fail" : dNm < IDEAL_MIRROR_MIN_NM ? "warn" : "pass",
   });
 
   const Icon = (s: Status) =>

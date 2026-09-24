@@ -1,7 +1,7 @@
 import { formatForceG, ionWindForceG } from "../utils/thrustLeakage";
-import { formatPower, predictDevice } from "../utils/device";
-import { AT_CLAIM, CORNER, DEVICE_DEFAULTS } from "../components/device/defaults";
-import { darkEnergyTide, darkMatterFlux, QUIETEST_RIG_ACCEL } from "../utils/darkCorners";
+import { RIM_SPEED_LIMIT_M_S, formatPower, predictDevice } from "../utils/device";
+import { AT_CLAIM, CLAIM_REACH_GAP_NM, CORNER, DEVICE_DEFAULTS, SURVIVABLE_R_NM } from "../components/device/defaults";
+import { DM_PARTICLE_GEV, darkEnergyTide, darkMatterFlux, QUIETEST_RIG_ACCEL } from "../utils/darkCorners";
 import { casimirPressure } from "../utils/physics";
 import { ED_QUALITY_FACTOR } from "../utils/thermalFloor";
 import { ATLAS_DEVICE } from "../utils/boundaryAtlas";
@@ -28,12 +28,14 @@ const ionNow = formatForceG(ionWindForceG(10_000, 101_325, 0.01));
 const ionVacuum = formatForceG(ionWindForceG(10_000, 1e-6, 0.01));
 const deviceNow = formatPower(predictDevice(DEVICE_DEFAULTS).P_output);
 const cornerPower = formatPower(CORNER.P_output);
-const cornerRimG = CORNER.rimAccelerationG.toExponential(0);
+const cornerRim = CORNER.v.toFixed(0);
+const rimLimit = RIM_SPEED_LIMIT_M_S.toFixed(0);
+const reachGap = CLAIM_REACH_GAP_NM.toFixed(0);
 const atClaimShortfall = AT_CLAIM.shortfall.toExponential(0);
 const darkNgPerDay = (darkMatterFlux().kgPerDayPerM2 * 1e12).toFixed(1);
+const dmPushRatio = (20e-6 / darkMatterFlux().hypotheticalPressurePa).toExponential(0);
 const tideRatio = (QUIETEST_RIG_ACCEL / darkEnergyTide(1)).toExponential(0);
 const casimir1um = Math.abs(casimirPressure(1e-6)).toExponential(1);
-const deviceGeometric = (AT_CLAIM.shortfall / 1e4).toExponential(0);
 const atlasRim = ((2 * Math.PI * ATLAS_DEVICE.fmHz * ATLAS_DEVICE.rotorRadiusNm * 1e-9)).toFixed(0);
 const emdrive = computeGate(PRESETS.eagleworks.values);
 const emdriveThermalShare = Math.round(
@@ -62,7 +64,7 @@ export const ERRATA: Erratum[] = [
   {
     title: "\"The gap cannot close\" — it can, on paper",
     was: "The Device Model said sweeping every knob could not bring the ceiling to the 1.3 W claim.",
-    now: `At every slider's limit the formula gives ${cornerPower}. What rules it out is materials (that rotor's rim pulls ${cornerRimG} g) and a 1 nm gap far below where the d⁻⁴ law holds; at the claim's own 50 nm and 500 kHz, with a rotor that survives, it stays ${atClaimShortfall}× short.`,
+    now: `At every slider's limit the formula gives ${cornerPower}. What rules it out is the rotor (its rim would move at ${cornerRim} m/s; spinning rims burst near ${rimLimit} m/s) and a 1 nm gap far below where the d⁻⁴ law holds. With rotors that survive, the ceiling reaches the claim only below about ${reachGap} nm; at the claim's own 50 nm and 500 kHz it stays ${atClaimShortfall}× short.`,
     tab: "Device Model",
   },
   {
@@ -98,12 +100,12 @@ export const ERRATA: Erratum[] = [
   {
     title: "Prose more certain than the model",
     was: "The Casimir force was \"negligible above ~1 μm\"; the Device Model's notes still said \"no tuning of the included physics\" reaches the claim (the slider corners do, on paper); the Teacher's Guide called the (v/c)² suppression \"thermodynamics\"; the nm-cavity tab put a 50 nm gap in the \"UV / soft-X-ray\" regime; Home promised \"the truth about your experiment\" and showed \"where vacuum energy extraction actually works\".",
-    now: `At 1 µm the Casimir pressure is ${casimir1um} Pa — small, and measured (Lamoreaux 1997, 0.6–6 µm); below ~100 nm the force is labelled an ideal-mirror bound. Within materials that survive, at the claim's own gap and drive, the Device Model stays ${deviceGeometric}× short even with a 10⁴ geometric allowance. The suppression is the model's physics; a 50 nm gap resonates in the deep UV, past where gold reflects well. The microwave DCE's pump pays for every photon.`,
+    now: `At 1 µm the Casimir pressure is ${casimir1um} Pa — small, and measured (Lamoreaux 1997, 0.6–6 µm); below ~100 nm the force is labelled an ideal-mirror bound. The Device Model quotes its shortfall with a rotor that survives. The suppression is the model's physics; a 50 nm gap resonates in the deep UV, past where gold reflects well. The microwave DCE's pump pays for every photon.`,
     tab: "Casimir Effect, Device Model, Teacher's Guide, nm-Cavity, Home",
   },
   {
     title: "The microwave DCE, told as one experiment",
-    was: "The Circuit QED tab said \"the GHz trick is resonance and quiet, not speed\" and modelled \"that experiment\" (Wilson et al. 2011) — but Wilson's open line had no cavity and relied on its SQUID mirror moving at about 5% of c; the cavity-pumped version is Lähteenmäki et al. (2013). Home called these \"the only experiments\" to make photon pairs from vacuum.",
+    was: "The Circuit QED tab said \"the GHz trick is resonance and quiet, not speed\" and modelled \"that experiment\" (Wilson et al. 2011) — but Wilson's open line had no cavity and relied on its SQUID mirror moving at about 5% of c; the cavity-pumped version is Lähteenmäki et al. (2013). Home called this \"the only experiment that ever coaxed photon pairs out of empty space\" and \"the one way it was actually done\".",
     now: "Both routes are described: raw effective-mirror speed (2011) and cavity resonance (2013, the regime the panel models). They are the first moving-mirror observations, not the only vacuum-pair experiments.",
     tab: "Circuit QED, Home",
   },
@@ -114,9 +116,9 @@ export const ERRATA: Erratum[] = [
     tab: "Acoustic Casimir, Home",
   },
   {
-    title: "The EmDrive preset's thermal drift was 50× low",
+    title: "The EmDrive preset's thermal drift was 50× below what TU Dresden measured",
     was: "The Artifact Budget Gate's Eagleworks preset set thermal drift at 20 nN/W and assumed a metre of unshielded cable (\"long unshielded DC run\", no source), so it read 98% magnetic.",
-    now: `Thermal drift is set to ≈ 1 µN/W, the size TU Dresden measured from their own EmDrive's thermal expansion ("similar to … White et al."), with a few centimetres of cable, their best estimate for an earlier false positive. Thermal is now ${emdriveThermalShare}% of the budget and the claim sits ${emdrive.ratio.toFixed(1)}× above it: indistinguishable. The values are labelled illustrative.`,
+    now: `Thermal drift is set to ≈ 1 µN/W, the size TU Dresden measured from mechanical stress as their own EmDrive's cavity expanded thermally ("similar to … White et al."), with a few centimetres of cable, their best estimate for an earlier false positive. Thermal is now ${emdriveThermalShare}% of the budget and the claim sits ${emdrive.ratio.toFixed(1)}× above it: indistinguishable. The values are labelled illustrative.`,
     tab: "Thrust & Weight Diagnostic (Artifact Budget Gate)",
   },
   {
@@ -130,5 +132,29 @@ export const ERRATA: Erratum[] = [
     was: "A client filing a claim, pre-registration or census run could set the row's own timestamp and id, so a pre-registration could be dated before the data it predicts; nothing limited how fast rows could be filed.",
     now: "The database stamps every new row's time and id itself, whatever the client sends, and caps filings per rolling hour (30 claims, 30 pre-registrations, 60 census runs).",
     tab: "Claim Registry, Replication Network",
+  },
+  {
+    title: "The rotor veto used the wrong failure mechanism",
+    was: "The Device Model vetoed rotors whose rim acceleration passed 10⁶ g (\"it shatters\"), so it capped the claim-drive rotor near 1 µm; the Boundary Atlas marked its 71 µm, 1 MHz rotor as shattered. Spinning rims burst from hoop stress, ρv², which depends on rim speed, not size — small rotors survive far more than 10⁶ g.",
+    now: `The veto is a rim speed: about ${rimLimit} m/s for generously strong silicon. At the claim's 500 kHz the slider's largest rotor (${SURVIVABLE_R_NM / 1000} µm, ${AT_CLAIM.v.toFixed(0)} m/s) survives and the ceiling is still ${atClaimShortfall}× short. With rotors that survive, the claim is reached only at gaps below about ${reachGap} nm, where real metals fall well short of the ideal-mirror law; the atlas now marks those cells for the gap.`,
+    tab: "Device Model, Boundary Atlas, Teacher's Guide, Lab Worksheet",
+  },
+  {
+    title: "A power verdict that contradicted its own numbers",
+    was: "When modelled leakage exceeded the claim by more than 5%, the Leakage verdict fell through to a red \"Unexplained excess … by many orders of magnitude\" while its error-bar line said \"Within budget\"; the tab said the badge turns green \"only when the claim truly exceeds every leakage channel\". \"Explained\" verdicts said the claim was \"quantitatively reproduced\", and \"partial\" reports said the residual was within the uncertainty whatever the error bars said.",
+    now: "Leakage at or above the claim reads \"Fully explained\". Explained verdicts say the modelled channels could produce the reading, not which one did; partial reports defer to the error-bar line; the sub-nanowatt verdict admits the budget has no DCE term.",
+    tab: "Leakage & Artifact Diagnostic, Thrust & Weight Diagnostic",
+  },
+  {
+    title: "Copy that outran its own model",
+    was: "The Lifter preset said \"it's just pushing air\" while the budget credited its electrostatic allowance; Dark Corners said \"precisely none\" of the dark matter \"touches anything\", called the Casimir energy density \"measured physics\" and counted \"≈ 3 particles per litre\" without saying it assumed a particle mass; Circuit QED said \"there is nothing to detect\" below the thermal line and that a thermally masked g² trace was \"indistinguishable from noise heating\"; the nonlinear notes said \"the conversion rate is set by ℏΩ\" and a 500 kHz drive \"yields microwave photons\"; the Budget Gate claimed to compute \"every known artifact channel\"; the DCE card said \"Maximum possible\" and \"cannot explain the claim by orders of magnitude\" at any ratio.",
+    now: `Each says only what its model computes: the Lifter tagline names the channel the budget actually credits; the particle count states its ${DM_PARTICLE_GEV} GeV assumption and the dark-matter push is compared like for like (${dmPushRatio}× below the faintest audible pressure swing); below the thermal line only integration and correlations can find pairs; ℏΩ fixes the photons' energies (radio frequency at 500 kHz); the gate sums six standard channels; the DCE card prints the claim ÷ ceiling ratio.`,
+    tab: "Thrust & Weight Diagnostic, Dark Corners, Circuit QED, Non-linear Coupling",
+  },
+  {
+    title: "Units and labels",
+    was: "The Replication Network labelled acceleration in milli-g as \"mΔg\" (Δg is grams-equivalent weight everywhere else) and called every filed run an \"independent rig\"; the g² panel said \"λ²/κ gives nₚ\" and always described \"the 20 mK mode\"; Experiment Design printed \"impossible\" for a channel that is simply zero; the Device Model's sideband check compared the linewidth with a fixed 500 kHz whatever the drive, and labelled a model-vs-claim ratio \"Energy conservation\".",
+    now: "Census values read milli-g and N counts filed runs; nₚ = (λ/κ)² at the live temperature; a zero channel reads \"no limit\"; the sideband check uses the live drive frequency; the claim check is labelled as the ratio it is.",
+    tab: "Replication Network, Circuit QED, Experiment Design, Device Model",
   },
 ];

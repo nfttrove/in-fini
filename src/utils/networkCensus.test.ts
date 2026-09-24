@@ -61,7 +61,11 @@ describe("collectiveBoundStatement", () => {
 
   it("states the bound once the fleet is real", () => {
     const text = collectiveBoundStatement(fleetStats(RUNS));
-    expect(text).toContain("10 independent rigs");
+    // Runs are not deduplicated by rig, so N counts filed runs; the √N
+    // bound is what that many independent rigs could reach.
+    expect(text).toContain("10 filed runs");
+    expect(text).toContain("that many independent rigs");
+    expect(text).not.toContain("mΔg"); // acceleration, not grams-equivalent weight
     expect(text).toContain("2.2e+0"); // 7/√10 ≈ 2.214
     // median/√N is a best case for a coordinated round, not what one run
     // sees — the old text said larger effects "should already have shown

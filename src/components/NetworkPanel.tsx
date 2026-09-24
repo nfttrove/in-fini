@@ -282,13 +282,13 @@ export default function NetworkPanel() {
                 <div className="grid grid-cols-2 gap-3">
                   <MetricCard
                     label="Noise floor (residual RMS)"
-                    value={`${profile.noiseRms.toExponential(2)} mΔg`}
+                    value={`${profile.noiseRms.toExponential(2)} milli-g`}
                     sub="after drift + mains removal"
                   />
                   <MetricCard
                     label="Loudest line"
                     value={profile.topPeakHz > 0 ? `${profile.topPeakHz.toFixed(1)} Hz` : "none"}
-                    sub={profile.topPeakHz > 0 ? `${profile.topPeakG.toExponential(1)} mΔg amplitude` : "quiet trace"}
+                    sub={profile.topPeakHz > 0 ? `${profile.topPeakG.toExponential(1)} milli-g amplitude` : "quiet trace"}
                   />
                   <MetricCard
                     label="Sampling"
@@ -340,14 +340,14 @@ export default function NetworkPanel() {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3 mb-4">
-                  <MetricCard label="Rigs filed" value={String(stats.n)} sub="independent census runs" />
+                  <MetricCard label="Runs filed" value={String(stats.n)} sub="census runs; not deduplicated by rig" />
                   <MetricCard
                     label="Collective floor"
-                    value={stats.n >= 5 ? `${stats.collectiveFloor.toExponential(1)} mΔg` : "—"}
-                    sub={stats.n >= 5 ? "median / √N · best case for a coordinated round" : "needs ≥ 5 rigs"}
+                    value={stats.n >= 5 ? `${stats.collectiveFloor.toExponential(1)} milli-g` : "—"}
+                    sub={stats.n >= 5 ? "median / √N, N = runs filed (one rig can file several) · best case" : "needs ≥ 5 runs"}
                   />
-                  <MetricCard label="Quietest rig" value={`${stats.quietestNoise.toExponential(1)} mΔg`} />
-                  <MetricCard label="Median rig" value={`${stats.medianNoise.toExponential(1)} mΔg`} />
+                  <MetricCard label="Quietest rig" value={`${stats.quietestNoise.toExponential(1)} milli-g`} />
+                  <MetricCard label="Median rig" value={`${stats.medianNoise.toExponential(1)} milli-g`} />
                 </div>
                 <div className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700">
                   Mains split: {stats.mains50} × 50 Hz · {stats.mains60} × 60 Hz

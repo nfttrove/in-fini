@@ -11,9 +11,12 @@ import { g2Correlations } from "../../utils/correlation";
 export default function G2Correlation({
   defaultPairNumber,
   defaultThermal,
+  tempmK,
 }: {
   defaultPairNumber: number;
   defaultThermal: number;
+  /** The main panel's current resonator temperature, mK. */
+  tempmK: number;
 }) {
   const [logPair, setLogPair] = useState(Math.log10(Math.max(defaultPairNumber, 1e-4)));
   const [logThermal, setLogThermal] = useState(
@@ -58,10 +61,11 @@ export default function G2Correlation({
             maxLabel="10² (warm)"
           />
           <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-amber-600 leading-relaxed">
-            In the main panel's default setup λ²/κ gives nₚ ≈{" "}
-            {(defaultPairNumber).toExponential(1)} and the 20 mK mode carries
-            n_th ≈ {defaultThermal.toExponential(1)} — start from reality,
-            then break it.
+            At the main panel's current settings (λ/κ)² gives nₚ ≈{" "}
+            {(defaultPairNumber).toExponential(1)} and the{" "}
+            {tempmK >= 1000 ? `${(tempmK / 1000).toFixed(0)} K` : `${tempmK.toFixed(0)} mK`} mode
+            carries n_th ≈ {defaultThermal.toExponential(1)} — start from
+            reality, then break it.
           </p>
         </div>
         <div className="space-y-4">

@@ -53,15 +53,16 @@ function buildReport(budget: ThrustBudget, params: ThrustParams): string {
     );
   } else if (budget.verdict.key === "explained") {
     lines.push(
-      "The claimed weight change is fully explained by the sum of mundane " +
-        "artifact forces. No anomalous thrust is required, and the " +
-        "measurement is consistent with known physics."
+      "The modelled artifact channels are large enough to produce the whole " +
+        "claimed weight change, so no anomalous source is needed to explain it. " +
+        "The budget does not say which artifact produced the reading."
     );
   } else if (budget.verdict.key === "partial") {
     lines.push(
-      "The residual is within the uncertainty of the artifact estimate. " +
-        "The data does not clearly indicate anomalous thrust nor rule it " +
-        "out -- further refinement of the measurement is needed."
+      "Between 5% and 50% of the claim is left after the modelled " +
+        "channels. The error-bar line above says whether that residual " +
+        "survives their uncertainty; either way, refine the measurement " +
+        "before concluding anything."
     );
   } else {
     lines.push(

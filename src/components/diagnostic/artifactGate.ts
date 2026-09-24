@@ -32,7 +32,7 @@ export interface PresetConfig {
 export const PRESETS: Record<string, PresetConfig> = {
   eagleworks: {
     label: "Eagleworks 2016 (EmDrive)",
-    note: "80 W RF, ~100 µN claimed (1.2 ± 0.1 mN/kW; White et al., J. Propul. Power 33, 830, 2017). The artifact values are illustrative, not measured on that rig: thermal drift ≈ 1 µN/W, the size TU Dresden measured when their own EmDrive's thermal expansion stressed the balance pivots (\"similar to … White et al.\"), and a few centimetres of unshielded cable in Earth's field, their best estimate for an earlier false positive (Tajmar, Neunzig & Weikert, CEAS Space J. 14, 31, 2022).",
+    note: "80 W RF, ~100 µN claimed (1.2 ± 0.1 mN/kW; White et al., J. Propul. Power 33, 830, 2017). The artifact values are illustrative, not measured on that rig: thermal drift ≈ 1 µN/W, the size TU Dresden measured from mechanical stress as their own EmDrive's cavity expanded thermally (\"similar to … White et al.\"), and a few centimetres of unshielded cable in Earth's field, their best estimate for an earlier false positive (Tajmar, Neunzig & Weikert, CEAS Space J. 14, 31, 2022).",
     values: {
       claim: 100, P: 80, leak: 0.5, I: 2.2, Leff: 0.05, B: 50,
       pressure: 1e-5, area: 100, epsGas: 0.005, cth: 1000,

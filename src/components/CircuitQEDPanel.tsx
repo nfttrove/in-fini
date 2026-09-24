@@ -55,6 +55,8 @@ const DEVICE_ROTOR_V = predictDevice(DEVICE_DEFAULTS).v;
 // 479, 376 (2011)): the SQUID moved the line's electrical end at roughly 5%
 // of the speed of light (Chalmers; MIT Technology Review, 26 May 2011).
 const WILSON_2011_V = 0.05 * 299_792_458;
+// A large turbofan's fan-blade tip runs at roughly 400–500 m/s.
+const JET_FAN_TIP_M_S = 400;
 
 export default function CircuitQEDPanel({
   initialState,
@@ -299,7 +301,7 @@ export default function CircuitQEDPanel({
               <MetricCard
                 label="Effective mirror speed"
                 value={pred.vEff.toFixed(1) + " m/s"}
-                sub="2π·fₘ·δx — slower than a jet turbine!"
+                sub={pred.vEff < JET_FAN_TIP_M_S ? "2π·fₘ·δx — slower than a jet engine's fan tip" : "2π·fₘ·δx"}
               />
               <MetricCard
                 label="…as a fraction of c"
@@ -312,9 +314,11 @@ export default function CircuitQEDPanel({
               {Math.round(pred.vEff / DEVICE_ROTOR_V)}× the Device Model's
               default rotor ({DEVICE_ROTOR_V.toFixed(2)} m/s), yet (v/c)² is
               still hopelessly small. In a cavity that is enough, because of
-              the two things mechanics cannot offer: pumping{" "}
-              <em>exactly at 2·f₀</em> (parametric resonance — needs f₀ in
-              microwaves, not optics) and a cryogenic mode with n̄ ≈ 0. The 2011
+              two things this setup has and a spinning rotor on a nanometre
+              gap does not: a pump{" "}
+              <em>exactly at 2·f₀</em> (parametric resonance — possible because
+              f₀ is a microwave frequency, not an optical one) and, at
+              millikelvin, a microwave mode with n̄ ≈ 0. The 2011
               open-line experiment had no cavity to help, so it used raw speed
               instead: its SQUID mirror reached about 5% of c,{" "}
               {(WILSON_2011_V / pred.vEff).toExponential(0)}× this setting.
@@ -329,8 +333,9 @@ export default function CircuitQEDPanel({
         <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-amber-600 mb-3 leading-relaxed">
           What you would sweep in the lab: pair rate (cyan) vs pump frequency,
           log scale, against the thermal floor (red). Off resonance the rate
-          collapses; the resonance width is κ/2. If the cyan line does not
-          clear the red one, there is nothing to detect.
+          collapses; the resonance width is κ/2. Where the cyan line sits
+          below the red one, a count rate cannot tell pairs from thermal
+          photons; only long integration and the correlations below can.
         </p>
         <CqedSweep base={params} />
       </Panel>
@@ -346,6 +351,7 @@ export default function CircuitQEDPanel({
         <G2Correlation
           defaultPairNumber={defaultPairNumber}
           defaultThermal={pred.thermalOccupation}
+          tempmK={s.tempmK}
         />
       </Panel>
 

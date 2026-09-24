@@ -20,7 +20,7 @@ import {
 type Mode = "thrust" | "power";
 
 function fmtVal(v: number, unit: string): string {
-  if (!isFinite(v)) return "impossible";
+  if (!isFinite(v)) return "no limit (channel is zero)";
   if (unit === "dB" || unit === "K") return `${v.toFixed(1)} ${unit}`;
   if (Math.abs(v) >= 1000) return `${v.toExponential(2)} ${unit}`;
   if (Math.abs(v) >= 1) return `${v.toFixed(2)} ${unit}`;

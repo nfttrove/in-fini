@@ -11,8 +11,8 @@ export default function HomePanel() {
         <p>
           This is a workbench for quantum vacuum physics and for the claims
           people make about it. Simulate the Casimir effect, cavity
-          resonances, and the experiment that actually made photons out of
-          vacuum. Then turn the same mathematics on extraordinary claims —
+          resonances, and the experiments that made photon pairs out of
+          vacuum with an electrical mirror. Then turn the same mathematics on extraordinary claims —
           over-unity generators, antigravity disks — and watch artifact
           budgets do the arguing.
         </p>
@@ -27,7 +27,7 @@ export default function HomePanel() {
         <ul className="list-disc pl-6 space-y-2 dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
           <li><strong>Interactive tabs</strong>, from Casimir forces to the first experiments to coax photon pairs out of empty space with a moving mirror — an electrical one, in microwave circuit QED — to the 95% of the universe your instruments can't reach.</li>
           <li><strong>Real mathematics, not vignettes</strong>: logarithmic sweeps, Lorentzian resonances, Bessel sidebands, g² correlation spectroscopy, FFT residual hunting — the same machinery used in real quantum electrodynamics.</li>
-          <li><strong>Artifact budgets with error bars</strong>: load a famous claim (Podkletnov, Searl, Biefeld–Brown, the ionocraft lifter) and watch the mundane channels — vibration, ion wind, electrostatics, thermal buoyancy — account for it, with uncertainties.</li>
+          <li><strong>Artifact budgets with error bars</strong>: load a famous claim (Podkletnov, Searl, Biefeld–Brown, the ionocraft lifter) and see how much of it the mundane channels — vibration, ion wind, electrostatics, thermal buoyancy — can account for, with uncertainties.</li>
           <li><strong>The experiment-design inverter</strong>: don't just judge claims — state the effect you want to detect and learn what your rig must achieve, down to the thermal noise floor of its own test mass.</li>
           <li><strong>A public record</strong>: file claims with their budgets, pre-register predictions before you measure, and join the Replication Network's calibration census with the phone in your pocket.</li>
           <li><strong>Things you can build tonight</strong>: acoustic radiation pressure — a classroom analogue of the vacuum Casimir force — with a speaker and a jewelry scale.</li>
@@ -51,7 +51,7 @@ export default function HomePanel() {
           </div>
           <div>
             <h3 className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">4. Put a famous claim on trial — with error bars</h3>
-            <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">Load "Podkletnov" and let the budget attribute the weight change to vibration and corona. Then jitter the parameters ±20% and ask the class which verdicts survive. That's experimental physics as she is practiced.</p>
+            <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">Load "Podkletnov" and see how much of the weight change the budget can pin on vibration and corona — and how much it can't. Then jitter the parameters ±20% and ask the class which verdicts survive. That's experimental physics as she is practiced.</p>
           </div>
           <div>
             <h3 className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">5. Design an experiment that survives its own budget</h3>
@@ -74,7 +74,7 @@ export default function HomePanel() {
       <section className="space-y-3">
         <h2 className="text-xl font-semibold dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-slate-100">Getting started</h2>
         <p className="dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          One honest path through the desk: start at <strong>Casimir Effect</strong> to feel the vacuum push. Move to <strong>Device Model</strong> to learn why extracting its energy is brutally hard (spoiler: you can't, at any price matter allows). Open <strong>Circuit QED</strong> to see the one way it was actually done. Then graduate to the grown-up tabs: put a claim on trial in <strong>Claim Registry</strong>, design your own rig in <strong>Experiment Design</strong>, and analyze real data in the <strong>Data Lab</strong>.
+          One honest path through the desk: start at <strong>Casimir Effect</strong> to feel the vacuum push. Move to <strong>Device Model</strong> to learn why extracting its energy is brutally hard (spoiler: not with rotors that survive, at gaps where the physics holds). Open <strong>Circuit QED</strong> to see how photons were actually made from vacuum — with a pump paying for every one. Then graduate to the grown-up tabs: put a claim on trial in <strong>Claim Registry</strong>, design your own rig in <strong>Experiment Design</strong>, and analyze real data in the <strong>Data Lab</strong>.
         </p>
         <p className="dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
           For structured lessons, the <strong>Teacher's Guide</strong> and <strong>Lab Worksheet</strong> tabs have you covered.

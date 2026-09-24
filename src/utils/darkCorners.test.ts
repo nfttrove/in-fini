@@ -97,7 +97,10 @@ describe("dark energy's tide across the desk", () => {
 
   it("stops calling an acceleration unmeasurable once it clears the rig floor", () => {
     expect(accelerationVerdict(QUIETEST_RIG_ACCEL * 2).key).toBe("metrology");
-    expect(accelerationVerdict(QUIETEST_RIG_ACCEL / 2).key).toBe("thermal-floored");
+    // Below this app's rig but above a year of LISA Pathfinder: measurable in
+    // space, so not "far below any instrument yet built".
+    expect(accelerationVerdict(QUIETEST_RIG_ACCEL / 2).key).toBe("metrology");
+    expect(accelerationVerdict(LISA_PF_YEAR_FLOOR / 2).key).toBe("thermal-floored");
     expect(accelerationVerdict(9.80665e-7).key).toBe("jewelry");
     expect(accelerationVerdict(9.80665e-5).key).toBe("kitchen");
   });

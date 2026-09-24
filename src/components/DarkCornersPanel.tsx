@@ -12,8 +12,12 @@ import {
   darkMatterFlux,
   darkEnergyTide,
   accelerationVerdict,
+  DM_PARTICLE_GEV,
   RHO_DARK_ENERGY_J,
 } from "../utils/darkCorners";
+
+// Threshold of hearing: the rms pressure swing of the faintest audible sound.
+const HEARING_THRESHOLD_PA = 20e-6;
 
 function exp(v: number, unit: string): string {
   return `${v.toExponential(2)} ${unit}`;
@@ -131,7 +135,7 @@ export default function DarkCornersPanel() {
                 <MetricCard
                   label="Local vacuum energy density"
                   value={exp(casimir, "J/m³")}
-                  sub="π²ħc/720d⁴ — measured physics"
+                  sub="π²ħc/720d⁴ — inferred from the measured force"
                 />
                 <MetricCard
                   label="vs the cosmos's vacuum"
@@ -146,8 +150,9 @@ export default function DarkCornersPanel() {
               </div>
               <p className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700 leading-relaxed">
                 At 100 nm the exclusion of modes between your plates changes
-                the local vacuum energy density by ~10⁹ times the
-                cosmological value. The touchable vacuum is wildly stronger
+                the local vacuum energy density by{" "}
+                {(casimirDensityJ(100) / RHO_DARK_ENERGY_J).toExponential(0)}×
+                the cosmological value. The touchable vacuum is wildly stronger
                 than the dark one — it is just billed in femtojoules over
                 nanometres, which is why the Device Model panel stays honest
                 about extractable power.
@@ -161,8 +166,8 @@ export default function DarkCornersPanel() {
             <div className="grid grid-cols-2 gap-3">
               <MetricCard
                 label="Local density"
-                value="≈ 3 particles per litre"
-                sub="0.3 GeV/cm³, standard halo"
+                value={`≈ ${(dm.numberDensity / 1000).toFixed(0)} particles per litre`}
+                sub={`0.3 GeV/cm³ (standard halo) ÷ an assumed ${DM_PARTICLE_GEV} GeV particle`}
               />
               <MetricCard
                 label="Drift speed"
@@ -181,11 +186,13 @@ export default function DarkCornersPanel() {
               />
             </div>
             <p className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700 mt-4 leading-relaxed">
-              About ten nanograms of dark matter drifts through your desk
-              every day, a few hundred million particles per second, and
-              precisely none of it touches anything — even under the
-              absurd assumption of perfect absorption its push would be a
-              million times fainter than the quietest sound you can hear.
+              About ten nanograms of dark matter drifts through each square
+              metre of your desk every day — {(dm.particlesPerSecondPerM2 / 1e6).toFixed(0)} million
+              particles a second if each weighs {DM_PARTICLE_GEV} GeV — and as far as
+              every detector can tell, none of it touches anything. Even under
+              the absurd assumption of perfect absorption, its steady push
+              would be {(HEARING_THRESHOLD_PA / dm.hypotheticalPressurePa).toExponential(0)}× smaller than the pressure swing of
+              the faintest sound you can hear (20 µPa).
               Detectors like XENONnT are this app's Claim Registry at
               billion-euro scale: budget every known channel, then hunt the
               residual. The residual is still winning.

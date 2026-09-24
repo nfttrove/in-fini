@@ -6,6 +6,10 @@ function formatPercent(x: number): string {
   return x >= 1e4 ? x.toExponential(1) : x.toFixed(1);
 }
 
+function formatRatio(x: number): string {
+  return x >= 100 ? x.toExponential(1) : x.toFixed(1);
+}
+
 interface Props {
   /** dceThrustLimitG's output: grams-equivalent, like every thrust channel. */
   dceThrustLimitG: Grams;
@@ -20,13 +24,13 @@ export default function ThrustDceLimit({ dceThrustLimitG, budget }: Props) {
     <div className="bg-teal-900/20 border border-teal-700/40 p-4 rounded-lg space-y-2">
       <div className="flex items-center justify-between">
         <span className="text-sm font-semibold text-teal-400">Theoretical DCE Thrust Limit</span>
-        <span className="text-xs text-teal-600 uppercase tracking-wide">Maximum possible</span>
+        <span className="text-xs text-teal-600 uppercase tracking-wide">Generous ceiling</span>
       </div>
       <div className="text-xl font-mono font-semibold text-teal-300">
         {formatForceG(dceThrustLimitG)}
       </div>
       <div className="text-xs text-teal-300/80 leading-relaxed">
-        Maximum force from ideal dynamical Casimir effect + sidebands, given cavity parameters.
+        Order-of-magnitude ceiling from the ideal dynamical Casimir effect + sidebands at these cavity parameters; its prefactor may be off by one or two orders.
       </div>
       {dceThrustLimitG > 0 && (
         <div className="pt-2 border-t border-teal-700/30">
@@ -46,7 +50,10 @@ export default function ThrustDceLimit({ dceThrustLimitG, budget }: Props) {
           </div>
           {!canExplain && (
             <div className="text-xs text-red-400 mt-1.5 font-semibold">
-              DCE cannot explain the claim by orders of magnitude.
+              The claim is {formatRatio(claimG / dceThrustLimitG)}× this ceiling
+              {claimG / dceThrustLimitG > 100
+                ? " — more than its prefactor could be off."
+                : " — within the ceiling's own uncertainty, so this alone does not rule the DCE out."}
             </div>
           )}
         </div>

@@ -9,7 +9,7 @@ import deviceNotesSrc from "./components/device/DeviceNotes.tsx?raw";
 import DeviceModelPanel from "./components/DeviceModelPanel";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CORNER } from "./components/device/defaults";
-import { formatPower } from "./utils/device";
+import { formatPower, predictDevice } from "./utils/device";
 import { formatDeltaG } from "./utils/format";
 import ThrustPresetPicker from "./components/thrust/ThrustPresetPicker";
 import PresetCard from "./components/thrust/PresetCard";
@@ -21,6 +21,21 @@ import { builtInPresets } from "./data/presetItems";
 import appSrc from "./App.tsx?raw";
 import gateModuleSrc from "./components/diagnostic/artifactGate.ts?raw";
 import leakageSrc from "./utils/leakage.ts?raw";
+import thrustLeakageSrc from "./utils/thrustLeakage.ts?raw";
+import uncertaintySrc from "./utils/uncertainty.ts?raw";
+import diagReportSrc from "./components/diagnostic/DiagnosticReport.tsx?raw";
+import thrustReportSrc from "./components/thrust/ThrustReport.tsx?raw";
+import dceLimitSrc from "./components/thrust/ThrustDceLimit.tsx?raw";
+import edSrc from "./components/ExperimentDesignPanel.tsx?raw";
+import networkPanelSrc from "./components/NetworkPanel.tsx?raw";
+import networkCensusSrc from "./utils/networkCensus.ts?raw";
+import DeviceSanity from "./components/device/DeviceSanity";
+import { DEVICE_DEFAULTS } from "./components/device/defaults";
+import NonlinearCouplingPanel from "./components/NonlinearCouplingPanel";
+import { g2Correlations } from "./utils/correlation";
+import { THRUST_PRESETS } from "./data/thrustPresets";
+import { computeThrustBudget } from "./utils/thrustLeakage";
+import { DM_PARTICLE_GEV, darkMatterFlux } from "./utils/darkCorners";
 import ExperimentDesignPanel from "./components/ExperimentDesignPanel";
 import BoundaryAtlasPanel from "./components/BoundaryAtlasPanel";
 import DarkCornersPanel from "./components/DarkCornersPanel";
@@ -30,7 +45,8 @@ import HomePanel from "./components/HomePanel";
 import NmCavityPanel from "./components/NmCavityPanel";
 import AcousticCasimirPanel from "./components/AcousticCasimirPanel";
 import RotatingFieldPanel from "./components/RotatingFieldPanel";
-import { AT_CLAIM } from "./components/device/defaults";
+import { AT_CLAIM, CLAIM_REACH_GAP_NM } from "./components/device/defaults";
+import { RIM_SPEED_LIMIT_M_S } from "./utils/device";
 import { ED_QUALITY_FACTOR, assessDecidability } from "./utils/thermalFloor";
 import { QUIETEST_RIG_ACCEL, darkEnergyTide } from "./utils/darkCorners";
 import { casimirPressure } from "./utils/physics";
@@ -149,8 +165,20 @@ describe("errata guards: claims no stronger than the model", () => {
 
   it("the Device Model's notes quote the survivable shortfall, not 'no tuning'", () => {
     const out = html(<DeviceModelPanel />);
-    expect(out).not.toMatch(/No tuning of the included physics/);
-    expect(out).toContain(`stays ${(AT_CLAIM.shortfall / 1e4).toExponential(0)}× short`);
+    expect(out).not.toMatch(/No tuning of the included physics|granting a geometric factor/);
+    expect(out).toContain(`${AT_CLAIM.shortfall.toExponential(1)}× short even with every other`);
+    expect(out).toContain(`gaps below about ${CLAIM_REACH_GAP_NM.toFixed(0)} nm`);
+  });
+
+  it("rotors burst by rim speed (hoop stress), not by a 10⁶ g acceleration", () => {
+    const out = html(<DeviceModelPanel />);
+    expect(out).not.toMatch(/10⁶ g|shatters/);
+    expect(out).toContain(`bursts near ${RIM_SPEED_LIMIT_M_S.toFixed(0)} m/s`);
+    expect(AT_CLAIM.v).toBeLessThan(RIM_SPEED_LIMIT_M_S); // the claim-drive rotor survives
+    expect(CORNER.v).toBeGreaterThan(RIM_SPEED_LIMIT_M_S); // the corner rotor does not
+    const atlas = html(<BoundaryAtlasPanel />);
+    expect(atlas).not.toMatch(/rotor shatters|10⁶ g material veto/);
+    expect(html(<TeacherGuidePanel />)).toContain("Then the fifth knob:");
   });
 
   it("Circuit QED tells both microwave routes: 2011 speed, 2013 cavity", () => {
@@ -159,7 +187,7 @@ describe("errata guards: claims no stronger than the model", () => {
     expect(out).toContain("Lähteenmäki");
     expect(out).toContain("5% of c");
     const home = html(<HomePanel />);
-    expect(home).not.toMatch(/the only experiments|vacuum energy extraction actually works|the truth about your experiment/);
+    expect(home).not.toMatch(/the only experiment\b|one way it was actually done|vacuum energy extraction actually works|the truth about your experiment/);
   });
 
   it("the Teacher's Guide does not call the (v/c)² model 'thermodynamics'", () => {
@@ -211,5 +239,57 @@ describe("errata guards: claims no stronger than the model", () => {
     expect(rot).toContain("never matches");
     expect(formatForceG(grams(5e-4))).toBe("500.00 µg");
     expect(appSrc).not.toContain("collective detection floor");
+  });
+});
+
+describe("errata guards: verdicts and copy say only what the model computes", () => {
+  it("explained / partial / excess verdicts claim no more than their branch", () => {
+    for (const src of [leakageSrc, thrustLeakageSrc, uncertaintySrc, diagReportSrc, thrustReportSrc]) {
+      expect(src).not.toMatch(/exceeds every plausible|account for the entire claimed|uncertainties included|residual is within the uncertainty of the/);
+    }
+    const diag = html(<DiagnosticPanel />);
+    expect(diag).not.toMatch(/truly exceeds every leakage channel|quantitatively reproduced|drops to\s+zero as T_h/);
+    expect(html(<ThrustDiagnosticPanel />)).not.toMatch(/quantitatively reproduced|comprehensive referee|all known artifact channels|computes every known/);
+    expect(gateSrc).not.toMatch(/fully reproducible by known artifacts/);
+    expect(dceLimitSrc).not.toMatch(/Maximum possible|cannot explain the claim by orders of magnitude/);
+  });
+
+  it("Dark Corners states its assumptions and compares like with like", () => {
+    const out = html(<DarkCornersPanel />);
+    expect(out).not.toMatch(/precisely none|measured physics|≈ 3 particles per litre"|million times fainter than the quietest/);
+    expect(out).toContain(`an assumed ${DM_PARTICLE_GEV} GeV particle`);
+    expect(out).toContain(`${(20e-6 / darkMatterFlux().hypotheticalPressurePa).toExponential(0)}× smaller than the pressure swing`);
+  });
+
+  it("Circuit QED's thermal line, g² text and speed comparison follow the live model", () => {
+    const out = html(<CircuitQEDPanel />);
+    expect(out).not.toMatch(/nothing to detect|slower than a jet turbine|λ²\/κ gives|mechanics cannot offer/);
+    expect(out).toContain("(λ/κ)² gives nₚ");
+    const masked = g2Correlations(0.1, 0.5);
+    expect(masked.description).not.toMatch(/indistinguishable from noise heating/);
+    expect(html(<NonlinearCouplingPanel />)).not.toMatch(/conversion rate is set by|yields microwave photons/);
+  });
+
+  it("the Lifter tagline names the channel the budget credits", () => {
+    expect(THRUST_PRESETS["Lifter (Ionocraft) Classic"].tagline).not.toMatch(/just pushing air/);
+    const b = computeThrustBudget(THRUST_PRESETS["Lifter (Ionocraft) Classic"].params);
+    const top = b.channels.reduce((a, c) => (c.valueG > a.valueG ? c : a));
+    expect(top.key).toBe("electrostatic");
+    expect(THRUST_PRESETS["Lifter (Ionocraft) Classic"].tagline).toMatch(/electrostatic allowance/);
+    expect(homeSrc).not.toMatch(/attribute the weight change to vibration and corona|account for it, with uncertainties/);
+  });
+
+  it("units and labels: milli-g, runs not rigs, no 'impossible', live sideband check", () => {
+    // The fleet cards only render with live data, so check the sources too.
+    expect(html(<NetworkPanel />)).not.toMatch(/mΔg|independent census runs/);
+    for (const src of [networkPanelSrc, networkCensusSrc]) expect(src).not.toContain("mΔg");
+    expect(edSrc).not.toContain('"impossible"');
+    const dev = html(<DeviceModelPanel />);
+    expect(dev).not.toContain("Energy conservation  (no over-unity)");
+    expect(dev).toContain("Model vs claim");
+    expect(dev).toMatch(/fₘ = 500\.00 kHz vs γ\/2/);
+    // Out of slider range, but the check must follow fₘ, not a fixed 500 kHz.
+    const narrow = { ...predictDevice(DEVICE_DEFAULTS), gammaHz: 2e6 };
+    expect(html(<DeviceSanity p={narrow} Q={1e4} beta={0.3} fmHz={5e6} />)).toContain("outside the linewidth");
   });
 });

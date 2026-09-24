@@ -90,7 +90,7 @@ const TABS = [
     id: "cqed",
     label: "Circuit QED (microwave DCE)",
     description:
-      "The regime where the dynamical Casimir effect was actually measured: parametric pumping at 2·f₀ in a cryogenic microwave resonator",
+      "Where the dynamical Casimir effect was measured: a SQUID mirror on a cryogenic microwave line (2011), then parametric pumping at 2·f₀ in a resonator (2013), the regime modelled here",
   },
   {
     id: "registry",
@@ -174,7 +174,7 @@ function AppContent() {
             Quantum Vacuum &amp; Cavity Physics
           </h1>
           <p className="dark-mode:text-slate-400 light-mode:text-slate-700 coffee-mode:text-amber-700 max-w-3xl text-lg leading-relaxed">
-            Honest numerical simulations of quantum vacuum physics — and a trial bench for extraordinary claims. Simulate the Casimir effect, cavity QED, and the one experiment that made photons from vacuum; then run any claim through its artifact budget, error bars included.
+            Honest numerical simulations of quantum vacuum physics — and a trial bench for extraordinary claims. Simulate the Casimir effect, cavity QED, and the microwave experiments that made photon pairs from vacuum; then run any claim through its artifact budget, error bars included.
           </p>
           <div className="mt-6 max-w-3xl card-bg px-5 py-4 text-sm leading-relaxed dark-mode:border-cyan-500/20 dark-mode:bg-cyan-600/5 dark-mode:text-cyan-100/80 light-mode:border-blue-200/50 light-mode:bg-blue-50/60 light-mode:text-blue-900 coffee-mode:border-amber-600/30 coffee-mode:bg-amber-900/20 coffee-mode:text-amber-100">
             <span className="font-semibold dark-mode:text-cyan-300 light-mode:text-blue-600 coffee-mode:text-amber-200">New here?</span> Every tab is a mini experiment: drag the sliders, watch the numbers move, and read the "plain English" box at the top of each panel. The tab strip runs from foundations (Casimir, cavities) to the frontier (circuit QED, the dark 95%) — and the tools in between put claims on trial with error bars.

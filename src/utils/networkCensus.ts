@@ -61,5 +61,5 @@ export function collectiveBoundStatement(stats: FleetStats): string {
   if (stats.n < 5) {
     return `Only ${stats.n} run${stats.n === 1 ? "" : "s"} filed — the floor is still one rig's floor. The census starts meaning something around a dozen independent rigs.`;
   }
-  return `Across ${stats.n} independent rigs (median noise ${stats.medianNoise.toExponential(1)} mΔg), a coordinated round — every rig measuring the same effect at the same time, with independent noise — could in principle average down to about ${stats.collectiveFloor.toExponential(1)} mΔg. That is the best case to plan a replication round against, not something this census measured: on its own, a typical rig here sees about ${stats.medianNoise.toExponential(1)} mΔg.`;
+  return `Across ${stats.n} filed runs (median noise ${stats.medianNoise.toExponential(1)} milli-g), a coordinated round of that many independent rigs — every rig measuring the same effect at the same time, with independent noise — could in principle average down to about ${stats.collectiveFloor.toExponential(1)} milli-g. That is the best case to plan a replication round against, not something this census measured: on its own, a typical rig here sees about ${stats.medianNoise.toExponential(1)} milli-g.`;
 }

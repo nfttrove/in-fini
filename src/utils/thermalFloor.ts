@@ -145,14 +145,15 @@ export function assessDecidability(
   }
 
   const requiredTempK = p.tempK * ratio * ratio;
-  const belowCMB = requiredTempK < 2.7;
+  // A dilution refrigerator bottoms out near 10 mK.
+  const beyondFridge = requiredTempK < 0.01;
   return {
     floorG,
     ratio,
     verdict: {
       key: "sub-thermal",
       label: "Sub-thermal: below this rig's Brownian floor",
-      description: `The claim is ${(1 / ratio).toExponential(1)}× SMALLER than the Brownian jitter of this test mass at ${p.tempK.toFixed(p.tempK < 1 ? 2 : 0)} K (Q = ${p.qualityFactor}). Shielding and vacuum do not help here — the noise is the mass's own. Cooling alone would have to reach ≈ ${requiredTempK.toExponential(1)} K${belowCMB ? ", below the 2.7 K cosmic microwave background" : ""}; the other levers are a lighter mass, a higher-Q resonator (real ones reach 10⁶–10⁹), longer integration or a quantum-limited readout — a different instrument. The claim is not wrong; this rig cannot witness it.`,
+      description: `The claim is ${(1 / ratio).toExponential(1)}× SMALLER than the Brownian jitter of this test mass at ${p.tempK.toFixed(p.tempK < 1 ? 2 : 0)} K (Q = ${p.qualityFactor}). Shielding does not help — the noise is the mass's own — and better vacuum helps only by raising Q. Cooling alone would have to reach ≈ ${requiredTempK.toExponential(1)} K${beyondFridge ? ", colder than a dilution refrigerator's ~10 mK" : ""}; the other levers are a lighter mass, a higher-Q resonator (real ones reach 10⁶–10⁹), longer integration or a quantum-limited readout — a different instrument. The claim is not wrong; this rig cannot witness it.`,
       tone: "red",
       requiredTempK,
     },

@@ -71,7 +71,7 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       activeArea_cm2: 1,
       driveFrequency_Hz: 1e6,
     },
-    tagline: "It flies, but it's not antigravity -- it's just pushing air.",
+    tagline: "It flies, but not by antigravity: known forces cover the claim. Real lifters ride ion wind; at this budget's default 10 cm² discharge area the electrostatic allowance does the covering.",
     source:
       "Bahder & Fazi, \"Force on an Asymmetric Capacitor\", ARL-TR-3005 (2003); Tajmar, AIAA J. 42, 315 (2004): lifter thrust is corona (ion) wind.",
   },

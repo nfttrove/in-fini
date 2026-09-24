@@ -1,13 +1,18 @@
 import PlainExplainer from "./ui/PlainExplainer";
-import { DEVICE_PUSHED } from "./device/defaults";
+import { DEVICE_PUSHED, ROTOR_R_MAX_NM, survivableRadiusNm } from "./device/defaults";
 import { summarizePreset } from "../data/thrustPresets";
-import { formatPower, predictDevice } from "../utils/device";
+import { RIM_SPEED_LIMIT_M_S, formatPower, predictDevice } from "../utils/device";
 
 // Quoted numbers come from the same engines as the panels, so they cannot
 // drift (the guide once promised ~100 µW where the model gives nanowatts).
 const PODKLETNOV = summarizePreset("Podkletnov Effect (1997 claim)");
 const SEARL = summarizePreset("Searl Effect Generator (SEG)");
 const PUSHED = predictDevice(DEVICE_PUSHED);
+// The fifth knob: the rotor radius at its slider limit, then at the largest
+// radius that survives at the same drive.
+const FIFTH = predictDevice({ ...DEVICE_PUSHED, rotorRadiusNm: ROTOR_R_MAX_NM });
+const SURVIVING_R_NM = survivableRadiusNm(DEVICE_PUSHED.fmHz);
+const SURVIVING = predictDevice({ ...DEVICE_PUSHED, rotorRadiusNm: SURVIVING_R_NM });
 const pct = (x: number) => `${Number(x.toPrecision(2))}%`;
 
 export default function TeacherGuidePanel() {
@@ -78,7 +83,10 @@ export default function TeacherGuidePanel() {
           <li>Shortfall: {PUSHED.shortfall.toExponential(1)}×. That's not an oopsie, it's a reality check.</li>
         </ul>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <strong>Why?</strong> The (v/c)² term. At {DEVICE_PUSHED.fmHz / 1e6} MHz your {DEVICE_PUSHED.rotorRadiusNm} nm rotor's rim moves at {PUSHED.v.toFixed(1)} m/s. Light moves at 3×10⁸ m/s. The ratio squared is {(PUSHED.vOverC ** 2).toExponential(1)}. Within this model you can't escape it: moving-mirror photon production is suppressed by (v/c)² whenever the mirror is slow, and every material mirror is slow. That is the model's physics, not a design flaw — the Circuit QED tab shows the one lab route around it, a mirror that is electrical rather than material.
+          <strong>Then the fifth knob:</strong> rotor radius to {ROTOR_R_MAX_NM / 1000} µm. The ceiling now reads {formatPower(FIFTH.P_output)} — past the claim. Ask the class what that rotor is doing: its rim moves at {FIFTH.v.toFixed(0)} m/s, and a spinning rim bursts near {RIM_SPEED_LIMIT_M_S.toFixed(0)} m/s whatever its size. The largest rotor that survives at {DEVICE_PUSHED.fmHz / 1e6} MHz ({(SURVIVING_R_NM / 1000).toFixed(0)} µm) gives {formatPower(SURVIVING.P_output)} — and only at a {DEVICE_PUSHED.dNm} nm gap, where real metals give much less than the ideal-mirror formula. Which limit is physics, and which is the model?
+        </p>
+        <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
+          <strong>Why?</strong> The (v/c)² term. At {DEVICE_PUSHED.fmHz / 1e6} MHz your {DEVICE_PUSHED.rotorRadiusNm} nm rotor's rim moves at {PUSHED.v.toFixed(1)} m/s. Light moves at 3×10⁸ m/s. The ratio squared is {(PUSHED.vOverC ** 2).toExponential(1)}. Within this model you can't escape it: moving-mirror photon production is suppressed by (v/c)², and a material mirror stays slow — a spinning rim bursts near {RIM_SPEED_LIMIT_M_S.toFixed(0)} m/s, so v/c stays below {(RIM_SPEED_LIMIT_M_S / 2.99792458e8).toExponential(0)}. That is the model's physics, not a design flaw — the Circuit QED tab shows the lab route around it, a mirror that is electrical rather than material.
         </p>
       </section>
 

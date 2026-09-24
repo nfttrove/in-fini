@@ -404,7 +404,7 @@ function classifyThrustVerdict(
       key: "explained",
       label: "Fully explained by mundane forces",
       description:
-        "The summed artifact channels account for the entire claimed weight change. No anomalous thrust is required.",
+        "The modelled artifact channels — several of them upper bounds — are large enough to produce the whole claimed weight change, so no anomalous thrust is needed to explain it. That says the artifacts could produce the reading, not which one did.",
       tone: "emerald",
     };
   }
@@ -433,7 +433,7 @@ function classifyThrustVerdict(
     key: "gross-excess",
     label: "Unexplained excess",
     description:
-      "Claimed weight change exceeds every plausible artifact force by many orders of magnitude. This strongly suggests a measurement error, systematic bias, or unknown physics.",
+      "The claimed weight change exceeds every modelled artifact force by more than a million times. First suspects: a force this budget leaves out, or a measurement error or systematic bias; only after those, unknown physics.",
     tone: "red",
   };
 }

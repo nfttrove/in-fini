@@ -6,7 +6,8 @@ const C = 299_792_458;
 // mirrors stop reflecting well, so an "ideal cavity" there is on paper only.
 const GOLD_PLASMA_NM = 140;
 const GOLD_PLASMA_THZ = C / (GOLD_PLASMA_NM * 1e-9) / 1e12;
-const F50_HZ = C / (2 * 50e-9);
+const GAP_50_NM = 50;
+const F50_HZ = C / (2 * GAP_50_NM * 1e-9);
 
 interface NmCavityNotesProps {
   f0THz: number;
@@ -19,9 +20,9 @@ export default function NmCavityNotes({ f0THz, ratio500kHz }: NmCavityNotesProps
       <div className="space-y-3">
         <InfoNote>
           A plane-parallel EM cavity of gap <em>d</em> supports standing modes
-          at f<sub>n</sub> = n·c / (2d). A 50 nm gap therefore resonates near
+          at f<sub>n</sub> = n·c / (2d). A {GAP_50_NM} nm gap therefore resonates near{" "}
           {(F50_HZ / 1e15).toFixed(0)} × 10<sup>15</sup> Hz (≈ {(F50_HZ / 1e15).toFixed(0)} PHz,
-          λ ≈ 100 nm), in the deep (vacuum) ultraviolet; soft X-rays begin
+          λ = 2d ≈ {2 * GAP_50_NM} nm), in the deep (vacuum) ultraviolet; soft X-rays begin
           near 10 nm. The current cavity shows f₀ ≈ {f0THz >= 1000 ? `${(f0THz / 1000).toFixed(2)} PHz` : `${f0THz.toFixed(1)} THz`}.
         </InfoNote>
         {f0THz > GOLD_PLASMA_THZ && (
@@ -45,10 +46,9 @@ export default function NmCavityNotes({ f0THz, ratio500kHz }: NmCavityNotesProps
         </InfoNote>
         <ul className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400 space-y-1.5 pl-5 list-disc leading-relaxed">
           <li>
-            <span className="dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">Parametric down-conversion</span>:
-            a high-frequency pump (near f₀) modulated at the RF rate produces
-            signal / idler sidebands; only the modulation envelope is at
-            500 kHz.
+            <span className="dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">A modulated optical pump</span>:
+            a pump near f₀, modulated at the RF rate, carries sidebands at
+            f₀ ± 500 kHz; only the modulation envelope is at 500 kHz.
           </li>
           <li>
             <span className="dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">Dynamical Casimir effect</span>:

@@ -45,9 +45,10 @@ describe("known points land in known regions", () => {
     expect(thrust.cells).toContain(2);
   });
 
-  it("device map reaches the material-vetoed plausibility corner", () => {
+  it("device map meets the claim only outside the model's validity", () => {
     const device = atlasDevice();
-    expect(device.cells).toContain(3); // ceiling ≥ claim AND rotor shatters
+    expect(device.cells).toContain(3); // ceiling ≥ claim, but below ~100 nm
+    expect(device.cells).not.toContain(2); // …never where the model holds
     expect(device.cells).toContain(0); // claim far above ceiling elsewhere
   });
 

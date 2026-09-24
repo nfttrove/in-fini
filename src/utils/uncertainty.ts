@@ -59,8 +59,8 @@ export function assessResidual(
   }
   return {
     key: "explained",
-    label: "Within budget, uncertainties included",
+    label: "Within budget",
     description:
-      "Even after allowing each channel its uncertainty, the mundane budget accounts for the claim. Nothing is left to explain.",
+      "At their central values the modelled channels already cover the claim, so there is no residual to test against the error bars. Nothing is left to explain at these inputs.",
   };
 }

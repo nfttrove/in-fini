@@ -76,7 +76,8 @@ export default function LabWorksheetPanel() {
             <li>Increase area to {DEVICE_PUSHED.areaMm2} mm² (the slider maximum)</li>
             <li>Set Q = 10⁶</li>
           </ul>
-          <p><strong>Step 4:</strong> What is the new maximum power?</p>
+          <p><strong>Step 4:</strong> What is the new predicted power?</p>
+          <p><strong>Step 5:</strong> Now push the rotor radius to its maximum too. The ceiling passes the claim. Open the Sanity Checks: what happens to a rotor rim moving that fast, and does the d⁻⁴ law hold at a {DEVICE_PUSHED.dNm} nm gap?</p>
           <p><strong>Analysis:</strong> Real claims are often 1 W or higher. How many orders of magnitude short are we?</p>
         </div>
       </section>

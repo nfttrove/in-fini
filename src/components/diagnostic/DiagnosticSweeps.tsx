@@ -142,8 +142,10 @@ export default function DiagnosticSweeps({ base }: Props) {
         />
         <p className="mt-3 text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 leading-relaxed">
           As shielding improves, RF pickup collapses and the residual
-          approaches (claim − thermal − mechanical). If the residual stays
-          flat, the claimed signal is not an RF artifact.
+          approaches (claim − the other channels). A flat curve means the
+          modelled RF channel is small at these settings; in the lab, the
+          matching test is whether the measured signal itself changes as
+          you add shielding.
         </p>
       </Panel>
       <Panel title="Residual vs. Hot-side Temperature">
@@ -152,8 +154,10 @@ export default function DiagnosticSweeps({ base }: Props) {
           className="w-full h-56 dark-mode:bg-slate-900 light-mode:bg-slate-100 coffee-mode:bg-slate-900 rounded-lg"
         />
         <p className="mt-3 text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 leading-relaxed">
-          Sweeping T_h exposes blackbody leakage. A residual that drops to
-          zero as T_h → T_c indicates the "signal" was actually thermal.
+          Sweeping T_h exposes blackbody leakage. With the claim held fixed,
+          the residual grows as T_h → T_c and the blackbody channel vanishes.
+          In the lab, run it the other way: if the measured signal itself
+          falls to zero as T_h → T_c, the "signal" was thermal.
         </p>
       </Panel>
     </div>

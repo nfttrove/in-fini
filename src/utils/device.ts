@@ -4,6 +4,24 @@ export const HBAR = 1.054571817e-34;
 export const C = 2.99792458e8;
 export const KB = 1.380649e-23;
 
+/**
+ * Where a spinning rotor bursts. Hoop stress in a thin rim is σ ≈ ρv²,
+ * independent of size, so the limit is a rim SPEED, not an acceleration:
+ * small rotors survive enormous v²/r (levitated nanoparticles have been
+ * spun past 1 GHz). Generous micro-scale silicon — σ ≈ 3 GPa, ρ = 2330
+ * kg/m³ — gives about 1.1 km/s; a solid disk holds somewhat more. An
+ * order-of-magnitude line, not a spec. (The model once vetoed rim
+ * acceleration above 10⁶ g instead, which is the wrong mechanism.)
+ */
+export const SILICON_DENSITY_KG_M3 = 2330;
+export const GENEROUS_SILICON_STRENGTH_PA = 3e9;
+export const RIM_SPEED_LIMIT_M_S = Math.sqrt(
+  GENEROUS_SILICON_STRENGTH_PA / SILICON_DENSITY_KG_M3
+);
+
+/** Below about this gap real metals fall well short of the ideal-mirror d⁻⁴ law. */
+export const IDEAL_MIRROR_MIN_NM = 100;
+
 export interface DeviceParams {
   dNm: number;
   fmHz: number;
