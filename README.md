@@ -230,8 +230,10 @@ Rules that exist because breaking them has already shipped bugs here:
 - **Every thrust quantity is a grams-equivalent weight change** (F/g × 1000),
   typed `Grams` (`src/utils/units.ts`). Forces are `Newtons`. Crossing units
   takes a named conversion (`gramsToNewtons`, `newtonsToGrams`); a bare number
-  or the wrong brand does not type-check at a formatter. Three 10–1000× display
-  bugs came from skipping this.
+  or the wrong brand does not type-check at a formatter. The `grams()` /
+  `newtons()` wrappers are assertions: they accept any number, so wrap only
+  values you know are in that unit. Three 10–1000× display bugs came from
+  skipping this.
 - **Numbers in prose are computed, not typed.** Worksheet answers, guide
   examples, preset verdicts and panel comparisons are derived from the same
   engines the panels use (`DEVICE_DEFAULTS`, `summarizePreset`, …) and pinned
@@ -253,7 +255,8 @@ repo and `npm run build` to change that).
 To catch a live site that has fallen behind, every build stamps
 `<meta name="in-fini-build" content="…">` with a hash of the shipped source
 (`scripts/build-id.mjs`: paths and contents of `src/`, `public/` and the build
-config, tests excluded). The scheduled `live-drift` workflow compares
+config; tests and dotfiles excluded, line endings normalised, dependency
+versions deliberately not included). The scheduled `live-drift` workflow compares
 in-fini.com's stamp with `main` daily and fails, which emails the repo owner,
 when they differ. Run it on demand from the Actions tab after publishing.
 

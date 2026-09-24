@@ -13,6 +13,16 @@ export interface ThrustPreset {
   // the engine said "Partially explained").
 }
 
+/**
+ * Names the cloud table may still carry from before a rename, mapped to the
+ * current name, so a card reads correctly even before the renaming
+ * migration (20260924140000) has been applied.
+ */
+export const LEGACY_PRESET_NAMES: Record<string, string> = {
+  "Manchester Sphere (2000)": "Charged-sphere levitation (illustrative)",
+  "Podkletnov Effect (1992)": "Podkletnov Effect (1997 claim)",
+};
+
 export const THRUST_PRESETS: Record<string, ThrustPreset> = {
   // Formerly "Manchester Sphere (2000)": no documented claim by that name
   // could be found, so it is presented as the illustration it is.
@@ -163,7 +173,9 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
     source: "Illustrative scenario, not a historical claim.",
   },
 
-  "Podkletnov Effect (1992)": {
+  // Formerly "Podkletnov Effect (1992)": the 2% claim is from 1997; the
+  // 1992 paper reported 0.05–0.3%.
+  "Podkletnov Effect (1997 claim)": {
     params: {
       claimedDeltaG: 2.0,
       driveVoltageV: 10000,

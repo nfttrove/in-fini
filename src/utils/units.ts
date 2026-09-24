@@ -7,7 +7,9 @@
  * Claim Registry's force readout (1000× large) and the thermal floor (÷ mass
  * too, 10× off at 100 g). A Grams value can still do arithmetic, but a bare
  * number no longer passes where Grams is expected, and grams never pass as
- * newtons: crossing units takes a named conversion.
+ * newtons: crossing units takes a named conversion. `grams()` and
+ * `newtons()` are assertions, not checks: they accept any number, so wrap
+ * only a value you know is in that unit.
  */
 
 declare const unit: unique symbol;

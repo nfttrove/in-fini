@@ -6,7 +6,7 @@ import { formatPower, predictDevice } from "../utils/device";
 // Expected readings come from the same engines as the panels, so they
 // cannot drift (this sheet once said "~5 µW" where the panel shows 18 fW).
 const DEFAULT_POWER = formatPower(predictDevice(DEVICE_DEFAULTS).P_output);
-const PODKLETNOV = summarizePreset("Podkletnov Effect (1992)");
+const PODKLETNOV = summarizePreset("Podkletnov Effect (1997 claim)");
 
 export default function LabWorksheetPanel() {
   return (
@@ -54,7 +54,7 @@ export default function LabWorksheetPanel() {
         <h3 className="text-lg font-semibold text-slate-100">Part 4 – Podkletnov Thrust Diagnostic (Simulation)</h3>
         <p className="text-sm text-slate-300"><strong>Objective:</strong> Understand how vibration and ion wind fake weight reduction.</p>
         <div className="space-y-2 text-sm text-slate-300">
-          <p><strong>Step 1:</strong> Open the Thrust & Weight Diagnostic tab. Load the "Podkletnov Effect (1992)" preset.</p>
+          <p><strong>Step 1:</strong> Open the Thrust & Weight Diagnostic tab. Load the "Podkletnov Effect (1997 claim)" preset.</p>
           <p><strong>Step 2:</strong> Identify the dominant artifact channel. Which contributes more: vibration or ion wind?</p>
           <p><strong>Step 3:</strong> The verdict should show "{PODKLETNOV.verdict}". What does this mean?</p>
           <p><strong>Step 4:</strong> Now reduce the ambient pressure to 10⁻⁶ Pa (hard vacuum). Which channel disappears? Does the verdict change?</p>

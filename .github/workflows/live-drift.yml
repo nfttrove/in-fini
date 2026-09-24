@@ -23,7 +23,11 @@ jobs:
       - name: Compare live build stamp with main
         run: |
           expected=$(node scripts/build-id.mjs)
-          live=$(curl -fsSL --retry 3 https://in-fini.com/ \
+          if ! page=$(curl -fsSL --retry 3 https://in-fini.com/); then
+            echo "::error::Could not fetch in-fini.com (site down or unreachable). This is not a drift result."
+            exit 1
+          fi
+          live=$(printf '%s' "$page" \
             | grep -o 'name="in-fini-build" content="[^"]*"' \
             | sed 's/.*content="\([^"]*\)"/\1/' || true)
           echo "main:  $expected"

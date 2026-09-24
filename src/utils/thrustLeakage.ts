@@ -258,6 +258,37 @@ export function dceThrustLimitG(p: ThrustParams): Grams {
   return grams(force_g);
 }
 
+/** The optional model knobs and what their absence means. */
+export const THRUST_KNOB_DEFAULTS = {
+  dischargeAreaM2: DEFAULT_DISCHARGE_AREA_M2,
+  vibrationRectification: 1,
+} as const;
+
+/**
+ * Apply a saved parameter set over the current one. Every required
+ * parameter the save carries is taken; the optional knobs are taken from
+ * the save or reset to their defaults when it predates them, because
+ * absent means default everywhere else (presets, permalinks, filings).
+ */
+export function mergeSavedThrustParams(
+  current: ThrustParams,
+  saved: Record<string, unknown>
+): ThrustParams {
+  const next: ThrustParams = { ...current };
+  const knobs = THRUST_KNOB_DEFAULTS as Record<string, number>;
+  for (const k of Object.keys(current) as (keyof ThrustParams)[]) {
+    if (k in knobs) continue;
+    const v = saved[k];
+    if (typeof v === "number" && isFinite(v)) (next[k] as number) = v;
+  }
+  for (const [k, d] of Object.entries(knobs)) {
+    const v = saved[k];
+    (next as unknown as Record<string, number>)[k] =
+      typeof v === "number" && isFinite(v) ? v : d;
+  }
+  return next;
+}
+
 /**
  * Verdict robustness: jitter every parameter ±`jitter` fraction and recount
  * the verdicts. A preset whose verdict flips on plausible measurement

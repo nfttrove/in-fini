@@ -11,6 +11,7 @@ import {
   formatForceG,
   vibrationForceG,
   DEFAULT_DISCHARGE_AREA_M2,
+  mergeSavedThrustParams,
   G,
   type ThrustParams,
 } from "./thrustLeakage";
@@ -300,5 +301,28 @@ describe("user-set model knobs: discharge area and rectified share", () => {
       computeThrustBudget({ ...p, vibrationRectification: r }).channels.find((c) => c.key === "vibration")!.label;
     expect(label(1)).toContain("upper bound");
     expect(label(0.5)).not.toContain("upper bound");
+  });
+});
+
+describe("mergeSavedThrustParams — loading a saved preset", () => {
+  const current: ThrustParams = { ...base, dischargeAreaM2: 0.05, vibrationRectification: 0.3 };
+
+  it("takes the saved knobs (review: loading used to keep whatever was on screen)", () => {
+    const next = mergeSavedThrustParams(current, { claimedDeltaG: 5, dischargeAreaM2: 0.1, vibrationRectification: 0.1 });
+    expect(next.claimedDeltaG).toBe(5);
+    expect(next.dischargeAreaM2).toBe(0.1);
+    expect(next.vibrationRectification).toBe(0.1);
+  });
+
+  it("resets the knobs to their defaults for a save made before they existed", () => {
+    const next = mergeSavedThrustParams(current, { claimedDeltaG: 5 });
+    expect(next.dischargeAreaM2).toBe(DEFAULT_DISCHARGE_AREA_M2);
+    expect(next.vibrationRectification).toBe(1);
+  });
+
+  it("keeps current values for required params the save lacks, and ignores junk", () => {
+    const next = mergeSavedThrustParams(current, { driveVoltageV: "x", bogus: 3 });
+    expect(next.driveVoltageV).toBe(current.driveVoltageV);
+    expect((next as unknown as Record<string, unknown>).bogus).toBeUndefined();
   });
 });

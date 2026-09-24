@@ -123,7 +123,7 @@ describe("Lab Worksheet and Teacher's Guide quote the engines", () => {
     const html = text(<LabWorksheetPanel />);
     expect(html).toContain(`Should be ~${formatPower(predictDevice(DEVICE_DEFAULTS).P_output)}.`);
     expect(html).not.toContain("5 µW");
-    expect(html).toContain(`should show "${summarizePreset("Podkletnov Effect (1992)").verdict}"`);
+    expect(html).toContain(`should show "${summarizePreset("Podkletnov Effect (1997 claim)").verdict}"`);
     // Part 3 uses controls the Cavity Coupling tab actually has.
     expect(html).not.toContain("cavity gap to 100 nm");
   });
@@ -159,7 +159,7 @@ describe("ThrustDceLimit units", () => {
   it("shows dceThrustLimitG as grams, and the claim ratio against grams", () => {
     // dceThrustLimitG returns grams like every channel; the card once
     // treated it as milligrams — ceiling 1000× too small, ratio 1000× too big.
-    const budget = computeThrustBudget(THRUST_PRESETS["Podkletnov Effect (1992)"].params);
+    const budget = computeThrustBudget(THRUST_PRESETS["Podkletnov Effect (1997 claim)"].params);
     const html = renderToString(<ThrustDceLimit dceThrustLimitG={grams(1.5e-27)} budget={budget} />)
       .replace(/<!-- -->/g, "");
     expect(html).toContain(formatForceG(grams(1.5e-27)));

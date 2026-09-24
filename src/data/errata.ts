@@ -38,7 +38,7 @@ export const ERRATA: Erratum[] = [
   {
     title: "Unit slips worth 10× to 1000×",
     was: "The DCE thrust ceiling was shown 1000× too small; Claim Registry thrust claims were printed as forces 1000× too large; Experiment Design's thermal floor was off by the test mass (10× at 100 g); Dark Corners printed \"0.0 ng\" of dark matter a day.",
-    now: `Every thrust quantity is a typed grams-equivalent, forces are typed newtons, and mixing them fails to compile. Dark Corners shows ${darkNgPerDay} ng a day through 1 m², as its own text always said.`,
+    now: `Thrust quantities are typed as grams and forces as newtons: a bare number no longer passes where a unit is expected, grams never pass as newtons, and converting takes a named function. Dark Corners shows ${darkNgPerDay} ng a day through 1 m², as its own text always said.`,
     tab: "Thrust, Claim Registry, Experiment Design, Dark Corners",
   },
   {
@@ -68,7 +68,7 @@ export const ERRATA: Erratum[] = [
   {
     title: "Citations",
     was: "A \"Manchester Sphere (2000)\" preset had no documented source; \"SUPERDRAG\" named a project that does not exist; the acoustic Casimir experiment was credited to \"Larson–Puttermann\"; the Podkletnov preset's 2% was labelled 1992.",
-    now: "The sphere preset is labelled illustrative; the TU Dresden work is the SpaceDrive project; the acoustic experiment is Larraza & Denardo (1998); the 1992 paper reported 0.05–0.3%, and 2% is Podkletnov's 1997 claim. Every preset now shows its source.",
+    now: "The sphere preset is labelled illustrative; the TU Dresden work is the SpaceDrive project; the acoustic experiment is Larraza & Denardo (1998); the Podkletnov preset is named for the 1997 claim its 2% comes from (the 1992 paper reported 0.05–0.3%). Every preset now shows its source.",
     tab: "Thrust & Weight Diagnostic, Acoustic Casimir",
   },
   {

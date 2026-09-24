@@ -3,7 +3,10 @@
 // .github/workflows/live-drift.yml). It hashes file paths and contents,
 // never dependencies or timestamps, so the same commit gives the same ID
 // in CI, locally and in Bolt's build. Tests are excluded: a test-only
-// commit changes nothing users see.
+// commit changes nothing users see. Dotfiles (.DS_Store, …) are skipped and
+// text files are hashed with LF line endings, so an OS or checkout setting
+// cannot raise a false alarm. Dependency versions (package-lock.json) are
+// deliberately outside the stamp.
 //
 //   node scripts/build-id.mjs            -> prints the ID for this checkout
 
@@ -24,6 +27,7 @@ const EXCLUDE = /\.test\.[cm]?[jt]sx?$/;
 
 function walk(dir, out) {
   for (const name of readdirSync(dir)) {
+    if (name.startsWith(".")) continue;
     const p = join(dir, name);
     if (statSync(p).isDirectory()) walk(p, out);
     else out.push(p);
@@ -46,7 +50,10 @@ export function computeBuildId(root) {
   for (const rel of listBuildInputs(root)) {
     hash.update(rel);
     hash.update("\0");
-    hash.update(readFileSync(join(root, rel)));
+    const bytes = readFileSync(join(root, rel));
+    // Binary files (they contain NUL bytes) are hashed as-is; text files
+    // with CRLF normalised to LF.
+    hash.update(bytes.includes(0) ? bytes : bytes.toString("utf8").replace(/\r\n/g, "\n"));
     hash.update("\0");
   }
   return hash.digest("hex").slice(0, 12);

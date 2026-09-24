@@ -37,4 +37,16 @@ describe("build ID", () => {
     writeFileSync(join(root, "public", "logo.svg"), "<svg></svg>");
     expect(computeBuildId(root)).not.toBe(id2);
   });
+
+  it("ignores CRLF line endings and dotfiles, so no environment raises a false alarm", () => {
+    const root = fixture();
+    const id = computeBuildId(root);
+    writeFileSync(join(root, "src", "App.tsx"), "export default 1;".replace(/;/, ";\r\n"));
+    const lf = fixture();
+    writeFileSync(join(lf, "src", "App.tsx"), "export default 1;\n");
+    expect(computeBuildId(root)).toBe(computeBuildId(lf));
+    writeFileSync(join(lf, "public", ".DS_Store"), "junk");
+    expect(computeBuildId(lf)).toBe(computeBuildId(root));
+    expect(id).not.toBe(computeBuildId(lf));
+  });
 });

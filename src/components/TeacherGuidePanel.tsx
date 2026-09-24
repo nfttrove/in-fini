@@ -5,7 +5,7 @@ import { formatPower, predictDevice } from "../utils/device";
 
 // Quoted numbers come from the same engines as the panels, so they cannot
 // drift (the guide once promised ~100 µW where the model gives nanowatts).
-const PODKLETNOV = summarizePreset("Podkletnov Effect (1992)");
+const PODKLETNOV = summarizePreset("Podkletnov Effect (1997 claim)");
 const SEARL = summarizePreset("Searl Effect Generator (SEG)");
 const PUSHED = predictDevice(DEVICE_PUSHED);
 const pct = (x: number) => `${Number(x.toPrecision(2))}%`;
@@ -57,7 +57,7 @@ export default function TeacherGuidePanel() {
           <strong>Activity:</strong> Load the presets and watch reality take over:
         </p>
         <ul className="list-disc pl-6 space-y-1 text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <li><strong>Podkletnov (1992):</strong> The preset claims a {pct(PODKLETNOV.claimPercent)} weight loss. Largest artifact: {PODKLETNOV.largestChannel.toLowerCase()}. Verdict: "{PODKLETNOV.verdict}". Ask the class: is the part the budget can't explain a discovery, or a rig that needs better isolation?</li>
+          <li><strong>Podkletnov (1997 claim):</strong> The preset claims a {pct(PODKLETNOV.claimPercent)} weight loss. Largest artifact: {PODKLETNOV.largestChannel.toLowerCase()}. Verdict: "{PODKLETNOV.verdict}". Ask the class: is the part the budget can't explain a discovery, or a rig that needs better isolation?</li>
           <li><strong>Searl Effect:</strong> The preset claims a {pct(SEARL.claimPercent)} weight loss. Largest artifact: {SEARL.largestChannel.toLowerCase()}. Verdict: "{SEARL.verdict}". Physics: 1. Hype: 0.</li>
           <li><strong>Charged-sphere levitation (an illustrative preset):</strong> Reduce the pressure to hard vacuum. Which channel vanishes, and what is still enough to fake the claim?</li>
         </ul>

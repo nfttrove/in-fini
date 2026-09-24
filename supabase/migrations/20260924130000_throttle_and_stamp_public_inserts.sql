@@ -12,7 +12,8 @@
      client sent.
   2. Nothing limited the rate, so a script could flood a record that by
      design cannot be cleaned up from the app. Each table now takes at most
-     a fixed number of new rows per rolling hour from API roles.
+     a fixed number of new rows per rolling hour from API roles, counted
+     under a per-table advisory lock so parallel requests cannot race it.
 
   Only API roles (anon, authenticated) are affected. Migrations and the
   dashboard run as other roles. The caps are global: no IPs or client
@@ -37,6 +38,12 @@ BEGIN
 
   NEW.created_at := now();
   NEW.id := gen_random_uuid();
+
+  -- Serialise the count per table. Without this, parallel requests each
+  -- see only committed rows and all pass (12 concurrent 59-row inserts put
+  -- 236 rows past a cap of 60 in review). The lock is held to the end of
+  -- the inserting transaction, so the next one counts after it commits.
+  PERFORM pg_advisory_xact_lock(hashtext('in-fini:throttle:' || TG_TABLE_NAME));
 
   EXECUTE format(
     'SELECT count(*) FROM %I.%I WHERE created_at > now() - interval ''1 hour''',

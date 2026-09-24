@@ -7,10 +7,10 @@ import Slider from "./ui/Slider";
 import MetricCard from "./ui/MetricCard";
 import { LeakageParams, computeBudget, energyBalance } from "../utils/leakage";
 import EnergyBalanceCard from "./diagnostic/EnergyBalanceCard";
+import { preregisteredClaimIds } from "../utils/preregistration";
 import { ThrustParams, computeThrustBudget } from "../utils/thrustLeakage";
 import { formatPower } from "../utils/device";
-import { formatForce } from "../utils/physics";
-import { grams, gramsToNewtons } from "../utils/units";
+import { formatDeltaG } from "../utils/format";
 import {
   ClaimEntry,
   Preregistration,
@@ -102,7 +102,7 @@ export default function ClaimRegistryPanel() {
       : {
           claimed: thrust.claimedDeltaG,
           unit: "Δg",
-          format: (g: number) => `${g.toExponential(2)} Δg (${formatForce(gramsToNewtons(grams(g)))})`,
+          format: formatDeltaG,
           leakage: thrustBudget.totalLeakageG,
           residual: thrustBudget.residualG,
           residualFrac: thrustBudget.residualFrac,
@@ -130,14 +130,16 @@ export default function ClaimRegistryPanel() {
       ]);
       setClaims(claimList);
       setPreregs(preregList);
-      // Match filed claims to pre-registrations by canonical hash.
-      const hashes = new Set(preregList.map((p) => p.param_hash));
-      const matched = new Set<string>();
-      for (const c of claimList) {
-        const h = await claimHash(c.title, c.claim_type, c.claimed_value);
-        if (hashes.has(h)) matched.add(c.id);
-      }
-      setMatchedClaimIds(matched);
+      // A claim is pre-registered only if a matching prediction (same
+      // canonical hash) was filed before it.
+      const hashed = await Promise.all(
+        claimList.map(async (c) => ({
+          id: c.id,
+          created_at: c.created_at,
+          hash: await claimHash(c.title, c.claim_type, c.claimed_value),
+        }))
+      );
+      setMatchedClaimIds(preregisteredClaimIds(hashed, preregList));
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -172,7 +174,10 @@ export default function ClaimRegistryPanel() {
       });
       // Does this filing match a prior pre-registration?
       const h = await claimHash(entry.title, entry.claim_type, entry.claimed_value);
-      const wasPreregistered = preregs.some((p) => p.param_hash === h);
+      const wasPreregistered = preregisteredClaimIds(
+        [{ id: entry.id, created_at: entry.created_at, hash: h }],
+        preregs
+      ).has(entry.id);
       setFiled(
         wasPreregistered
           ? `Filed "${entry.title}" — verdict: ${entry.verdict_label}. Matches a prior pre-registration ✓`

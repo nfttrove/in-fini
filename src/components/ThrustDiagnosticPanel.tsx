@@ -12,7 +12,12 @@ import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
 import GoverningEquation from "./ui/GoverningEquation";
 import ArtifactBudgetGate from "./diagnostic/ArtifactBudgetGate";
-import { ThrustParams, computeThrustBudget, dceThrustLimitG } from "../utils/thrustLeakage";
+import {
+  ThrustParams,
+  computeThrustBudget,
+  dceThrustLimitG,
+  mergeSavedThrustParams,
+} from "../utils/thrustLeakage";
 
 const DEFAULT_PARAMS: ThrustParams = {
   claimedDeltaG: 0.1,
@@ -102,17 +107,7 @@ export default function ThrustDiagnosticPanel() {
           <PresetBar
             panel="thrust"
             currentParams={paramsForSave}
-            onLoad={(p) => {
-              const next: ThrustParams = { ...params };
-              (Object.keys(DEFAULT_PARAMS) as (keyof ThrustParams)[]).forEach(
-                (k) => {
-                  if (typeof p[k] === "number") {
-                    (next[k] as number) = p[k] as number;
-                  }
-                }
-              );
-              setParams(next);
-            }}
+            onLoad={(p) => setParams(mergeSavedThrustParams(params, p))}
           />
         </div>
       </div>

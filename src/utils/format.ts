@@ -1,3 +1,6 @@
+import { formatForce } from "./physics";
+import { grams, gramsToNewtons } from "./units";
+
 export function fmtPower(w: number): string {
   const a = Math.abs(w);
   if (a === 0) return "0 W";
@@ -14,4 +17,13 @@ export function fmtFreq(hz: number): string {
   if (hz >= 1e6) return `${(hz / 1e6).toFixed(3)} MHz`;
   if (hz >= 1e3) return `${(hz / 1e3).toFixed(3)} kHz`;
   return `${hz.toFixed(1)} Hz`;
+}
+
+/**
+ * A thrust claim as the registry prints it: the grams-equivalent weight
+ * change and the force that weighs that much. (The inline version once
+ * treated grams as kilograms, printing 0.1 g as 980.7 mN.)
+ */
+export function formatDeltaG(g: number): string {
+  return `${g.toExponential(2)} Δg (${formatForce(gramsToNewtons(grams(g)))})`;
 }
