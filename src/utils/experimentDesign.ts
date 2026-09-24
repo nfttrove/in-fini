@@ -19,7 +19,12 @@
  * stability of the *sensor*, and blind analysis. The panel says so.
  */
 
-import { G, ionWindForceG, thermalConvectionG } from "./thrustLeakage";
+import {
+  G,
+  ionWindForceG,
+  ionWindPressureLimitPa,
+  thermalConvectionG,
+} from "./thrustLeakage";
 import { rfLeakageW } from "./leakage";
 
 const EPS0 = 8.854187817e-12;
@@ -78,16 +83,19 @@ export function thrustRequirements(ctx: ThrustDesignContext): DesignResult {
   const vibMaxM = (allow * G) / (1000 * ctx.deviceMassKg * omega * omega);
   const vibNowM = ctx.vibrationAmpNm * 1e-9;
 
-  // ion wind: value ∝ 1/P (mobility) and ∝ V². Both limits are useful:
-  // raising pressure suppresses it (until the heuristic breaks in vacuum,
-  // where there is no gas to push); lowering the voltage quadratically helps.
+  // ion wind: ∝ V² at fixed pressure, and flat in pressure until the ions'
+  // mean free path approaches the gap. Two routes to the allowance: lower
+  // the voltage, or pump below p_max so the ions stop pushing air.
   const ionNow = ionWindForceG(
     ctx.driveVoltageV,
     ctx.ambientPressurePa,
     ctx.electrodeGapM
   );
-  const pMax =
-    ionNow > 0 ? (ctx.ambientPressurePa * ionNow) / allow : Infinity;
+  const pMax = ionWindPressureLimitPa(
+    allow,
+    ctx.driveVoltageV,
+    ctx.electrodeGapM
+  );
   const vMaxIon =
     ionNow > 0 ? ctx.driveVoltageV * Math.sqrt(allow / ionNow) : Infinity;
 
@@ -119,7 +127,7 @@ export function thrustRequirements(ctx: ThrustDesignContext): DesignResult {
       },
       {
         key: "ion-wind",
-        label: `Drive voltage at ${ctx.ambientPressurePa.toFixed(0)} Pa (ion wind ∝ V²; pressure alone cannot fix it — p_max would be ${isFinite(pMax) ? (pMax / 101325).toFixed(1) : "∞"} atm)`,
+        label: `Drive voltage at ${ctx.ambientPressurePa.toFixed(0)} Pa (ion wind ∝ V²; ${isFinite(pMax) ? `or pump below ${pMax.toExponential(1)} Pa` : "within allowance at any pressure"})`,
         value: vMaxIon,
         unit: "V",
         asFractionOfReference: frac(ctx.driveVoltageV, vMaxIon),

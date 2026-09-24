@@ -51,13 +51,13 @@ const DriveSection = ({ p, onChange }: Props) => (
     />
     <Slider
       label="Ambient pressure"
-      value={Math.log10(Math.max(p.ambientPressurePa, 1))}
+      value={Math.log10(Math.max(p.ambientPressurePa, 1e-6))}
       displayValue={`${p.ambientPressurePa.toExponential(2)} Pa`}
-      min={0}
+      min={-6}
       max={5.1}
       step={0.05}
       onChange={(v) => onChange("ambientPressurePa", Math.pow(10, v))}
-      minLabel="1 Pa (vacuum)"
+      minLabel="10⁻⁶ Pa (hard vacuum)"
       maxLabel="1 atm"
     />
   </div>

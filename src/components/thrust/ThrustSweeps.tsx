@@ -107,7 +107,10 @@ function drawSweep(
   for (let i = 0; i <= 4; i++) {
     const v = xMin + ((xMax - xMin) * i) / 4;
     ctx.fillStyle = tickColor;
-    ctx.fillText(v.toFixed(0), toX(v), h - 24);
+    // The pressure sweep's x is log₁₀(Pa): whole-number rounding would put
+    // a tick half a decade from its label.
+    const digits = xMax - xMin < 50 ? 1 : 0;
+    ctx.fillText(String(Number(v.toFixed(digits))), toX(v), h - 24);
   }
 
   ctx.font = "11px sans-serif";
@@ -141,13 +144,13 @@ function SweepCanvas({
       }));
     }
     return residualVsPressure(base).map((d) => ({
-      x: d.pressurePa,
+      x: Math.log10(d.pressurePa),
       residual: d.residualG,
       leakage: d.totalLeakageG,
     }));
   }, [base, sweep]);
 
-  const xLabel = sweep === "voltage" ? "Drive voltage (V)" : "Pressure (Pa)";
+  const xLabel = sweep === "voltage" ? "Drive voltage (V)" : "log₁₀ pressure (Pa)";
 
   useEffect(() => {
     if (ref.current) drawSweep(ref.current, data, xLabel, isDark);

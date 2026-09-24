@@ -113,17 +113,61 @@ export function besselJ1(x: number): number {
   return x < 0 ? -result : result;
 }
 
+const P_ATM = 101325;
+/** Ion–neutral mean free path in air at 1 atm, 293 K (≈ N₂ kinetic value). */
+const ION_MFP_ATM_M = 6.6e-8;
+/** Effective emitter–collector cross-section of a desktop corona rig (10 cm²). */
+const EHD_AREA_M2 = 1e-3;
+
+/**
+ * Ion wind in the collisional limit, grams-equivalent. Thrust is T = I·d/μ
+ * (ions drift across the gap and hand their momentum to the air). With a
+ * space-charge-limited current, J = 9/8·ε₀μV²/d³, the mobility cancels:
+ * T = 9/8·ε₀·(V/d)²·A. Real corona rigs sit below this, so as an artifact
+ * allowance it is generous.
+ */
+export function ionWindCollisionalG(voltageV: number, gapM: number): number {
+  if (gapM <= 0) return 0;
+  const E = voltageV / gapM;
+  const thrustN = (9 / 8) * EPS0 * E * E * EHD_AREA_M2;
+  return (thrustN / G) * 1000;
+}
+
+/**
+ * Ion wind at a given pressure. Ions only push air they collide with: an ion
+ * crossing the gap meets ~d/λ neutrals (λ ∝ 1/p), so the share of its
+ * momentum that reaches the gas is taken as d/(d+λ). At 1 atm λ ≈ 66 nm and
+ * the share is 1; in hard vacuum ions fly straight into the collector, the
+ * force stays inside the device, and the wind vanishes.
+ *
+ * The previous form, ε₀·μ·E²·d·0.001, had units of amperes and grew as the
+ * pressure fell (μ ∝ 1/p) — 10⁵× stronger at 1 Pa than at 1 atm.
+ */
 export function ionWindForceG(
   voltageV: number,
   pressurePa: number,
   gapM: number
 ): number {
-  if (gapM <= 0) return 0;
-  const mobility = 2e-4 * (101325 / Math.max(pressurePa, 1));
-  const E = voltageV / gapM;
-  const currentDensity = EPS0 * mobility * E * E;
-  const thrustN = currentDensity * gapM * 0.001;
-  return (thrustN / G) * 1000;
+  if (gapM <= 0 || !(pressurePa > 0)) return 0;
+  const mfpM = ION_MFP_ATM_M * (P_ATM / pressurePa);
+  return ionWindCollisionalG(voltageV, gapM) * (gapM / (gapM + mfpM));
+}
+
+/**
+ * The pressure below which the ion-wind channel stays under `allowG` —
+ * the inverse of ionWindForceG in pressure. Infinity when the collisional
+ * limit is already within the allowance (no pumping needed).
+ */
+export function ionWindPressureLimitPa(
+  allowG: number,
+  voltageV: number,
+  gapM: number
+): number {
+  const collisional = ionWindCollisionalG(voltageV, gapM);
+  if (!(collisional > allowG)) return Infinity;
+  const share = allowG / collisional;
+  const mfpM = (gapM * (1 - share)) / share;
+  return (ION_MFP_ATM_M * P_ATM) / mfpM;
 }
 
 export function vibrationForceG(
@@ -221,7 +265,7 @@ export function computeThrustBudget(p: ThrustParams): ThrustBudget {
       key: "ionWind",
       label: "Ion wind / corona thrust",
       valueG: ionWindForceG(p.driveVoltageV, p.ambientPressurePa, p.electrodeGapM),
-      formula: "ε₀ μ E² d (heuristic)",
+      formula: "⁹⁄₈ ε₀ E² A · d/(d+λ) (heuristic)",
     },
     {
       key: "vibration",
@@ -337,13 +381,17 @@ export function residualVsVoltage(
 
 export function residualVsPressure(
   base: ThrustParams,
-  pMin = 1,
+  pMin = 1e-6,
   pMax = 101325,
   steps = 40
 ): { pressurePa: number; residualG: number; totalLeakageG: number }[] {
+  // Log-spaced: the ion-wind channel only moves once the mean free path
+  // approaches the gap, many decades below 1 atm.
   const out: { pressurePa: number; residualG: number; totalLeakageG: number }[] = [];
+  const lo = Math.log10(pMin);
+  const hi = Math.log10(pMax);
   for (let i = 0; i <= steps; i++) {
-    const pressurePa = pMin + ((pMax - pMin) * i) / steps;
+    const pressurePa = Math.pow(10, lo + ((hi - lo) * i) / steps);
     const budget = computeThrustBudget({ ...base, ambientPressurePa: pressurePa });
     out.push({ pressurePa, residualG: budget.residualG, totalLeakageG: budget.totalLeakageG });
   }

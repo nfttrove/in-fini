@@ -1,5 +1,15 @@
 import { describe, it, expect } from "vitest";
-import { besselJ1, dceThrustLimitG, computeThrustBudget, verdictStability, type ThrustParams } from "./thrustLeakage";
+import {
+  besselJ1,
+  dceThrustLimitG,
+  computeThrustBudget,
+  verdictStability,
+  ionWindForceG,
+  ionWindCollisionalG,
+  ionWindPressureLimitPa,
+  G,
+  type ThrustParams,
+} from "./thrustLeakage";
 
 const base: ThrustParams = {
   claimedDeltaG: 0,
@@ -175,5 +185,59 @@ describe("verdictStability", () => {
       activeArea_cm2: 1, driveFrequency_Hz: 1e6,
     };
     expect(verdictStability(p)).toEqual(verdictStability(p));
+  });
+});
+
+describe("ionWindForceG — ions push air, so no air means no wind", () => {
+  const V = 10_000;
+  const d = 0.01;
+  const atm = ionWindForceG(V, 101325, d);
+
+  it("matches the space-charge-limited closed form 9/8·ε₀·(V/d)²·A at 1 atm", () => {
+    const EPS0 = 8.854187817e-12;
+    const expectedG = (((9 / 8) * EPS0 * (V / d) ** 2 * 1e-3) / G) * 1000;
+    expect(atm / expectedG).toBeCloseTo(1, 4);
+    // ~1 g at the panel defaults — the size real desktop corona rigs reach.
+    expect(atm).toBeGreaterThan(0.5);
+    expect(atm).toBeLessThan(2);
+  });
+
+  it("never grows as the pressure falls (the old μ ∝ 1/p form did, 10⁵× by 1 Pa)", () => {
+    let prev = atm;
+    for (let logP = 5; logP >= -6; logP -= 0.25) {
+      const f = ionWindForceG(V, 10 ** logP, d);
+      expect(f).toBeLessThanOrEqual(prev * (1 + 1e-12));
+      prev = f;
+    }
+    expect(ionWindForceG(V, 1, d)).toBeLessThan(atm);
+  });
+
+  it("vanishes in hard vacuum and at zero pressure", () => {
+    expect(ionWindForceG(V, 1e-6, d) / atm).toBeLessThan(1e-5);
+    expect(ionWindForceG(V, 0, d)).toBe(0);
+  });
+
+  it("scales as V² at fixed pressure", () => {
+    expect(ionWindForceG(2 * V, 50, d) / ionWindForceG(V, 50, d)).toBeCloseTo(4, 9);
+  });
+
+  it("the pressure limit feeds back to exactly the allowance", () => {
+    const allow = atm / 40;
+    const pMax = ionWindPressureLimitPa(allow, V, d);
+    expect(pMax).toBeGreaterThan(0);
+    expect(pMax).toBeLessThan(101325);
+    expect(ionWindForceG(V, pMax, d)).toBeCloseTo(allow, 9);
+  });
+
+  it("needs no pumping when the collisional limit is already within the allowance", () => {
+    expect(ionWindPressureLimitPa(2 * ionWindCollisionalG(V, d), V, d)).toBe(Infinity);
+  });
+
+  it("drops out of the thrust budget in hard vacuum", () => {
+    const p: ThrustParams = { ...base, driveVoltageV: V, electrodeGapM: d };
+    const ion = (pa: number) =>
+      computeThrustBudget({ ...p, ambientPressurePa: pa }).channels.find((c) => c.key === "ionWind")!.valueG;
+    expect(ion(101325)).toBeCloseTo(atm, 12);
+    expect(ion(1e-6)).toBeLessThan(atm * 1e-5);
   });
 });
