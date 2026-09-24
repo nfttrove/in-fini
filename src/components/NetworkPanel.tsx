@@ -202,10 +202,11 @@ export default function NetworkPanel() {
         </p>
         <p className="mt-2 dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
           <span className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">Why it matters:</span>{" "}
-          N independent rigs pooled together can in principle reach a noise
-          floor of median/√N. Once the census is populated, that number is
-          the honest detection limit of this fleet — the floor under every
-          future replication round. No location is collected, ever.
+          N independent rigs measuring the same effect at the same time can in
+          principle average their noise down to about median/√N. Once the
+          census is populated, that is the best case to plan a coordinated
+          replication round against — not what any single table can see.
+          No location is collected, ever.
         </p>
       </PlainExplainer>
 
@@ -343,7 +344,7 @@ export default function NetworkPanel() {
                   <MetricCard
                     label="Collective floor"
                     value={stats.n >= 5 ? `${stats.collectiveFloor.toExponential(1)} mΔg` : "—"}
-                    sub={stats.n >= 5 ? "median / √N" : "needs ≥ 5 rigs"}
+                    sub={stats.n >= 5 ? "median / √N · best case for a coordinated round" : "needs ≥ 5 rigs"}
                   />
                   <MetricCard label="Quietest rig" value={`${stats.quietestNoise.toExponential(1)} mΔg`} />
                   <MetricCard label="Median rig" value={`${stats.medianNoise.toExponential(1)} mΔg`} />

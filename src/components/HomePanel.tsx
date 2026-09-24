@@ -89,7 +89,7 @@ export default function HomePanel() {
           </div>
           <div>
             <p className="font-semibold dark-mode:text-slate-100 light-mode:text-slate-800 coffee-mode:text-slate-100">Sixty seconds: join the fleet</p>
-            <p>Lay your phone on the table and record a census run in the <strong>Replication Network</strong> tab. Your noise floor joins the fleet's collective bound — the crowd-sourced detection limit before anyone replicates anything.</p>
+            <p>Lay your phone on the table and record a census run in the <strong>Replication Network</strong> tab. Your noise floor joins the census: the fleet's measured baseline, and the best case a coordinated replication round could reach.</p>
           </div>
           <div>
             <p className="font-semibold dark-mode:text-slate-100 light-mode:text-slate-800 coffee-mode:text-slate-100">A weekend: a thrust balance</p>

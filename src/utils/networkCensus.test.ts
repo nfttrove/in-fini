@@ -63,5 +63,11 @@ describe("collectiveBoundStatement", () => {
     const text = collectiveBoundStatement(fleetStats(RUNS));
     expect(text).toContain("10 independent rigs");
     expect(text).toContain("2.2e+0"); // 7/√10 ≈ 2.214
+    // median/√N is a best case for a coordinated round, not what one run
+    // sees — the old text said larger effects "should already have shown
+    // up in a single careful run", but one run's floor is the median.
+    expect(text).toContain("best case");
+    expect(text).toContain("7.0e+0");
+    expect(text).not.toContain("single careful run");
   });
 });

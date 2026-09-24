@@ -36,7 +36,7 @@ The app is organised as nineteen tabs, each a self-contained mini-experiment:
 | **Boundary Atlas** | Verdict-flip terrain for four engines — thrust budgets, the device model's plausibility frontier (with the material veto), circuit-QED regimes, and the decidability wall — computed live from the same tested functions |
 | **Dark Corners** | The 95%: the 10^120 vacuum-overshoot problem with a cutoff slider, local Casimir vacuum density vs the cosmological one, dark-matter flux through your desk, and dark energy's unwitnessable tide — each honest number paired with "here endeth the desk" |
 | **Acoustic Casimir** | Sound's radiation pressure (p²/ρc²) side by side with the vacuum Casimir force it mirrors — with the gap at which empty space matches your speaker, and a build-it-tonight parts list |
-| **Replication Network** | Calibration Census 001: record 60 s of your rig's noise floor (phone accelerometer in-browser, or paste CSV) and file it; the fleet's collective floor is median/√N — the honest detection limit of the crowd before any replication round |
+| **Replication Network** | Calibration Census 001: record 60 s of your rig's noise floor (phone accelerometer in-browser, or paste CSV) and file it; median/√N of the fleet's noise is the best case a coordinated replication round (same effect, same time) could reach — not what the census itself sees |
 
 Diagnostic panels end in a colour-coded verdict — *explained / partial / excess /
 gross-excess* — based on how much of the claim the mundane channels account for.
