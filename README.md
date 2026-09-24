@@ -43,7 +43,7 @@ gross-excess* — based on how much of the claim the mundane channels account fo
 
 ### The physics modules
 
-All numerical models live in `src/utils/` and are unit-tested (161 tests, Vitest):
+All numerical models live in `src/utils/` and are unit-tested (165 tests, Vitest):
 
 - `physics.ts` — Casimir pressure `−π²ħc/240d⁴`, force and energy; cavity mode
   frequencies `fₙ = n·c/2L`; Lorentzian cavity response.
@@ -139,7 +139,7 @@ The unit tests never touch the network and need no environment at all.
 npm run dev        # start the dev server
 npm run build      # production build to dist/
 npm run preview    # serve the production build
-npm test           # run the Vitest suite (161 tests)
+npm test           # run the Vitest suite (165 tests)
 npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
 ```

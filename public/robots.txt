@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://in-fini.com/sitemap.xml

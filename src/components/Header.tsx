@@ -1,23 +1,17 @@
 import ThemeSwitcher from "./ThemeSwitcher";
-import { useTheme } from "../contexts/theme-context";
 
-const LogoImage = ({ isDark }: { isDark: boolean }) => (
-  <img
-    src={isDark ? "/in_fini_dark.png" : "/in_fini_white.png"}
-    alt="In Fini Logo"
-    className="h-8 w-auto"
-  />
+// The infinity mark; its gradients read on every theme. (The previous PNG
+// logos were truncated uploads that rendered as a dark smudge.)
+const LogoImage = () => (
+  <img src="/infini-mark.svg" alt="In Fini logo" className="h-8 w-auto" />
 );
 
 export default function Header() {
-  const { theme } = useTheme();
-  const isDark = theme === "dark" || theme === "coffee";
-
   return (
     <header className="dark-mode:border-slate-800/40 dark-mode:bg-slate-950/60 light-mode:border-blue-200/30 light-mode:bg-white/70 coffee-mode:border-amber-800/40 coffee-mode:bg-amber-950/60 border-b backdrop-blur-md sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-6">
         <div className="flex-shrink-0">
-          <LogoImage isDark={isDark} />
+          <LogoImage />
         </div>
         <div className="flex-1">
           <h1 className="text-2xl font-bold bg-gradient-to-r dark-mode:from-cyan-400 dark-mode:to-blue-400 light-mode:from-blue-600 light-mode:to-cyan-600 coffee-mode:from-amber-500 coffee-mode:to-orange-600 bg-clip-text text-transparent">
