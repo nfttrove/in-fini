@@ -370,6 +370,8 @@ function classifyThrustVerdict(
 export function formatForceG(g: number): string {
   const a = Math.abs(g);
   if (a === 0) return "0 g";
+  // Below 0.01 pg a fixed-point pg reading rounds to "0.00 pg".
+  if (a < 1e-14) return `${g.toExponential(2)} g`;
   if (a < 1e-9) return `${(g * 1e12).toFixed(2)} pg`;
   if (a < 1e-6) return `${(g * 1e9).toFixed(2)} ng`;
   if (a < 1e-3) return `${(g * 1e6).toFixed(2)} ug`;

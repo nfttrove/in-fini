@@ -1,5 +1,10 @@
 import { ThrustBudget, formatForceG } from "../../utils/thrustLeakage";
 
+// Claim ÷ ceiling routinely runs to 10³⁰ %; print that as an exponent.
+function formatPercent(x: number): string {
+  return x >= 1e4 ? x.toExponential(1) : x.toFixed(1);
+}
+
 interface Props {
   dceThrustLimit_mg: number;
   budget: ThrustBudget;
@@ -33,7 +38,7 @@ export default function ThrustDceLimit({ dceThrustLimit_mg, budget }: Props) {
               />
             </div>
             <div className="text-xs text-slate-400 whitespace-nowrap">
-              {dceThrustLimit_mg > 0 ? (Math.abs(budget.claimedG) * 1000 / dceThrustLimit_mg * 100).toFixed(1) : "∞"}%
+              {dceThrustLimit_mg > 0 ? formatPercent(Math.abs(budget.claimedG) * 1000 / dceThrustLimit_mg * 100) : "∞"}%
             </div>
           </div>
           {!canExplain && (

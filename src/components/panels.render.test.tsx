@@ -129,3 +129,18 @@ describe("Lab Worksheet and Teacher's Guide quote the engines", () => {
     expect(html).toContain(summarizePreset("Searl Effect Generator (SEG)").verdict);
   });
 });
+
+describe("ExperimentDesignPanel requirement wording", () => {
+  it("marks requirements the default rig already meets as met, not as needs", () => {
+    const html = renderToString(
+      <ThemeProvider>
+        <ExperimentDesignPanel />
+      </ThemeProvider>
+    ).replace(/<!-- -->/g, "");
+    // Default: 10 kV and 2 K/m are inside their allowances; vibration is not.
+    expect(html).toContain("already satisfies this");
+    expect(html).toMatch(/need [\d.]+e-\d+× today&#x27;s value/);
+    expect(html).not.toContain("of today&#x27;s value");
+    expect(html).toContain("absolute requirement");
+  });
+});

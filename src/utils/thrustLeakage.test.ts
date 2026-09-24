@@ -8,6 +8,7 @@ import {
   ionWindCollisionalG,
   ionWindPressureLimitPa,
   thermalConvectionG,
+  formatForceG,
   G,
   type ThrustParams,
 } from "./thrustLeakage";
@@ -249,5 +250,13 @@ describe("thermalConvectionG — buoyancy needs air", () => {
     expect(thermalConvectionG(2, 0.1, 0.01, 101325)).toBe(atm);
     expect(thermalConvectionG(2, 0.1, 0.01, 101325 / 10) / atm).toBeCloseTo(0.1, 12);
     expect(thermalConvectionG(2, 0.1, 0.01, 1e-6) / atm).toBeLessThan(1e-10);
+  });
+});
+
+describe("formatForceG", () => {
+  it("never rounds a real sub-picogram force to zero", () => {
+    // The DCE thrust ceiling (~1e-20 g) used to print as "0.00 pg".
+    expect(formatForceG(1.2e-20)).toBe("1.20e-20 g");
+    expect(formatForceG(5e-12)).toBe("5.00 pg");
   });
 });

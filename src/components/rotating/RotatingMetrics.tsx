@@ -20,7 +20,7 @@ export default function RotatingMetrics({ omega, k, simTimeUs }: RotatingMetrics
         />
         <MetricCard
           label="Wavenumber (k = ω/c)"
-          value={`${(k * 1e-3).toFixed(4)} × 10³ m⁻¹`}
+          value={`${k.toPrecision(4)} m⁻¹`}
           color="text-cyan-400"
         />
         <MetricCard
