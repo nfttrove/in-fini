@@ -1,4 +1,12 @@
 import PlainExplainer from "./ui/PlainExplainer";
+import { DEVICE_DEFAULTS, DEVICE_PUSHED } from "./device/defaults";
+import { summarizePreset } from "../data/thrustPresets";
+import { formatPower, predictDevice } from "../utils/device";
+
+// Expected readings come from the same engines as the panels, so they
+// cannot drift (this sheet once said "~5 µW" where the panel shows 18 fW).
+const DEFAULT_POWER = formatPower(predictDevice(DEVICE_DEFAULTS).P_output);
+const PODKLETNOV = summarizePreset("Podkletnov Effect (1992)");
 
 export default function LabWorksheetPanel() {
   return (
@@ -34,11 +42,11 @@ export default function LabWorksheetPanel() {
         <h3 className="text-lg font-semibold text-slate-100">Part 3 – Cavity Resonance (Simulation)</h3>
         <p className="text-sm text-slate-300"><strong>Objective:</strong> Measure cavity Q-factor and understand Lorentzian response.</p>
         <div className="space-y-2 text-sm text-slate-300">
-          <p><strong>Step 1:</strong> Open the Cavity Coupling tab. Set cavity gap to 100 nm and Q = 1000.</p>
-          <p><strong>Step 2:</strong> Sweep drive frequency from 0.1 MHz to 10 MHz. Note the peak power and frequency.</p>
-          <p><strong>Step 3:</strong> Measure the full width at half maximum (FWHM) of the resonance peak.</p>
-          <p><strong>Step 4:</strong> Compute Q from: Q = f₀ / FWHM. Does it match your input?</p>
-          <p><strong>Step 5:</strong> Increase Q to 10,000 and repeat. How does the resonance change?</p>
+          <p><strong>Step 1:</strong> Open the Cavity Coupling tab. Keep cavity length 0.30 m and mode n = 1 (f₀ = c/2L ≈ 500 MHz). Set Q = 10.</p>
+          <p><strong>Step 2:</strong> Sweep drive frequency from 400 MHz to 600 MHz. Where does the normalized coupling peak?</p>
+          <p><strong>Step 3:</strong> Find the two frequencies where the coupling falls to 71% — the half-power points (the tab plots field amplitude, and power goes as its square). Their separation is the linewidth Δf.</p>
+          <p><strong>Step 4:</strong> Compute Q from: Q = f₀ / Δf. Does it match your input?</p>
+          <p><strong>Step 5:</strong> Increase Q to 100 and repeat. How does the resonance change? (At Q = 1000 the linewidth, 0.5 MHz, is finer than the slider's 1 MHz step — high-Q cavities are hard to hit.)</p>
         </div>
       </section>
 
@@ -46,10 +54,10 @@ export default function LabWorksheetPanel() {
         <h3 className="text-lg font-semibold text-slate-100">Part 4 – Podkletnov Thrust Diagnostic (Simulation)</h3>
         <p className="text-sm text-slate-300"><strong>Objective:</strong> Understand how vibration and ion wind fake weight reduction.</p>
         <div className="space-y-2 text-sm text-slate-300">
-          <p><strong>Step 1:</strong> Open the Thrust & Weight Diagnostic tab. Load the "Podkletnov (1992)" preset.</p>
+          <p><strong>Step 1:</strong> Open the Thrust & Weight Diagnostic tab. Load the "Podkletnov Effect (1992)" preset.</p>
           <p><strong>Step 2:</strong> Identify the dominant artifact channel. Which contributes more: vibration or ion wind?</p>
-          <p><strong>Step 3:</strong> The verdict should show "Explained". What does this mean?</p>
-          <p><strong>Step 4:</strong> Now reduce the ambient pressure to 1 Pa (hard vacuum). Does the verdict change?</p>
+          <p><strong>Step 3:</strong> The verdict should show "{PODKLETNOV.verdict}". What does this mean?</p>
+          <p><strong>Step 4:</strong> Now reduce the ambient pressure to 10⁻⁶ Pa (hard vacuum). Which channel disappears? Does the verdict change?</p>
           <p><strong>Step 5:</strong> Reduce vibration amplitude to 1 nm. Does it change?</p>
           <p><strong>Challenge:</strong> What combination of parameters makes the residual "Unexplained"?</p>
         </div>
@@ -59,13 +67,13 @@ export default function LabWorksheetPanel() {
         <h3 className="text-lg font-semibold text-slate-100">Part 5 – DCE Theoretical Limit (Simulation)</h3>
         <p className="text-sm text-slate-300"><strong>Objective:</strong> Compare DCE prediction to real claims and understand orders of magnitude.</p>
         <div className="space-y-2 text-sm text-slate-300">
-          <p><strong>Step 1:</strong> Open the Device Model tab. Leave parameters at defaults (50 nm, 500 kHz).</p>
-          <p><strong>Step 2:</strong> What is the predicted power? (Should be ~5 µW.)</p>
-          <p><strong>Step 3:</strong> Now try to maximise power:</p>
+          <p><strong>Step 1:</strong> Open the Device Model tab. Leave parameters at defaults ({DEVICE_DEFAULTS.dNm} nm, {DEVICE_DEFAULTS.fmHz / 1e3} kHz).</p>
+          <p><strong>Step 2:</strong> What is the predicted power? (Should be ~{DEFAULT_POWER}.)</p>
+          <p><strong>Step 3:</strong> Now push these four knobs to their limits:</p>
           <ul className="list-disc pl-4 space-y-1">
-            <li>Reduce cavity gap to 10 nm</li>
-            <li>Increase frequency to 10 MHz</li>
-            <li>Increase area to 100 cm²</li>
+            <li>Reduce cavity gap to {DEVICE_PUSHED.dNm} nm</li>
+            <li>Increase frequency to {DEVICE_PUSHED.fmHz / 1e6} MHz</li>
+            <li>Increase area to {DEVICE_PUSHED.areaMm2} mm² (the slider maximum)</li>
             <li>Set Q = 10⁶</li>
           </ul>
           <p><strong>Step 4:</strong> What is the new maximum power?</p>

@@ -5,6 +5,11 @@ import ClaimRegistryPanel from "./ClaimRegistryPanel";
 import ExperimentDesignPanel from "./ExperimentDesignPanel";
 import DataLabPanel from "./DataLabPanel";
 import DarkCornersPanel from "./DarkCornersPanel";
+import LabWorksheetPanel from "./LabWorksheetPanel";
+import TeacherGuidePanel from "./TeacherGuidePanel";
+import { DEVICE_DEFAULTS, DEVICE_PUSHED } from "./device/defaults";
+import { summarizePreset } from "../data/thrustPresets";
+import { formatPower, predictDevice } from "../utils/device";
 import { ThemeProvider } from "../contexts/ThemeContext";
 
 /**
@@ -94,5 +99,33 @@ describe("DarkCornersPanel render", () => {
     const ng = Number(html.match(/([\d.]+) ng</)?.[1]);
     expect(ng).toBeGreaterThan(5);
     expect(ng).toBeLessThan(20);
+  });
+});
+
+describe("Lab Worksheet and Teacher's Guide quote the engines", () => {
+  // Server rendering puts <!-- --> between adjacent text nodes and escapes
+  // quotes; undo both so the sentences read as the user sees them.
+  const text = (el: JSX.Element) =>
+    renderToString(<ThemeProvider>{el}</ThemeProvider>)
+      .replace(/<!-- -->/g, "")
+      .replace(/&quot;/g, '"');
+
+  it("worksheet expects the Device Model's actual default reading", () => {
+    const html = text(<LabWorksheetPanel />);
+    expect(html).toContain(`Should be ~${formatPower(predictDevice(DEVICE_DEFAULTS).P_output)}.`);
+    expect(html).not.toContain("5 µW");
+    expect(html).toContain(`should show "${summarizePreset("Podkletnov Effect (1992)").verdict}"`);
+    // Part 3 uses controls the Cavity Coupling tab actually has.
+    expect(html).not.toContain("cavity gap to 100 nm");
+  });
+
+  it("guide's pushed-knob numbers are the model's, not the old 100 µW / 10,000×", () => {
+    const html = text(<TeacherGuidePanel />);
+    const pushed = predictDevice(DEVICE_PUSHED);
+    expect(html).toContain(`Predicted power: ${formatPower(pushed.P_output)}`);
+    expect(html).toContain(`Shortfall: ${pushed.shortfall.toExponential(1)}×`);
+    expect(html).not.toContain("100 µW");
+    expect(html).not.toContain("10,000×");
+    expect(html).toContain(summarizePreset("Searl Effect Generator (SEG)").verdict);
   });
 });

@@ -1,4 +1,14 @@
 import PlainExplainer from "./ui/PlainExplainer";
+import { DEVICE_PUSHED } from "./device/defaults";
+import { summarizePreset } from "../data/thrustPresets";
+import { formatPower, predictDevice } from "../utils/device";
+
+// Quoted numbers come from the same engines as the panels, so they cannot
+// drift (the guide once promised ~100 µW where the model gives nanowatts).
+const PODKLETNOV = summarizePreset("Podkletnov Effect (1992)");
+const SEARL = summarizePreset("Searl Effect Generator (SEG)");
+const PUSHED = predictDevice(DEVICE_PUSHED);
+const pct = (x: number) => `${Number(x.toPrecision(2))}%`;
 
 export default function TeacherGuidePanel() {
   return (
@@ -33,7 +43,7 @@ export default function TeacherGuidePanel() {
         <h3 className="text-lg font-semibold dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-slate-100">3. Resonance & Sidebands—No Free Lunch (40 min)</h3>
         <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400"><strong>Tabs:</strong> Cavity Coupling, Non-linear Coupling</p>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <strong>Activity 1:</strong> Sweep drive frequency through resonance. Watch the peak spike. Measure FWHM and compute Q. Ask: why is this so sharp? (Answer: energy gets trapped and recycled before leaking out.)
+          <strong>Activity 1:</strong> Sweep drive frequency through resonance. Watch the peak spike. Measure the width Δf between the half-power points (coupling ≈ 71% — the tab plots field amplitude) and compute Q = f₀/Δf. Ask: why is this so sharp? (Answer: energy gets trapped and recycled before leaking out.)
         </p>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
           <strong>Activity 2:</strong> Crank up modulation depth β. Sidebands pop out at f₀ ± f_m. Looks like free power, right? Wrong. Where does the sideband energy come from? (The main carrier. You're just stealing from Peter to pay Paul.)
@@ -47,8 +57,8 @@ export default function TeacherGuidePanel() {
           <strong>Activity:</strong> Load the presets and watch reality take over:
         </p>
         <ul className="list-disc pl-6 space-y-1 text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <li><strong>Podkletnov (1992):</strong> Claims 0.053% weight loss. Vibration alone explains 1.9%. Verdict: your table is shaking harder than the signal is real.</li>
-          <li><strong>Searl Effect:</strong> Claims 78% weight loss. Even with all artifacts maxed, you can't reach it. Physics: 1. Hype: 0.</li>
+          <li><strong>Podkletnov (1992):</strong> The preset claims a {pct(PODKLETNOV.claimPercent)} weight loss. Largest artifact: {PODKLETNOV.largestChannel.toLowerCase()}. Verdict: "{PODKLETNOV.verdict}". Ask the class: is the part the budget can't explain a discovery, or a rig that needs better isolation?</li>
+          <li><strong>Searl Effect:</strong> The preset claims a {pct(SEARL.claimPercent)} weight loss. Largest artifact: {SEARL.largestChannel.toLowerCase()}. Verdict: "{SEARL.verdict}". Physics: 1. Hype: 0.</li>
           <li><strong>Manchester Spheres:</strong> Micro-scale "levitation". Reduce pressure to hard vacuum. Does it still float? (Spoiler: no.)</li>
         </ul>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
@@ -60,15 +70,15 @@ export default function TeacherGuidePanel() {
         <h3 className="text-lg font-semibold dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-slate-100">5. Why Your 500 kHz Buzzer Won't Power a Lightbulb (30 min)</h3>
         <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400"><strong>Tab:</strong> Device Model — Power from Vacuum</p>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <strong>Activity:</strong> Turn every knob to maximum. Tiny gap (10 nm). Insane Q (10⁶). Huge area (10 cm²). Run at 10 MHz:
+          <strong>Activity:</strong> Push four knobs to their limits. Tiny gap ({DEVICE_PUSHED.dNm} nm). Insane Q (10⁶). The biggest area ({DEVICE_PUSHED.areaMm2} mm²). Run at {DEVICE_PUSHED.fmHz / 1e6} MHz:
         </p>
         <ul className="list-disc pl-6 space-y-1 text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <li>Predicted power: ~100 µW (microWatts)</li>
+          <li>Predicted power: {formatPower(PUSHED.P_output)}</li>
           <li>Claimed power: 1.3 W (Watts)</li>
-          <li>Shortfall: 10,000×. That's not an oopsie, it's a cosmological reality check.</li>
+          <li>Shortfall: {PUSHED.shortfall.toExponential(1)}×. That's not an oopsie, it's a cosmological reality check.</li>
         </ul>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <strong>Why?</strong> The (v/c)² term. Your rotor moves at 0.15 m/s. Light moves at 3×10⁸ m/s. The ratio squared is 2.7×10⁻¹⁹. You can't escape this. It's not a design flaw—it's thermodynamics.
+          <strong>Why?</strong> The (v/c)² term. At {DEVICE_PUSHED.fmHz / 1e6} MHz your {DEVICE_PUSHED.rotorRadiusNm} nm rotor's rim moves at {PUSHED.v.toFixed(1)} m/s. Light moves at 3×10⁸ m/s. The ratio squared is {(PUSHED.vOverC ** 2).toExponential(1)}. You can't escape this. It's not a design flaw—it's thermodynamics.
         </p>
       </section>
 

@@ -1,4 +1,4 @@
-import { ThrustParams } from "../utils/thrustLeakage";
+import { ThrustParams, computeThrustBudget } from "../utils/thrustLeakage";
 
 export interface ThrustPreset {
   params: ThrustParams;
@@ -248,3 +248,23 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
     verdict: "Unexplained excess (no data entered)",
   },
 };
+
+/**
+ * What the Thrust & Weight Diagnostic shows for a preset, computed by the
+ * same engine. The Lab Worksheet and Teacher's Guide quote this instead of
+ * hand-typed numbers, which had drifted from the panel.
+ */
+export function summarizePreset(name: string): {
+  claimPercent: number;
+  largestChannel: string;
+  verdict: string;
+} {
+  const { params } = THRUST_PRESETS[name];
+  const budget = computeThrustBudget(params);
+  const largest = budget.channels.reduce((a, c) => (c.valueG > a.valueG ? c : a));
+  return {
+    claimPercent: (100 * params.claimedDeltaG) / (params.deviceMassKg * 1000),
+    largestChannel: largest.label,
+    verdict: budget.verdict.label,
+  };
+}

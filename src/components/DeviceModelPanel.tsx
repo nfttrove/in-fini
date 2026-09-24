@@ -9,15 +9,16 @@ import DeviceNotes from "./device/DeviceNotes";
 import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
 import GoverningEquation from "./ui/GoverningEquation";
+import { DEVICE_DEFAULTS } from "./device/defaults";
 import { predictDevice } from "../utils/device";
 
 export default function DeviceModelPanel() {
-  const [dNm, setDNm] = useState(50);
-  const [fmKHz, setFmKHz] = useState(500);
-  const [beta, setBeta] = useState(0.3);
-  const [rotorRadiusNm, setRotorRadiusNm] = useState(50);
-  const [Q, setQ] = useState(10000);
-  const [areaMm2, setAreaMm2] = useState(1);
+  const [dNm, setDNm] = useState(DEVICE_DEFAULTS.dNm);
+  const [fmKHz, setFmKHz] = useState(DEVICE_DEFAULTS.fmHz / 1e3);
+  const [beta, setBeta] = useState(DEVICE_DEFAULTS.beta);
+  const [rotorRadiusNm, setRotorRadiusNm] = useState(DEVICE_DEFAULTS.rotorRadiusNm);
+  const [Q, setQ] = useState(DEVICE_DEFAULTS.Q);
+  const [areaMm2, setAreaMm2] = useState(DEVICE_DEFAULTS.areaMm2);
 
   const base = useMemo(
     () => ({
