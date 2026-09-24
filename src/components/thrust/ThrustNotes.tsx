@@ -10,11 +10,12 @@ export default function ThrustNotes() {
           for your experiment on the left; the tool sums four mundane force
           channels and reports the <em>residual</em> -- the portion of the
           claimed weight change that is <em>not</em> accounted for by known
-          physics. The vibration, electrostatic and thermal channels are generous
-          allowances (upper bounds), so a claim inside them is one the artifacts{" "}
-          <em>could</em> produce. The ion-wind channel is a heuristic scaled to a
-          desktop corona rig's ~10 cm² discharge area; a large-electrode rig can
-          push harder.
+          physics. The electrostatic and thermal channels, and vibration at its
+          default rectified share of 1, are generous allowances (upper bounds),
+          so a claim inside them is one the artifacts <em>could</em> produce.
+          The ion-wind channel is a heuristic over the discharge area you set
+          (default 10 cm², a desktop corona rig); a large-electrode rig can
+          push much harder.
         </p>
         <ul className="list-disc list-inside space-y-1 dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
           <li>
@@ -29,7 +30,9 @@ export default function ThrustNotes() {
             device pushes on the scale with a peak force m ω² x. A linear
             balance averages that to zero; it reads as a steady weight change
             only through a nonlinearity (a bouncing contact, a saturating or
-            filtering readout), so the peak is counted as an upper bound.
+            filtering readout). By default the whole peak is counted — the upper
+            bound; the rectified-share slider asks what a more linear balance
+            would read.
           </li>
           <li>
             <span className="text-rose-300">Electrostatic image:</span>{" "}

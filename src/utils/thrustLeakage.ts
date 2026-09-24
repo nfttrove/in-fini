@@ -16,6 +16,18 @@ export interface ThrustParams {
   cavityQ: number;
   activeArea_cm2: number;
   driveFrequency_Hz: number;
+  /**
+   * Ion-wind discharge cross-section, m². Optional so presets, permalinks
+   * and filed claims made before it existed keep their values: absent means
+   * DEFAULT_DISCHARGE_AREA_M2.
+   */
+  dischargeAreaM2?: number;
+  /**
+   * Share of the peak vibration force that reads as a steady weight change,
+   * 0–1. 1 is the upper bound (and the value when absent); 0 is a perfectly
+   * linear balance, which averages a steady shake to nothing.
+   */
+  vibrationRectification?: number;
 }
 
 import { SigmaAssessment, assessResidual, combinedSigma } from "./uncertainty";
@@ -116,21 +128,25 @@ export function besselJ1(x: number): number {
 const P_ATM = 101325;
 /** Ion–neutral mean free path in air at 1 atm, 293 K (≈ N₂ kinetic value). */
 const ION_MFP_ATM_M = 6.6e-8;
-/** Effective emitter–collector cross-section of a desktop corona rig (10 cm²). */
-const EHD_AREA_M2 = 1e-3;
+/** Emitter–collector cross-section of a desktop corona rig (10 cm²). */
+export const DEFAULT_DISCHARGE_AREA_M2 = 1e-3;
 
 /**
  * Ion wind in the collisional limit, grams-equivalent. Thrust is T = I·d/μ
  * (ions drift across the gap and hand their momentum to the air). With a
  * space-charge-limited current, J = 9/8·ε₀μV²/d³, the mobility cancels:
- * T = 9/8·ε₀·(V/d)²·A, here over a fixed ~10 cm² discharge area. Corona
- * rigs of that size sit below it; a large-electrode rig can exceed it, so
- * this is a heuristic, not an upper bound for every geometry.
+ * T = 9/8·ε₀·(V/d)²·A over the discharge area A (default 10 cm², a desktop
+ * corona rig, which sits below this bound). A heuristic: the area is the
+ * user's to set, and a large-electrode rig can push much harder.
  */
-export function ionWindCollisionalG(voltageV: number, gapM: number): number {
-  if (gapM <= 0) return 0;
+export function ionWindCollisionalG(
+  voltageV: number,
+  gapM: number,
+  areaM2: number = DEFAULT_DISCHARGE_AREA_M2
+): number {
+  if (gapM <= 0 || !(areaM2 > 0)) return 0;
   const E = voltageV / gapM;
-  const thrustN = (9 / 8) * EPS0 * E * E * EHD_AREA_M2;
+  const thrustN = (9 / 8) * EPS0 * E * E * areaM2;
   return (thrustN / G) * 1000;
 }
 
@@ -147,11 +163,12 @@ export function ionWindCollisionalG(voltageV: number, gapM: number): number {
 export function ionWindForceG(
   voltageV: number,
   pressurePa: number,
-  gapM: number
+  gapM: number,
+  areaM2: number = DEFAULT_DISCHARGE_AREA_M2
 ): number {
   if (gapM <= 0 || !(pressurePa > 0)) return 0;
   const mfpM = ION_MFP_ATM_M * (P_ATM / pressurePa);
-  return ionWindCollisionalG(voltageV, gapM) * (gapM / (gapM + mfpM));
+  return ionWindCollisionalG(voltageV, gapM, areaM2) * (gapM / (gapM + mfpM));
 }
 
 /**
@@ -162,23 +179,30 @@ export function ionWindForceG(
 export function ionWindPressureLimitPa(
   allowG: number,
   voltageV: number,
-  gapM: number
+  gapM: number,
+  areaM2: number = DEFAULT_DISCHARGE_AREA_M2
 ): number {
-  const collisional = ionWindCollisionalG(voltageV, gapM);
+  const collisional = ionWindCollisionalG(voltageV, gapM, areaM2);
   if (!(collisional > allowG)) return Infinity;
   const share = allowG / collisional;
   const mfpM = (gapM * (1 - share)) / share;
   return (ION_MFP_ATM_M * P_ATM) / mfpM;
 }
 
+/**
+ * Vibration: the peak inertial force m·ω²·x, times the share of it that
+ * reads as a steady weight change (clamped to 0–1; 1 is the upper bound).
+ */
 export function vibrationForceG(
   massKg: number,
   ampNm: number,
-  freqHz: number
+  freqHz: number,
+  rectification: number = 1
 ): number {
   const omega = 2 * Math.PI * freqHz;
   const acc = omega * omega * (ampNm * 1e-9);
-  return (massKg * acc / G) * 1000;
+  const share = Math.min(1, Math.max(0, rectification));
+  return share * (massKg * acc / G) * 1000;
 }
 
 export function electrostaticForceG(
@@ -265,22 +289,36 @@ export function computeThrustBudget(p: ThrustParams): ThrustBudget {
   // and "buoyancy" separately, but both reduce to the same Δρ·A·h term —
   // the same physics counted twice (found by the permutation sweep,
   // regression-tested below).
+  const rectification = Math.min(1, Math.max(0, p.vibrationRectification ?? 1));
   const channels: ThrustChannel[] = [
     {
       key: "ionWind",
       label: "Ion wind / corona thrust",
-      valueG: ionWindForceG(p.driveVoltageV, p.ambientPressurePa, p.electrodeGapM),
-      formula: "⁹⁄₈ ε₀ E² A · d/(d+λ) (heuristic)",
+      valueG: ionWindForceG(
+        p.driveVoltageV,
+        p.ambientPressurePa,
+        p.electrodeGapM,
+        p.dischargeAreaM2 ?? DEFAULT_DISCHARGE_AREA_M2
+      ),
+      formula: "⁹⁄₈ ε₀ E² A_d · d/(d+λ) (heuristic)",
     },
     {
       key: "vibration",
       // The peak inertial force. A linear balance averages a sinusoidal
       // shake to zero; it only reads as a steady weight change through a
       // nonlinearity (bouncing contact, saturating or filtering readout).
-      // Counted at the peak, so this channel is an upper bound.
-      label: "Vibration (peak inertial force, upper bound)",
-      valueG: vibrationForceG(p.deviceMassKg, p.vibrationAmpNm, p.vibrationFreqHz),
-      formula: "m ω² x / g (peak)",
+      // At the default rectification of 1 this channel is the upper bound.
+      label:
+        rectification >= 1
+          ? "Vibration (peak inertial force, upper bound)"
+          : "Vibration (rectified share of the peak force)",
+      valueG: vibrationForceG(
+        p.deviceMassKg,
+        p.vibrationAmpNm,
+        p.vibrationFreqHz,
+        rectification
+      ),
+      formula: rectification >= 1 ? "m ω² x / g (peak)" : `${rectification.toFixed(2)} × m ω² x / g`,
     },
     {
       key: "electrostatic",

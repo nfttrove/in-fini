@@ -9,6 +9,8 @@ import {
   ionWindPressureLimitPa,
   thermalConvectionG,
   formatForceG,
+  vibrationForceG,
+  DEFAULT_DISCHARGE_AREA_M2,
   G,
   type ThrustParams,
 } from "./thrustLeakage";
@@ -258,5 +260,44 @@ describe("formatForceG", () => {
     // The DCE thrust ceiling (~1e-20 g) used to print as "0.00 pg".
     expect(formatForceG(1.2e-20)).toBe("1.20e-20 g");
     expect(formatForceG(5e-12)).toBe("5.00 pg");
+  });
+});
+
+describe("user-set model knobs: discharge area and rectified share", () => {
+  const p: ThrustParams = {
+    ...base,
+    driveVoltageV: 10_000,
+    electrodeGapM: 0.01,
+    ambientPressurePa: 101325,
+    deviceMassKg: 0.1,
+    vibrationAmpNm: 100,
+    vibrationFreqHz: 100,
+  };
+  const ch = (q: ThrustParams, key: string) =>
+    computeThrustBudget(q).channels.find((c) => c.key === key)!.valueG;
+
+  it("absent knobs reproduce the explicit defaults exactly (presets, permalinks, filings)", () => {
+    const explicit = { ...p, dischargeAreaM2: DEFAULT_DISCHARGE_AREA_M2, vibrationRectification: 1 };
+    expect(computeThrustBudget(p)).toEqual(computeThrustBudget(explicit));
+  });
+
+  it("ion wind scales linearly with the discharge area", () => {
+    expect(ch({ ...p, dischargeAreaM2: 1e-2 }, "ionWind") / ch(p, "ionWind")).toBeCloseTo(10, 9);
+    expect(ionWindForceG(1e4, 101325, 0.01, 0)).toBe(0);
+  });
+
+  it("vibration scales with the rectified share, clamped to 0–1", () => {
+    const full = ch(p, "vibration");
+    expect(ch({ ...p, vibrationRectification: 0.25 }, "vibration") / full).toBeCloseTo(0.25, 12);
+    expect(ch({ ...p, vibrationRectification: 0 }, "vibration")).toBe(0);
+    expect(vibrationForceG(0.1, 100, 100, 1.7)).toBe(vibrationForceG(0.1, 100, 100, 1));
+    expect(vibrationForceG(0.1, 100, 100, -1)).toBe(0);
+  });
+
+  it("labels the vibration channel as the upper bound only at share 1", () => {
+    const label = (r: number) =>
+      computeThrustBudget({ ...p, vibrationRectification: r }).channels.find((c) => c.key === "vibration")!.label;
+    expect(label(1)).toContain("upper bound");
+    expect(label(0.5)).not.toContain("upper bound");
   });
 });

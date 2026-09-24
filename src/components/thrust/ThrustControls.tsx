@@ -1,6 +1,6 @@
 import Panel from "../ui/Panel";
 import Slider from "../ui/Slider";
-import { ThrustParams } from "../../utils/thrustLeakage";
+import { DEFAULT_DISCHARGE_AREA_M2, ThrustParams } from "../../utils/thrustLeakage";
 
 interface Props {
   p: ThrustParams;
@@ -48,6 +48,17 @@ const DriveSection = ({ p, onChange }: Props) => (
       max={100}
       step={0.1}
       onChange={(v) => onChange("electrodeGapM", v / 1000)}
+    />
+    <Slider
+      label="Discharge area (ion wind)"
+      value={Math.log10((p.dischargeAreaM2 ?? DEFAULT_DISCHARGE_AREA_M2) * 1e4)}
+      displayValue={`${((p.dischargeAreaM2 ?? DEFAULT_DISCHARGE_AREA_M2) * 1e4).toPrecision(3)} cm²`}
+      min={-1}
+      max={3}
+      step={0.05}
+      onChange={(v) => onChange("dischargeAreaM2", Math.pow(10, v) / 1e4)}
+      minLabel="0.1 cm²"
+      maxLabel="1000 cm²"
     />
     <Slider
       label="Ambient pressure"
@@ -98,6 +109,17 @@ const VibrationSection = ({ p, onChange }: Props) => (
       onChange={(v) => onChange("vibrationFreqHz", Math.pow(10, v))}
       minLabel="1 Hz"
       maxLabel="100 kHz"
+    />
+    <Slider
+      label="Rectified share (reads as steady weight)"
+      value={p.vibrationRectification ?? 1}
+      displayValue={(p.vibrationRectification ?? 1).toFixed(2)}
+      min={0}
+      max={1}
+      step={0.01}
+      onChange={(v) => onChange("vibrationRectification", v)}
+      minLabel="0 · linear balance"
+      maxLabel="1 · upper bound"
     />
   </div>
 );
