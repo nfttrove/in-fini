@@ -14,7 +14,7 @@ test: if a discovery disappears when you halve the timestep, it was never real.
 
 ## What's inside
 
-The app is organised as nineteen tabs, each a self-contained mini-experiment:
+The app is organised as tabs, each a self-contained mini-experiment:
 
 | Tab | What it shows |
 | --- | --- |
@@ -37,6 +37,7 @@ The app is organised as nineteen tabs, each a self-contained mini-experiment:
 | **Dark Corners** | The 95%: the 10^120 vacuum-overshoot problem with a cutoff slider, local Casimir vacuum density vs the cosmological one, dark-matter flux through your desk, and dark energy's unwitnessable tide — each honest number paired with "here endeth the desk" |
 | **Acoustic Casimir** | Sound's radiation pressure (p²/ρc²) side by side with the vacuum Casimir force it mirrors — with the gap at which empty space matches your speaker, and a build-it-tonight parts list |
 | **Replication Network** | Calibration Census 001: record 60 s of your rig's noise floor (phone accelerometer in-browser, or paste CSV) and file it; median/√N of the fleet's noise is the best case a coordinated replication round (same effect, same time) could reach — not what the census itself sees |
+| **Errata** | Every mistake the site has shipped and corrected, old value beside new; the corrected figures are computed live by the engines |
 
 Diagnostic panels end in a colour-coded verdict — *explained / partial / excess /
 gross-excess* — based on how much of the claim the mundane channels account for.

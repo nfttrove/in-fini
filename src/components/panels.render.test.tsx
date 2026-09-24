@@ -11,7 +11,10 @@ import { DEVICE_DEFAULTS, DEVICE_PUSHED } from "./device/defaults";
 import { summarizePreset } from "../data/thrustPresets";
 import { formatPower, predictDevice } from "../utils/device";
 import ThrustDceLimit from "./thrust/ThrustDceLimit";
-import { computeThrustBudget, formatForceG } from "../utils/thrustLeakage";
+import ErrataPanel from "./ErrataPanel";
+import { ERRATA } from "../data/errata";
+import { CORNER } from "./device/defaults";
+import { computeThrustBudget, formatForceG, ionWindForceG } from "../utils/thrustLeakage";
 import { THRUST_PRESETS } from "../data/thrustPresets";
 import { grams } from "../utils/units";
 import { ThemeProvider } from "../contexts/ThemeContext";
@@ -161,5 +164,19 @@ describe("ThrustDceLimit units", () => {
       .replace(/<!-- -->/g, "");
     expect(html).toContain(formatForceG(grams(1.5e-27)));
     expect(html).toContain(`${((budget.claimedG / 1.5e-27) * 100).toExponential(1)}%`);
+  });
+});
+
+describe("ErrataPanel", () => {
+  it("lists every erratum and quotes current values computed by the engines", () => {
+    const html = renderToString(
+      <ThemeProvider>
+        <ErrataPanel />
+      </ThemeProvider>
+    ).replace(/<!-- -->/g, "");
+    for (const e of ERRATA) expect(html).toContain(e.title.replace(/"/g, "&quot;"));
+    // "Now" figures come from the same functions the panels use.
+    expect(html).toContain(formatForceG(ionWindForceG(10_000, 101_325, 0.01)));
+    expect(html).toContain(formatPower(CORNER.P_output));
   });
 });

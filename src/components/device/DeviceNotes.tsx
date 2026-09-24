@@ -1,37 +1,7 @@
 import Panel from "../ui/Panel";
 import InfoNote from "../ui/InfoNote";
-import { DevicePrediction, formatPower, predictDevice } from "../../utils/device";
-
-/** Rim acceleration beyond which no demonstrated micro-rotor survives (g). */
-const MATERIAL_VETO_G = 1e6;
-
-// Every slider at its limit. The generous ceiling does pass the claim here;
-// what stops it is materials, not the formula.
-const CORNER = predictDevice({
-  dNm: 1,
-  fmHz: 10e6,
-  beta: 1,
-  rotorRadiusNm: 100_000,
-  Q: 1e6,
-  areaMm2: 100,
-});
-
-// At the claim's own 50 nm and 500 kHz, the largest rotor that survives the
-// veto (a = (2πf)²·r) with every other knob at its limit.
-const CLAIM_FM_HZ = 500e3;
-// Floored: at the exact radius the rim sits on the veto (and rounding up
-// would put it past it, failing the panel's own sanity check).
-const SURVIVABLE_R_NM = Math.floor(
-  ((MATERIAL_VETO_G * 9.80665) / (2 * Math.PI * CLAIM_FM_HZ) ** 2) * 1e9
-);
-const AT_CLAIM = predictDevice({
-  dNm: 50,
-  fmHz: CLAIM_FM_HZ,
-  beta: 1,
-  rotorRadiusNm: SURVIVABLE_R_NM,
-  Q: 1e6,
-  areaMm2: 100,
-});
+import { DevicePrediction, formatPower } from "../../utils/device";
+import { AT_CLAIM, CORNER, SURVIVABLE_R_NM } from "./defaults";
 
 interface Props {
   p: DevicePrediction;

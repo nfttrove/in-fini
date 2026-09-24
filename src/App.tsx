@@ -21,6 +21,7 @@ import NetworkPanel from "./components/NetworkPanel";
 import AcousticCasimirPanel from "./components/AcousticCasimirPanel";
 import DarkCornersPanel from "./components/DarkCornersPanel";
 import BoundaryAtlasPanel from "./components/BoundaryAtlasPanel";
+import ErrataPanel from "./components/ErrataPanel";
 import { readUrlParam, writeUrlParam } from "./hooks/usePanelUrlState";
 import { useEffect } from "react";
 
@@ -133,6 +134,12 @@ const TABS = [
     description:
       "Dark matter through your desk and dark energy's tide across it — the unnamed bulk of the universe computed next to what your instruments can reach",
   },
+  {
+    id: "errata",
+    label: "Errata (what we got wrong)",
+    description:
+      "Every mistake this site has shipped and corrected, old value next to new — the corrected numbers computed live",
+  },
 ];
 
 function AppContent() {
@@ -225,6 +232,7 @@ function AppContent() {
           {activeTab === "acoustic" && <AcousticCasimirPanel />}
           {activeTab === "atlas" && <BoundaryAtlasPanel />}
           {activeTab === "dark" && <DarkCornersPanel />}
+          {activeTab === "errata" && <ErrataPanel />}
         </section>
 
         <footer className="mt-20 pt-8 dark-mode:border-slate-800/50 light-mode:border-slate-200 coffee-mode:border-amber-800/40 border-t">
