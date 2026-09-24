@@ -77,8 +77,8 @@ describe("dceThrustLimitG — no spurious step at β=0.1", () => {
 describe("dceThrustLimitG — the ceiling is watts-scale, not watts×c", () => {
   it("is astronomically small at the reference parameters", () => {
     // With the dimensionally consistent ceiling P ≤ ħc²/d⁴ · (v/c)² · A the
-    // limit at these parameters lands near 1.8e-16 mg. A stray factor of c
-    // (the ħc³ variant this gate was added against) returns ~5.3e-8 mg —
+    // limit at these parameters lands near 1.8e-16 g. A stray factor of c
+    // (the ħc³ variant this gate was added against) returns ~5.3e-8 g —
     // four orders of magnitude above this threshold.
     const limit = dceThrustLimitG(base);
     expect(limit).toBeGreaterThan(0);
