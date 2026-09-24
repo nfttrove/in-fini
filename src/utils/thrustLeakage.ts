@@ -32,11 +32,12 @@ export interface ThrustParams {
 
 import { SigmaAssessment, assessResidual, combinedSigma } from "./uncertainty";
 import { seededRandom } from "./residuals";
+import { Grams, grams } from "./units";
 
 export interface ThrustChannel {
   key: string;
   label: string;
-  valueG: number;
+  valueG: Grams;
   formula: string;
 }
 
@@ -55,13 +56,13 @@ export interface ThrustVerdict {
 
 export interface ThrustBudget {
   channels: ThrustChannel[];
-  totalLeakageG: number;
-  claimedG: number;
-  residualG: number;
+  totalLeakageG: Grams;
+  claimedG: Grams;
+  residualG: Grams;
   residualFrac: number;
   verdict: ThrustVerdict;
   /** Combined 1σ uncertainty of the summed channels (25% per channel, RSS). */
-  sigmaG: number;
+  sigmaG: Grams;
   sigmaAssessment: SigmaAssessment;
 }
 
@@ -143,11 +144,11 @@ export function ionWindCollisionalG(
   voltageV: number,
   gapM: number,
   areaM2: number = DEFAULT_DISCHARGE_AREA_M2
-): number {
-  if (gapM <= 0 || !(areaM2 > 0)) return 0;
+): Grams {
+  if (gapM <= 0 || !(areaM2 > 0)) return grams(0);
   const E = voltageV / gapM;
   const thrustN = (9 / 8) * EPS0 * E * E * areaM2;
-  return (thrustN / G) * 1000;
+  return grams((thrustN / G) * 1000);
 }
 
 /**
@@ -165,10 +166,10 @@ export function ionWindForceG(
   pressurePa: number,
   gapM: number,
   areaM2: number = DEFAULT_DISCHARGE_AREA_M2
-): number {
-  if (gapM <= 0 || !(pressurePa > 0)) return 0;
+): Grams {
+  if (gapM <= 0 || !(pressurePa > 0)) return grams(0);
   const mfpM = ION_MFP_ATM_M * (P_ATM / pressurePa);
-  return ionWindCollisionalG(voltageV, gapM, areaM2) * (gapM / (gapM + mfpM));
+  return grams(ionWindCollisionalG(voltageV, gapM, areaM2) * (gapM / (gapM + mfpM)));
 }
 
 /**
@@ -198,19 +199,19 @@ export function vibrationForceG(
   ampNm: number,
   freqHz: number,
   rectification: number = 1
-): number {
+): Grams {
   const omega = 2 * Math.PI * freqHz;
   const acc = omega * omega * (ampNm * 1e-9);
   const share = Math.min(1, Math.max(0, rectification));
-  return share * (massKg * acc / G) * 1000;
+  return grams(share * (massKg * acc / G) * 1000);
 }
 
 export function electrostaticForceG(
   fieldVPerM: number,
   areaM2: number
-): number {
+): Grams {
   const forceN = 0.5 * EPS0 * fieldVPerM * fieldVPerM * areaM2;
-  return (forceN / G) * 1000;
+  return grams((forceN / G) * 1000);
 }
 
 export function thermalConvectionG(
@@ -218,17 +219,17 @@ export function thermalConvectionG(
   heightM: number,
   areaM2: number,
   pressurePa: number = P_ATM
-): number {
+): Grams {
   // Buoyancy of heated air scales with the air's density, ∝ pressure:
   // in hard vacuum there is no air to heat.
   const deltaT = tempGradKPerM * heightM;
   const rhoAir = RHO_AIR_STP * (Math.max(pressurePa, 0) / P_ATM);
   const deltaRho = rhoAir * BETA_AIR * deltaT;
   const buoyancyN = deltaRho * areaM2 * heightM * G;
-  return (buoyancyN / G) * 1000;
+  return grams((buoyancyN / G) * 1000);
 }
 
-export function dceThrustLimitG(p: ThrustParams): number {
+export function dceThrustLimitG(p: ThrustParams): Grams {
   const hbar = 1.0545718e-34;
   const c = 299792458;
   const d_m = p.cavityGap_nm * 1e-9;
@@ -237,7 +238,7 @@ export function dceThrustLimitG(p: ThrustParams): number {
   const v = 2 * Math.PI * f_m_Hz * rotorRadius_m;
   const A_m2 = p.activeArea_cm2 * 1e-4;
 
-  if (d_m <= 0 || f_m_Hz <= 0 || A_m2 <= 0) return 0;
+  if (d_m <= 0 || f_m_Hz <= 0 || A_m2 <= 0) return grams(0);
 
   const sidebandEfficiency = 2 * Math.pow(besselJ1(p.modulationDepth_beta), 2);
   const f0_Hz = c / (2 * d_m);
@@ -254,7 +255,7 @@ export function dceThrustLimitG(p: ThrustParams): number {
   const force_N = power_W / c;
   const force_g = (force_N / G) * 1000; // grams-equivalent, like every channel
 
-  return force_g;
+  return grams(force_g);
 }
 
 /**
@@ -339,16 +340,16 @@ export function computeThrustBudget(p: ThrustParams): ThrustBudget {
     },
   ];
 
-  const totalLeakageG = channels.reduce((s, c) => s + c.valueG, 0);
-  const residualG = p.claimedDeltaG - totalLeakageG;
+  const totalLeakageG = grams(channels.reduce((s, c) => s + c.valueG, 0));
+  const residualG = grams(p.claimedDeltaG - totalLeakageG);
   const residualFrac =
     p.claimedDeltaG > 0 ? residualG / p.claimedDeltaG : residualG === 0 ? 0 : 1;
 
   const verdict = classifyThrustVerdict(p.claimedDeltaG, totalLeakageG, residualG);
-  const sigmaG = combinedSigma(channels.map((c) => c.valueG));
+  const sigmaG = grams(combinedSigma(channels.map((c) => c.valueG)));
   const sigmaAssessment = assessResidual(residualG, sigmaG);
 
-  return { channels, totalLeakageG, claimedG: p.claimedDeltaG, residualG, residualFrac, verdict, sigmaG, sigmaAssessment };
+  return { channels, totalLeakageG, claimedG: grams(p.claimedDeltaG), residualG, residualFrac, verdict, sigmaG, sigmaAssessment };
 }
 
 function classifyThrustVerdict(
@@ -406,7 +407,7 @@ function classifyThrustVerdict(
   };
 }
 
-export function formatForceG(g: number): string {
+export function formatForceG(g: Grams): string {
   const a = Math.abs(g);
   if (a === 0) return "0 g";
   // Below 0.01 pg a fixed-point pg reading rounds to "0.00 pg".

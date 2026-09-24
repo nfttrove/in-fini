@@ -7,6 +7,7 @@ import {
   residualVsPressure,
   formatForceG,
 } from "../../utils/thrustLeakage";
+import { grams } from "../../utils/units";
 
 interface Props {
   base: ThrustParams;
@@ -95,7 +96,7 @@ function drawSweep(
     const v = yMin + ((yMax - yMin) * i) / nTicks;
     const py = toY(v);
     ctx.fillStyle = tickColor;
-    ctx.fillText(formatForceG(v), pad.left - 6, py + 4);
+    ctx.fillText(formatForceG(grams(v)), pad.left - 6, py + 4); // axis values are grams
     ctx.strokeStyle = gridColor;
     ctx.beginPath();
     ctx.moveTo(pad.left, py);

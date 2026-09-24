@@ -14,6 +14,7 @@ import {
   G,
   type ThrustParams,
 } from "./thrustLeakage";
+import { grams } from "./units";
 
 const base: ThrustParams = {
   claimedDeltaG: 0,
@@ -258,8 +259,8 @@ describe("thermalConvectionG — buoyancy needs air", () => {
 describe("formatForceG", () => {
   it("never rounds a real sub-picogram force to zero", () => {
     // The DCE thrust ceiling (~1e-20 g) used to print as "0.00 pg".
-    expect(formatForceG(1.2e-20)).toBe("1.20e-20 g");
-    expect(formatForceG(5e-12)).toBe("5.00 pg");
+    expect(formatForceG(grams(1.2e-20))).toBe("1.20e-20 g");
+    expect(formatForceG(grams(5e-12))).toBe("5.00 pg");
   });
 });
 

@@ -29,6 +29,8 @@
  * floor, P_min ≈ k_B T / τ (one kT of energy per measurement).
  */
 
+import { Grams, newtons, newtonsToGrams } from "./units";
+
 export const KB = 1.380649e-23;
 export const G = 9.80665;
 
@@ -53,8 +55,8 @@ export function thermalForceFloorN(p: ThermalFloorParams): number {
  * divided by the test mass too, giving milli-g of acceleration, which put
  * the claim ÷ floor ratio off by the mass in kg — 10× at 100 g.)
  */
-export function thermalFloorDeltaG(p: ThermalFloorParams): number {
-  return (thermalForceFloorN(p) / G) * 1000;
+export function thermalFloorDeltaG(p: ThermalFloorParams): Grams {
+  return newtonsToGrams(newtons(thermalForceFloorN(p)));
 }
 
 /** rms thermal position jitter of the test mass [m] (equipartition). */

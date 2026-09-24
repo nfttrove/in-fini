@@ -1,3 +1,5 @@
+import type { Newtons } from "./units";
+
 export const HBAR = 1.0545718e-34;
 export const C = 2.99792458e8;
 export const PI = Math.PI;
@@ -67,7 +69,7 @@ export function formatScientific(value: number, digits: number = 3): string {
   return `${mantissa.toFixed(digits)} × 10^${exp}`;
 }
 
-export function formatForce(forceN: number): string {
+export function formatForce(forceN: Newtons): string {
   const abs = Math.abs(forceN);
   if (abs >= 1) return `${forceN.toFixed(4)} N`;
   if (abs >= 1e-3) return `${(forceN * 1e3).toFixed(4)} mN`;

@@ -1,4 +1,5 @@
 import { ThrustBudget, formatForceG } from "../../utils/thrustLeakage";
+import type { Grams } from "../../utils/units";
 
 // Claim ÷ ceiling routinely runs to 10³⁰ %; print that as an exponent.
 function formatPercent(x: number): string {
@@ -7,7 +8,7 @@ function formatPercent(x: number): string {
 
 interface Props {
   /** dceThrustLimitG's output: grams-equivalent, like every thrust channel. */
-  dceThrustLimitG: number;
+  dceThrustLimitG: Grams;
   budget: ThrustBudget;
 }
 

@@ -13,6 +13,7 @@ import { formatPower, predictDevice } from "../utils/device";
 import ThrustDceLimit from "./thrust/ThrustDceLimit";
 import { computeThrustBudget, formatForceG } from "../utils/thrustLeakage";
 import { THRUST_PRESETS } from "../data/thrustPresets";
+import { grams } from "../utils/units";
 import { ThemeProvider } from "../contexts/ThemeContext";
 
 /**
@@ -156,9 +157,9 @@ describe("ThrustDceLimit units", () => {
     // dceThrustLimitG returns grams like every channel; the card once
     // treated it as milligrams — ceiling 1000× too small, ratio 1000× too big.
     const budget = computeThrustBudget(THRUST_PRESETS["Podkletnov Effect (1992)"].params);
-    const html = renderToString(<ThrustDceLimit dceThrustLimitG={1.5e-27} budget={budget} />)
+    const html = renderToString(<ThrustDceLimit dceThrustLimitG={grams(1.5e-27)} budget={budget} />)
       .replace(/<!-- -->/g, "");
-    expect(html).toContain(formatForceG(1.5e-27));
+    expect(html).toContain(formatForceG(grams(1.5e-27)));
     expect(html).toContain(`${((budget.claimedG / 1.5e-27) * 100).toExponential(1)}%`);
   });
 });

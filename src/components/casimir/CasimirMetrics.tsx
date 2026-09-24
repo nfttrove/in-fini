@@ -1,5 +1,6 @@
 import Panel from "../ui/Panel";
 import MetricCard from "../ui/MetricCard";
+import { newtons } from "../../utils/units";
 import {
   casimirForce,
   casimirPressure,
@@ -23,7 +24,7 @@ export default function CasimirMetrics({ sepM, areaM2 }: CasimirMetricsProps) {
       <div className="space-y-3">
         <MetricCard
           label="Casimir Force"
-          value={formatForce(Math.abs(force))}
+          value={formatForce(newtons(Math.abs(force)))}
           sub="attractive (toward each other)"
           color="text-cyan-400"
         />
