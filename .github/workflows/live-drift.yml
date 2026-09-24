@@ -1,0 +1,35 @@
+name: live-drift
+# Does in-fini.com serve what `main` says? The site is published from Bolt,
+# so a merge does not deploy it. The live site once ran six commits behind
+# main without anyone noticing. Each build stamps
+# <meta name="in-fini-build" content="…"> with a hash of the shipped source
+# (scripts/build-id.mjs); this job compares that stamp with main's and fails,
+# which emails the repo owner, when they differ.
+on:
+  schedule:
+    - cron: "17 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Compare live build stamp with main
+        run: |
+          expected=$(node scripts/build-id.mjs)
+          live=$(curl -fsSL --retry 3 https://in-fini.com/ \
+            | grep -o 'name="in-fini-build" content="[^"]*"' \
+            | sed 's/.*content="\([^"]*\)"/\1/' || true)
+          echo "main:  $expected"
+          echo "live:  ${live:-<no stamp>}"
+          if [ "$live" != "$expected" ]; then
+            echo "::error::in-fini.com is not serving main (live ${live:-<no stamp>}, main $expected). Pull main into Bolt and publish."
+            exit 1
+          fi
+          echo "in-fini.com matches main."

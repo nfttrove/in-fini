@@ -250,6 +250,13 @@ has CI but **no continuous deployment**: pushing to GitHub does not redeploy it.
 here, redeploy from the Bolt workspace (or wire up Netlify/Vercel against the
 repo and `npm run build` to change that).
 
+To catch a live site that has fallen behind, every build stamps
+`<meta name="in-fini-build" content="…">` with a hash of the shipped source
+(`scripts/build-id.mjs`: paths and contents of `src/`, `public/` and the build
+config, tests excluded). The scheduled `live-drift` workflow compares
+in-fini.com's stamp with `main` daily and fails, which emails the repo owner,
+when they differ. Run it on demand from the Actions tab after publishing.
+
 ## Status and known caveats
 
 - CI (typecheck, lint, tests, build) is the source of truth for whether they pass; this file deliberately quotes no counts.
