@@ -16,7 +16,8 @@ import { useState, useMemo } from "react";
 
   A claimed thrust that sits inside the summed budget is not a discovery.
   A claim needs to clear the budget by ~5× before it earns the word "anomaly".
-  This is the gate the EmDrive failed (Tajmar et al., SUPERDRAG, TU Dresden).
+  This is the gate the EmDrive failed (Tajmar, Neunzig & Weikert, SpaceDrive
+  project, TU Dresden; CEAS Space J. 14, 31, 2022).
 */
 
 const C_LIGHT = 2.998e8;
@@ -62,7 +63,7 @@ interface PresetConfig {
 const PRESETS: Record<string, PresetConfig> = {
   eagleworks: {
     label: "Eagleworks 2016 (EmDrive)",
-    note: "80 W RF, ~100 µN claimed. Long unshielded DC run in Earth's field.",
+    note: "80 W RF, ~100 µN claimed (1.2 ± 0.1 mN/kW; White et al., J. Propul. Power 33, 830, 2017). Long unshielded DC run in Earth's field.",
     values: {
       claim: 100, P: 80, leak: 0.5, I: 2.2, Leff: 1.0, B: 50,
       pressure: 1e-5, area: 100, epsGas: 0.005, cth: 20,
@@ -70,8 +71,8 @@ const PRESETS: Record<string, PresetConfig> = {
     },
   },
   shielded: {
-    label: "Clean lab (SUPERDRAG-style)",
-    note: "Mu-metal shielding, twisted pairs, liquid-metal contacts. What a claim must beat.",
+    label: "Clean lab (SpaceDrive-style)",
+    note: "Mu-metal shielding, twisted pairs, liquid-metal contacts: what a claim must beat. TU Dresden's SpaceDrive balance found no EmDrive thrust; earlier signals were thermal and cable artefacts (Tajmar, Neunzig & Weikert, CEAS Space J. 14, 31, 2022).",
     values: {
       claim: 100, P: 80, leak: 0.1, I: 2.2, Leff: 0.02, B: 1,
       pressure: 1e-7, area: 100, epsGas: 0.001, cth: 2,

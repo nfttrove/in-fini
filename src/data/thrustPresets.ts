@@ -3,13 +3,20 @@ import { ThrustParams, computeThrustBudget } from "../utils/thrustLeakage";
 export interface ThrustPreset {
   params: ThrustParams;
   tagline: string;
+  /**
+   * Where the claim comes from, verified against the primary literature
+   * (2026-09) — or a plain statement that the preset is illustrative.
+   */
+  source: string;
   // No stored verdict: cards and copy show computeThrustBudget's own label.
   // Hand-written verdicts drifted (Podkletnov read "Fully explained" while
   // the engine said "Partially explained").
 }
 
 export const THRUST_PRESETS: Record<string, ThrustPreset> = {
-  "Manchester Sphere (2000)": {
+  // Formerly "Manchester Sphere (2000)": no documented claim by that name
+  // could be found, so it is presented as the illustration it is.
+  "Charged-sphere levitation (illustrative)": {
     params: {
       claimedDeltaG: 0.18,
       driveVoltageV: 50000,
@@ -29,7 +36,9 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       activeArea_cm2: 1,
       driveFrequency_Hz: 1e6,
     },
-    tagline: "Sorry, the spheres were likely just corona discharge and shaking.",
+    tagline: "A charged sphere on a scale: corona wind and shaking can fake this much.",
+    source:
+      "Illustrative scenario. Earlier versions called it \"Manchester Sphere (2000)\"; no documented claim by that name could be found.",
   },
 
   "Lifter (Ionocraft) Classic": {
@@ -53,6 +62,8 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "It flies, but it's not antigravity -- it's just pushing air.",
+    source:
+      "Bahder & Fazi, \"Force on an Asymmetric Capacitor\", ARL-TR-3005 (2003); Tajmar, AIAA J. 42, 315 (2004): lifter thrust is corona (ion) wind.",
   },
 
   "Shaken, Not Stirred": {
@@ -76,6 +87,7 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "Your scale is shaking, not your device levitating.",
+    source: "Illustrative scenario, not a historical claim.",
   },
 
   "Hot Air Balloon Mode": {
@@ -98,7 +110,8 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       activeArea_cm2: 1,
       driveFrequency_Hz: 1e6,
     },
-    tagline: "You've just built a tiny heater, not an antigravity drive.",
+    tagline: "Warm air does lift, but at this gradient it covers only a sliver of the claim — heat alone can't explain it.",
+    source: "Illustrative scenario, not a historical claim.",
   },
 
   "Electrostatic Levitation (Tiny)": {
@@ -122,6 +135,7 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "You're sticking to the ceiling like a balloon, not defying gravity.",
+    source: "Illustrative scenario, not a historical claim.",
   },
 
   "Cryogenic Ideal (Antigravity Dream)": {
@@ -146,6 +160,7 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
     },
     tagline:
       "If you actually achieve these conditions and still see thrust, call a physicist.",
+    source: "Illustrative scenario, not a historical claim.",
   },
 
   "Podkletnov Effect (1992)": {
@@ -168,7 +183,9 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       activeArea_cm2: 1,
       driveFrequency_Hz: 1e6,
     },
-    tagline: "Podkletnov's result is likely just vibration and corona discharge.",
+    tagline: "Vibration covers much of this claim; what's left needs better isolation, not new physics.",
+    source:
+      "Podkletnov & Nieminen, Physica C 203, 441 (1992): 0.05% over a stationary levitating disk, up to 0.3% rotating. The preset's 2% is Podkletnov's later peak claim (1.9–2.1% while braking; arXiv:cond-mat/9701074, 1997). Nulls: Li et al., Physica C 281, 260 (1997, NASA MSFC); Hathaway, Cleveland & Bao, Physica C 385, 488 (2003).",
   },
 
   "Searl Effect Generator (SEG)": {
@@ -192,6 +209,8 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "The SEG 'levitates' because it shakes itself apart.",
+    source:
+      "Roshchin & Godin, Tech. Phys. Lett. 26, 1105 (2000), reported weight changes of up to about 35% in a Searl-type magnetic rig; no independent replication. The preset scales the claim down to 1%.",
   },
 
   "Biefeld-Brown Capacitor": {
@@ -215,6 +234,8 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "It works, but not because of gravity modification.",
+    source:
+      "T. T. Brown, GB patent 300,311 (1928). Bahder & Fazi, ARL-TR-3005 (2003) measured the force; Tajmar, AIAA J. 42, 315 (2004) traces it to corona wind.",
   },
 
   "The Lazy Scientist": {
@@ -238,6 +259,7 @@ export const THRUST_PRESETS: Record<string, ThrustPreset> = {
       driveFrequency_Hz: 1e6,
     },
     tagline: "Garbage in, garbage out. Measure something first.",
+    source: "Illustrative scenario, not a historical claim.",
   },
 };
 

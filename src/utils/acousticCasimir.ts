@@ -11,7 +11,8 @@
  * exact structural analogue of the electromagnetic energy density whose
  * imbalance between two plates IS the vacuum Casimir effect. A perfect
  * absorber feels u; a reflector feels 2u (momentum reversal). Larraza &
- * Denardo (1998) showed the deeper version: two plates in a diffuse
+ * Denardo, Phys. Lett. A 248, 151 (1998) showed the deeper version: two
+ * plates in a diffuse
  * acoustic field attract by excluding sound modes between them — a
  * laboratory-scale Casimir effect you can build for the price of a
  * speaker.

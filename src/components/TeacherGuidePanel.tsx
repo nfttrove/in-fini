@@ -59,7 +59,7 @@ export default function TeacherGuidePanel() {
         <ul className="list-disc pl-6 space-y-1 text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
           <li><strong>Podkletnov (1992):</strong> The preset claims a {pct(PODKLETNOV.claimPercent)} weight loss. Largest artifact: {PODKLETNOV.largestChannel.toLowerCase()}. Verdict: "{PODKLETNOV.verdict}". Ask the class: is the part the budget can't explain a discovery, or a rig that needs better isolation?</li>
           <li><strong>Searl Effect:</strong> The preset claims a {pct(SEARL.claimPercent)} weight loss. Largest artifact: {SEARL.largestChannel.toLowerCase()}. Verdict: "{SEARL.verdict}". Physics: 1. Hype: 0.</li>
-          <li><strong>Manchester Spheres:</strong> Micro-scale "levitation". Reduce pressure to hard vacuum. Does it still float? (Spoiler: no.)</li>
+          <li><strong>Charged-sphere levitation (an illustrative preset):</strong> Reduce the pressure to hard vacuum. Which channel vanishes, and what is still enough to fake the claim?</li>
         </ul>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
           <strong>Key insight:</strong> Vibration is the best liar in experimental physics. A perfectly linear scale would average a steady shake to zero — but real ones aren't: a contact that bounces, a readout that saturates or filters, and the shake becomes a steady fake weight change. The budget counts the peak shaking force as the most it could fake. This is why serious experiments sit inside multi-layer vibration isolators that cost more than a car.

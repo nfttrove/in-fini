@@ -190,7 +190,7 @@ export default function AcousticCasimirPanel() {
               <li>Any speaker; a tone-generator app set to a few hundred Hz.</li>
               <li>A 0.001 g jewelry scale (≈ €15). Put the plate ON the scale, speaker facing down above it.</li>
               <li>Tone ON vs OFF — the difference is the radiation pressure. That A/B is your null test.</li>
-              <li>Expect factors-of-a-few from near-field and standing-wave effects: this panel's plane-wave numbers are the floor, and the Larraza–Denardo two-plate geometry (a real "acoustic Casimir") needs more care.</li>
+              <li>Expect factors-of-a-few from near-field and standing-wave effects: this panel's plane-wave numbers are the floor, and the Larraza–Denardo two-plate geometry (Phys. Lett. A 248, 151, 1998) (a real "acoustic Casimir") needs more care.</li>
               <li>File your measured force in the Claim Registry with "sound" as the artifact — same rules as everything else.</li>
             </ul>
           </Panel>

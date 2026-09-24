@@ -37,6 +37,12 @@ describe("built-in thrust presets (offline fallback data)", () => {
         ).toBe(true);
       }
       expect(preset.tagline.length, `${name}: tagline`).toBeGreaterThan(0);
+      // Every preset says where it comes from: a verified citation (with a
+      // year) or a plain "illustrative" label, never an unsourced "famous claim".
+      expect(
+        /\(\d{4}\)|\d{4}\)|illustrative/i.test(preset.source),
+        `${name}: source cites a year or says illustrative`
+      ).toBe(true);
     }
   });
 
@@ -45,6 +51,6 @@ describe("built-in thrust presets (offline fallback data)", () => {
     expect(names).toContain("Podkletnov");
     expect(names).toContain("Searl");
     expect(names).toContain("Biefeld");
-    expect(names).toContain("Manchester");
+    expect(names).toContain("Lifter");
   });
 });

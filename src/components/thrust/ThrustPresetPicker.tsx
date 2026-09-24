@@ -36,6 +36,7 @@ interface PresetItem {
   name: string;
   tagline: string;
   verdict: string;
+  source?: string;
   params: ThrustParams;
 }
 
@@ -66,10 +67,15 @@ function rowToParams(row: ThrustPresetRow): ThrustParams {
 // while the budget said "Partially explained").
 function rowToItem(row: ThrustPresetRow): PresetItem {
   const params = rowToParams(row);
+  // The repo's copy of a preset (tagline, verified source) wins over the
+  // cloud row's text, so corrections reach the cards without waiting for a
+  // database migration. Params come from the row.
+  const local = THRUST_PRESETS[row.name];
   return {
     name: row.name,
-    tagline: row.tagline,
+    tagline: local?.tagline ?? row.tagline,
     verdict: computeThrustBudget(params).verdict.label,
+    source: local?.source,
     params,
   };
 }
@@ -79,6 +85,7 @@ function builtInPresets(): PresetItem[] {
     name,
     tagline: preset.tagline,
     verdict: computeThrustBudget(preset.params).verdict.label,
+    source: preset.source,
     params: preset.params,
   }));
 }
@@ -144,6 +151,11 @@ function PresetCard({
             <p className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400 italic mt-2 leading-relaxed pb-1">
               "{item.tagline}"
             </p>
+            {item.source && (
+              <p className="text-[11px] dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-amber-700 mt-1 leading-relaxed">
+                <span className="font-semibold">Source:</span> {item.source}
+              </p>
+            )}
             <p className="text-[10px] dark-mode:text-slate-500 light-mode:text-slate-500 coffee-mode:text-amber-700 mt-1 font-mono">
               distance to legitimacy:{" "}
               {(() => {

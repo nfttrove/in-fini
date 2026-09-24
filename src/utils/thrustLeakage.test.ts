@@ -164,7 +164,7 @@ describe("verdictStability", () => {
     expect(Object.keys(s.tally).length).toBeGreaterThan(1);
   });
 
-  it("finds Manchester Sphere rock-stable", () => {
+  it("finds the charged-sphere preset rock-stable", () => {
     const s = verdictStability(
       {
         claimedDeltaG: 0.18, driveVoltageV: 50000, ambientPressurePa: 101325,

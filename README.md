@@ -4,7 +4,7 @@ An interactive, open-source teaching tool for quantum vacuum physics — and for
 stress-test extraordinary claims with ordinary physics. It simulates the Casimir effect,
 rotating polarization fields, resonant cavities and non-linear up-conversion, then puts
 famous "anomalous thrust / energy from the vacuum" claims (Podkletnov, Searl,
-Biefeld–Brown, the Manchester spheres…) through quantitative artifact budgets to show
+Biefeld–Brown, the ionocraft lifter…) through quantitative artifact budgets to show
 how much of each claim ion wind, vibration, electrostatics, ohmic heating and blackbody
 radiation can account for.
 
