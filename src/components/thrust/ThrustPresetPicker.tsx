@@ -17,13 +17,11 @@ interface Props {
 
 
 export default function ThrustPresetPicker({ onLoad }: Props) {
-  // Without a cloud backend the built-ins are the list, so start with them
-  // (the effect below would set the same thing): no empty first frame, and
-  // a server render shows real cards and badges.
-  const [presets, setPresets] = useState<PresetItem[]>(() =>
-    supabaseConfigured ? [] : builtInPresets()
-  );
-  const [loading, setLoading] = useState(supabaseConfigured);
+  // Always start with the built-ins so SSR and the first client frame show
+  // real cards and badges. The effect below replaces them with cloud data
+  // when Supabase is available; until then there is no empty frame.
+  const [presets, setPresets] = useState<PresetItem[]>(builtInPresets);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Robustness of each listed preset's verdict under ±20% jitter.
@@ -37,7 +35,6 @@ export default function ThrustPresetPicker({ onLoad }: Props) {
         return;
       }
       try {
-        setLoading(true);
         setError(null);
         const { data, error: err } = await supabase!
           .from("thrust_presets")
