@@ -289,7 +289,7 @@ export default function ArtifactBudgetGate() {
         </section>
 
         {/* inputs */}
-        <section style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}>
+        <section style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))" }}>
           <ChannelGroup title="The claim" contribution={fmtForce(claimN)}>
             <Field label="Claimed thrust" unit="µN" value={v.claim} onChange={set("claim")} />
             <Field label="Input power P" unit="W" value={v.P} onChange={set("P")} />

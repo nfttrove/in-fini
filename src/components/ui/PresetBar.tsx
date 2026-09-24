@@ -97,7 +97,7 @@ export default function PresetBar({ panel, currentParams, onLoad }: PresetBarPro
           onChange={(e) => setName(e.target.value)}
           placeholder="Preset name..."
           maxLength={80}
-          className="flex-1 dark-mode:bg-slate-900 light-mode:bg-slate-100 coffee-mode:bg-slate-900 dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-slate-100 dark-mode:placeholder-slate-600 light-mode:placeholder-slate-400 coffee-mode:placeholder-slate-600 rounded-lg px-3 py-2 text-sm border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700 focus:border-cyan-500 focus:outline-none"
+          className="flex-1 min-w-0 dark-mode:bg-slate-900 light-mode:bg-slate-100 coffee-mode:bg-slate-900 dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-slate-100 dark-mode:placeholder-slate-600 light-mode:placeholder-slate-400 coffee-mode:placeholder-slate-600 rounded-lg px-3 py-2 text-sm border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700 focus:border-cyan-500 focus:outline-none"
         />
         <button
           onClick={handleSave}
