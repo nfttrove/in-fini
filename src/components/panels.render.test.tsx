@@ -4,6 +4,7 @@ import CircuitQEDPanel from "./CircuitQEDPanel";
 import ClaimRegistryPanel from "./ClaimRegistryPanel";
 import ExperimentDesignPanel from "./ExperimentDesignPanel";
 import DataLabPanel from "./DataLabPanel";
+import DarkCornersPanel from "./DarkCornersPanel";
 import { ThemeProvider } from "../contexts/ThemeContext";
 
 /**
@@ -76,5 +77,22 @@ describe("DataLabPanel render", () => {
     expect(html).toContain("Analyze my data");
     expect(html).toContain("Artifact or anomaly? (game)");
     expect(html).toContain("nothing is uploaded");
+  });
+});
+
+describe("DarkCornersPanel render", () => {
+  it("shows the daily dark-matter mass in nanograms, matching its own prose", () => {
+    const html = renderToString(
+      <ThemeProvider>
+        <DarkCornersPanel />
+      </ThemeProvider>
+    );
+    // ρ·v·86400 s ≈ 1.0e-11 kg = ~10 ng per m² per day. The tile once
+    // multiplied kg by 1e9 (µg) and printed "0.0 ng" beside "about ten
+    // nanograms" in the text.
+    expect(html).toContain("About ten nanograms");
+    const ng = Number(html.match(/([\d.]+) ng</)?.[1]);
+    expect(ng).toBeGreaterThan(5);
+    expect(ng).toBeLessThan(20);
   });
 });

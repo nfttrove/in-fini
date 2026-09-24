@@ -168,7 +168,7 @@ export default function DarkCornersPanel() {
               />
               <MetricCard
                 label="Through 1 m² per day"
-                value={`${(dm.kgPerDayPerM2 * 1e9).toFixed(1)} ng`}
+                value={`${(dm.kgPerDayPerM2 * 1e12).toFixed(1)} ng`}
                 sub={`≈ ${dm.particlesPerSecondPerM2.toExponential(1)} particles/s`}
               />
               <MetricCard
