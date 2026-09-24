@@ -11,6 +11,64 @@
  * its own each rig sees roughly the median noise.
  */
 
+import type { SeriesAnalysis } from "./residuals";
+
+/** m/s² → milli-g (thousandths of standard gravity). */
+export const M_S2_TO_MILLIG = 1000 / 9.80665;
+
+interface UnitRow {
+  source: string;
+  /** 'milli-g' once filed by the fixed client or rescaled; 'legacy' before. */
+  units?: string | null;
+  noise_rms: number;
+  top_peak_g: number;
+}
+
+/**
+ * Phone runs filed before the units fix were converted to milli-g twice
+ * (≈ 102× too high). The database rescales them and marks them 'milli-g'
+ * (migration 20260924150000); any phone row still marked legacy — say one
+ * filed by a cached old page — is rescaled here on read. CSV runs were
+ * converted once and are left alone.
+ */
+export function normalizeRunUnits<T extends UnitRow>(r: T): T {
+  if (r.source !== "phone-accelerometer" || r.units === "milli-g") return r;
+  return {
+    ...r,
+    noise_rms: r.noise_rms / M_S2_TO_MILLIG,
+    top_peak_g: r.top_peak_g / M_S2_TO_MILLIG,
+    units: "milli-g",
+  };
+}
+
+/** One census run's profile, in milli-g, ready to file. */
+export interface Profile {
+  sampleRateHz: number;
+  durationS: number;
+  noiseRms: number; // milli-g
+  topPeakHz: number;
+  topPeakG: number; // milli-g
+  mainsHz: 0 | 50 | 60;
+  label: string;
+}
+
+/**
+ * An analysed trace in m/s² → a census profile in milli-g. Phone and CSV
+ * traces both arrive in m/s², so this is the one place units change.
+ */
+export function analysisToProfile(a: SeriesAnalysis, label: string): Profile {
+  const peak = a.topPeaks[0];
+  return {
+    sampleRateHz: a.sampleRateHz,
+    durationS: a.durationS,
+    noiseRms: a.residualRms * M_S2_TO_MILLIG,
+    topPeakHz: peak ? peak.freqHz : 0,
+    topPeakG: peak ? peak.magnitude * M_S2_TO_MILLIG : 0,
+    mainsHz: a.mainsFraction > 0.15 ? (a.mainsHz as 50 | 60) : 0,
+    label,
+  };
+}
+
 export interface RunProfile {
   noise_rms: number; // milli-g
   mains_hz: number; // 0 | 50 | 60

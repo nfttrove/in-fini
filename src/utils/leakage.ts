@@ -217,16 +217,6 @@ function classifyVerdict(
     };
   }
 
-  if (absClaim > 0 && absClaim < 1e-9 && absResidual < 10 * leak + 1e-15) {
-    return {
-      key: "consistent",
-      label: "Sub-nanowatt, near the leakage floor",
-      description:
-        "The claim is below a nanowatt and within about 10× of the modelled leakage. This budget has no dynamical-Casimir term, so it cannot say more: nothing here stands out from the known channels, and nothing is confirmed either.",
-      tone: "sky",
-    };
-  }
-
   if (absClaim === 0) {
     return {
       key: "explained",
@@ -248,6 +238,18 @@ function classifyVerdict(
       description:
         "The modelled leakage channels are large enough to produce the whole claimed output, so no anomalous source is needed to explain it. That says the artifacts could produce the reading, not which one did.",
       tone: "emerald",
+    };
+  }
+
+  // Checked after "explained", so a tiny claim buried under large leakage
+  // reads explained rather than "near the leakage floor".
+  if (absClaim < 1e-9 && absResidual < 10 * leak + 1e-15) {
+    return {
+      key: "consistent",
+      label: "Sub-nanowatt, near the leakage floor",
+      description:
+        "The claim is below a nanowatt, above the modelled leakage but within about 10× of it. This budget has no dynamical-Casimir term, so it cannot say more: nothing here stands out from the known channels, and nothing is confirmed either.",
+      tone: "sky",
     };
   }
 

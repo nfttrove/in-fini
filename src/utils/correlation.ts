@@ -71,7 +71,7 @@ export function g2Correlations(
     description = `g₁₂² = ${(g12 * g12).toFixed(2)} exceeds the classical bound g₁₁·g₂₂ = ${(g11 * g11).toFixed(2)}. Coincidences between the two output modes exceed anything a hot resistor can produce — the pair signature of the dynamical Casimir effect.`;
   } else if (n_p > 0) {
     label = "Pairs present but thermally masked";
-    description = `Vacuum pairs exist (${n_p.toExponential(1)} per mode) but thermal photons (${n_th.toExponential(1)} per mode) pull the correlations inside the classical bound. g₁₂ = ${g12.toFixed(2)} is still above 1, so something couples the modes — but classically correlated light could do that too, so this trace cannot prove vacuum origin. Cool the experiment or pump harder.`;
+    description = `Vacuum pairs exist (${n_p.toExponential(1)} per mode) but thermal photons (${n_th.toExponential(1)} per mode) pull the correlations inside the classical bound. g₁₂ − 1 = ${(g12 - 1).toExponential(1)} is still above zero, so something couples the modes — but classically correlated light could do that too, so this trace cannot prove vacuum origin. Cool the experiment or pump harder.`;
   } else {
     label = "Purely classical light";
     description =

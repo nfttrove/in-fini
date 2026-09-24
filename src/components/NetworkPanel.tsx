@@ -4,15 +4,13 @@ import Panel from "./ui/Panel";
 import Skeleton from "./ui/Skeleton";
 import PlainExplainer from "./ui/PlainExplainer";
 import MetricCard from "./ui/MetricCard";
-import {
-  parseSeries,
-  analyzeSeries,
-  SeriesAnalysis,
-} from "../utils/residuals";
+import { parseSeries, analyzeSeries } from "../utils/residuals";
 import {
   fleetStats,
   collectiveBoundStatement,
   FleetStats,
+  analysisToProfile,
+  type Profile,
 } from "../utils/networkCensus";
 import {
   NetworkRun,
@@ -21,33 +19,9 @@ import {
   supabaseConfigured,
 } from "../lib/supabase";
 
-const M_S2_TO_MILLIG = 1000 / 9.80665;
 const RECORD_SECONDS = 60;
 
 type Capture = { t: number[]; y: number[] };
-
-interface Profile {
-  sampleRateHz: number;
-  durationS: number;
-  noiseRms: number; // milli-g
-  topPeakHz: number;
-  topPeakG: number;
-  mainsHz: 0 | 50 | 60;
-  label: string;
-}
-
-function analysisToProfile(a: SeriesAnalysis, label: string): Profile {
-  const peak = a.topPeaks[0];
-  return {
-    sampleRateHz: a.sampleRateHz,
-    durationS: a.durationS,
-    noiseRms: a.residualRms * M_S2_TO_MILLIG,
-    topPeakHz: peak ? peak.freqHz : 0,
-    topPeakG: peak ? peak.magnitude * M_S2_TO_MILLIG : 0,
-    mainsHz: a.mainsFraction > 0.15 ? (a.mainsHz as 50 | 60) : 0,
-    label,
-  };
-}
 
 export default function NetworkPanel() {
   const [recording, setRecording] = useState(false);
@@ -119,7 +93,9 @@ export default function NetworkPanel() {
       }
       if (aY !== null) {
         samplesRef.current.t.push((performance.now() - t0) / 1000);
-        samplesRef.current.y.push(aY * M_S2_TO_MILLIG);
+        // Raw m/s², like a pasted CSV: the profile converts to milli-g once.
+        // (It once converted here too, filing phone runs ~102× too high.)
+        samplesRef.current.y.push(aY);
       }
     };
     window.addEventListener("devicemotion", handler);
@@ -247,8 +223,8 @@ export default function NetworkPanel() {
           <div className="mt-4 pt-4 border-t dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700">
             <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-amber-600 mb-2 leading-relaxed">
               No motion sensors (desktop, or permission denied)? Paste any
-              accelerometer/log CSV — time,value — from any app or a
-              load-cell rig. Same analysis, same fleet.
+              accelerometer CSV — time (s), acceleration (m/s²) — from any
+              logging app. Same analysis, same fleet.
             </p>
             <textarea
               value={csvText}
@@ -346,8 +322,8 @@ export default function NetworkPanel() {
                     value={stats.n >= 5 ? `${stats.collectiveFloor.toExponential(1)} milli-g` : "—"}
                     sub={stats.n >= 5 ? "median / √N, N = runs filed (one rig can file several) · best case" : "needs ≥ 5 runs"}
                   />
-                  <MetricCard label="Quietest rig" value={`${stats.quietestNoise.toExponential(1)} milli-g`} />
-                  <MetricCard label="Median rig" value={`${stats.medianNoise.toExponential(1)} milli-g`} />
+                  <MetricCard label="Quietest run" value={`${stats.quietestNoise.toExponential(1)} milli-g`} />
+                  <MetricCard label="Median run" value={`${stats.medianNoise.toExponential(1)} milli-g`} />
                 </div>
                 <div className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700">
                   Mains split: {stats.mains50} × 50 Hz · {stats.mains60} × 60 Hz

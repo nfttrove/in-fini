@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { normalizeRunUnits } from "../utils/networkCensus";
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -293,11 +294,13 @@ export interface NetworkRun {
   top_peak_hz: number;
   top_peak_g: number;
   mains_hz: 0 | 50 | 60;
+  /** 'milli-g', or 'legacy' for phone rows filed before the units fix. */
+  units: "legacy" | "milli-g";
   created_at: string;
 }
 
 const NETWORK_COLUMNS =
-  "id,campaign,device_label,source,sample_rate_hz,duration_s,noise_rms,top_peak_hz,top_peak_g,mains_hz,created_at";
+  "id,campaign,device_label,source,sample_rate_hz,duration_s,noise_rms,top_peak_hz,top_peak_g,mains_hz,units,created_at";
 
 export async function listNetworkRuns(
   campaign = "census-001",
@@ -310,7 +313,7 @@ export async function listNetworkRuns(
     .order("created_at", { ascending: false })
     .limit(limit);
   if (error) throw error;
-  return (data ?? []) as NetworkRun[];
+  return ((data ?? []) as NetworkRun[]).map(normalizeRunUnits);
 }
 
 export async function fileNetworkRun(entry: {
@@ -326,7 +329,7 @@ export async function fileNetworkRun(entry: {
 }): Promise<NetworkRun> {
   const { data, error } = await requireClient()
     .from("network_runs")
-    .insert({ campaign: entry.campaign ?? "census-001", ...entry })
+    .insert({ campaign: entry.campaign ?? "census-001", ...entry, units: "milli-g" })
     .select(NETWORK_COLUMNS)
     .maybeSingle();
   if (error) throw error;

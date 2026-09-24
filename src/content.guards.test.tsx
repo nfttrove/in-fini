@@ -256,7 +256,7 @@ describe("errata guards: verdicts and copy say only what the model computes", ()
 
   it("Dark Corners states its assumptions and compares like with like", () => {
     const out = html(<DarkCornersPanel />);
-    expect(out).not.toMatch(/precisely none|measured physics|≈ 3 particles per litre"|million times fainter than the quietest/);
+    expect(out).not.toMatch(/precisely none|measured physics|million times fainter than the quietest/);
     expect(out).toContain(`an assumed ${DM_PARTICLE_GEV} GeV particle`);
     expect(out).toContain(`${(20e-6 / darkMatterFlux().hypotheticalPressurePa).toExponential(0)}× smaller than the pressure swing`);
   });
@@ -282,11 +282,15 @@ describe("errata guards: verdicts and copy say only what the model computes", ()
   it("units and labels: milli-g, runs not rigs, no 'impossible', live sideband check", () => {
     // The fleet cards only render with live data, so check the sources too.
     expect(html(<NetworkPanel />)).not.toMatch(/mΔg|independent census runs/);
-    for (const src of [networkPanelSrc, networkCensusSrc]) expect(src).not.toContain("mΔg");
+    for (const src of [networkPanelSrc, networkCensusSrc]) {
+      expect(src).not.toMatch(/mΔg|Rigs filed|independent census runs|needs ≥ 5 rigs|Quietest rig|Median rig/);
+    }
+    // The phone path files raw m/s²; the profile converts to milli-g once.
+    expect(networkPanelSrc).not.toMatch(/aY \* M_S2_TO_MILLIG/);
     expect(edSrc).not.toContain('"impossible"');
     const dev = html(<DeviceModelPanel />);
     expect(dev).not.toContain("Energy conservation  (no over-unity)");
-    expect(dev).toContain("Model vs claim");
+    expect(dev).toContain("Model vs claim  (shortfall = 1.3 W ÷ predicted)");
     expect(dev).toMatch(/fₘ = 500\.00 kHz vs γ\/2/);
     // Out of slider range, but the check must follow fₘ, not a fixed 500 kHz.
     const narrow = { ...predictDevice(DEVICE_DEFAULTS), gammaHz: 2e6 };

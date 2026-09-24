@@ -147,7 +147,7 @@ export function accelerationVerdict(a: number): DeskVerdict {
     };
   }
   if (mg < 1e-3) {
-    return { key: "metrology", label: "Precision-metrology territory", description: `Equivalent to ${mg.toExponential(1)} mg per kg — below a laboratory balance; torsion balances and space accelerometers work here.` };
+    return { key: "metrology", label: "Precision-metrology territory", description: `Equivalent to ${mg.toExponential(1)} mg per kg — below a laboratory balance. The best torsion balances reach about 10⁻¹⁵ m/s²; below that, only space accelerometers with long averaging.` };
   }
   if (mg < 1) {
     return { key: "jewelry", label: "Below household scales", description: `Equivalent to ${mg.toExponential(1)} mg — real, but laboratory-balance territory.` };

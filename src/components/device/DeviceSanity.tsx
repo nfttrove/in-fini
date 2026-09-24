@@ -64,7 +64,7 @@ export default function DeviceSanity({ p, Q, beta, fmHz }: Props) {
 
   checks.push({
     key: "energy",
-    label: "Model vs claim  (predicted ÷ 1.3 W)",
+    label: "Model vs claim  (shortfall = 1.3 W ÷ predicted)",
     detail: `predicted ${p.P_output.toExponential(2)} W  vs  claimed 1.3 W  →  shortfall ${p.shortfall.toExponential(
       2
     )}×`,

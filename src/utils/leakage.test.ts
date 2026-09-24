@@ -99,3 +99,25 @@ describe("classifyVerdict — leakage above the claim", () => {
     expect(computeBudget({ ...over, pClaimW: 1e7 }).verdict.key).toBe("gross-excess");
   });
 });
+
+describe("classifyVerdict — sub-nanowatt claims", () => {
+  const quiet: LeakageParams = {
+    pClaimW: 1e-10, vDriveV: 1, rDriveOhm: 50, shieldDb: 60, iBiasA: 0, rResOhm: 0,
+    tHotK: 300, tColdK: 300, emissivity: 0.1, aRadM2: 1e-4,
+    rotorMassKg: 0, rotorAmpNm: 0, fmHz: 5e5, mechQ: 1e4,
+  };
+
+  it("reads explained when leakage buries a tiny claim, not 'near the leakage floor'", () => {
+    const b = computeBudget(quiet);
+    expect(b.totalLeakageW).toBeGreaterThan(100 * b.claimedW);
+    expect(b.verdict.key).toBe("explained");
+  });
+
+  it("keeps the sub-nanowatt verdict for a claim just above the leakage", () => {
+    // 120 dB of shielding leaves the ~1 pW baseline.
+    const leak = computeBudget({ ...quiet, shieldDb: 120 }).totalLeakageW;
+    expect(leak).toBeLessThan(1e-11);
+    const b = computeBudget({ ...quiet, shieldDb: 120, pClaimW: 3 * leak });
+    expect(b.verdict.label).toBe("Sub-nanowatt, near the leakage floor");
+  });
+});

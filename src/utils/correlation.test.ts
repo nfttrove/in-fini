@@ -38,3 +38,13 @@ describe("g2Correlations", () => {
     expect(r.violation).toBe(false);
   });
 });
+
+describe("thermally masked pairs — the text never contradicts its number", () => {
+  it("reports g₁₂ − 1 so a tiny excess never prints as 'g₁₂ = 1.00 is above 1'", () => {
+    const r = g2Correlations(1e-3, 1);
+    expect(r.label).toBe("Pairs present but thermally masked");
+    expect(r.g12).toBeGreaterThan(1);
+    expect(r.description).not.toMatch(/g₁₂ = 1\.00 is still above 1/);
+    expect(r.description).toContain(`g₁₂ − 1 = ${(r.g12 - 1).toExponential(1)}`);
+  });
+});

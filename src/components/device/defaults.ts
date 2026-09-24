@@ -79,6 +79,8 @@ export const CLAIM_REACH_GAP_NM = (() => {
       predictDevice({ dNm, fmHz, beta: 1, rotorRadiusNm: survivableRadiusNm(fmHz), Q: 1e6, areaMm2: 100 });
     if (at(1).P_output < at(1).claimedW) continue;
     let lo = 1, hi = 500;
+    // The slider stops at 500 nm; if even that meets the claim, say so.
+    if (at(hi).P_output >= at(hi).claimedW) return hi;
     for (let k = 0; k < 60; k++) {
       const mid = Math.sqrt(lo * hi);
       if (at(mid).P_output >= at(mid).claimedW) lo = mid; else hi = mid;

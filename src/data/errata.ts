@@ -33,6 +33,7 @@ const rimLimit = RIM_SPEED_LIMIT_M_S.toFixed(0);
 const reachGap = CLAIM_REACH_GAP_NM.toFixed(0);
 const atClaimShortfall = AT_CLAIM.shortfall.toExponential(0);
 const darkNgPerDay = (darkMatterFlux().kgPerDayPerM2 * 1e12).toFixed(1);
+const phoneOverRead = (1000 / 9.80665).toFixed(0);
 const dmPushRatio = (20e-6 / darkMatterFlux().hypotheticalPressurePa).toExponential(0);
 const tideRatio = (QUIETEST_RIG_ACCEL / darkEnergyTide(1)).toExponential(0);
 const casimir1um = Math.abs(casimirPressure(1e-6)).toExponential(1);
@@ -154,7 +155,13 @@ export const ERRATA: Erratum[] = [
   {
     title: "Units and labels",
     was: "The Replication Network labelled acceleration in milli-g as \"mΔg\" (Δg is grams-equivalent weight everywhere else) and called every filed run an \"independent rig\"; the g² panel said \"λ²/κ gives nₚ\" and always described \"the 20 mK mode\"; Experiment Design printed \"impossible\" for a channel that is simply zero; the Device Model's sideband check compared the linewidth with a fixed 500 kHz whatever the drive, and labelled a model-vs-claim ratio \"Energy conservation\".",
-    now: "Census values read milli-g and N counts filed runs; nₚ = (λ/κ)² at the live temperature; a zero channel reads \"no limit\"; the sideband check uses the live drive frequency; the claim check is labelled as the ratio it is.",
+    now: "Census values are labelled milli-g and N counts filed runs; nₚ = (λ/κ)² at the live temperature; a zero channel reads \"no limit\"; the sideband check uses the live drive frequency; the claim check is labelled as the shortfall it shows (1.3 W ÷ predicted).",
     tab: "Replication Network, Circuit QED, Experiment Design, Device Model",
+  },
+  {
+    title: "Phone census runs were filed about 100× too high",
+    was: `The Replication Network converted each phone sample from m/s² to milli-g, then converted the analysed noise and peak to milli-g again, so every phone run showed and filed ${phoneOverRead}× its real noise. Pasted CSV runs were converted once, so the fleet statistics mixed two scales.`,
+    now: "Both paths take m/s² and convert once. A database migration rescales the phone runs already filed and marks every row with its units; the page rescales any phone row still unmarked, such as one filed by a cached old page.",
+    tab: "Replication Network",
   },
 ];
