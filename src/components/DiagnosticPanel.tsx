@@ -9,7 +9,8 @@ import DiagnosticReport from "./diagnostic/DiagnosticReport";
 import DiagnosticNotes from "./diagnostic/DiagnosticNotes";
 import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
-import { LeakageParams, computeBudget } from "../utils/leakage";
+import { LeakageParams, computeBudget, energyBalance } from "../utils/leakage";
+import EnergyBalanceCard from "./diagnostic/EnergyBalanceCard";
 
 const DEFAULT_PARAMS: LeakageParams = {
   pClaimW: 1.3,
@@ -74,6 +75,7 @@ export default function DiagnosticPanel() {
         </div>
         <div className="lg:col-span-3 space-y-6">
           <DiagnosticVerdict budget={budget} />
+          <EnergyBalanceCard balance={energyBalance(params)} />
           <DiagnosticBudget budget={budget} />
         </div>
       </div>

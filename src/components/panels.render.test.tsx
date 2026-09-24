@@ -46,6 +46,8 @@ describe("ClaimRegistryPanel render", () => {
       </ThemeProvider>
     );
     expect(html).toContain("File a claim. Get a budget");
+    // Power claims also get the energy balance: output vs known input.
+    expect(html.replace(/<!-- -->/g, "")).toContain("Energy balance: Output exceeds the known input");
     // Unconfigured backend (no env in tests): local budget still shows.
     expect(html).toContain("The budget&#x27;s verdict");
     expect(html).toContain("Claimed");

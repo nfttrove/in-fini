@@ -95,6 +95,55 @@ export function triboBaselineW(): number {
   return 1e-12;
 }
 
+export interface EnergyBalance {
+  /**
+   * Power the rig is known to draw: the drive, ½V²/R, plus the bias
+   * current's I²R. A floor: anything else plugged in only adds to it.
+   */
+  inputW: number;
+  /** Claimed output ÷ known input. */
+  ratio: number;
+  /** Claimed output − known input: the only part that could be over-unity. */
+  netExcessW: number;
+  key: "within-input" | "exceeds-input";
+  label: string;
+  description: string;
+}
+
+/**
+ * The first question for any power-from-nothing claim, asked before the
+ * leakage channels: does the output even exceed what goes in? The leakage
+ * budget explains a *reading*; this compares the claim with the energy the
+ * rig is already known to consume. Kept separate from the channels because
+ * the RF channel already counts a shielded fraction of the same drive.
+ */
+export function energyBalance(p: LeakageParams): EnergyBalance {
+  const driveW = p.rDriveOhm > 0 ? (0.5 * p.vDriveV * p.vDriveV) / p.rDriveOhm : 0;
+  const inputW = driveW + jouleW(p.iBiasA, p.rResOhm);
+  const ratio = inputW > 0 ? p.pClaimW / inputW : Infinity;
+  const netExcessW = p.pClaimW - inputW;
+  if (netExcessW <= 0) {
+    return {
+      inputW,
+      ratio,
+      netExcessW,
+      key: "within-input",
+      label: "Output within the known input",
+      description:
+        "The rig draws at least this much power, and the claim does not exceed it. Turning input into output is not over-unity, whatever the leakage channels say. Measure input and output with the same calorimeter before claiming anything.",
+    };
+  }
+  return {
+    inputW,
+    ratio,
+    netExcessW,
+    key: "exceeds-input",
+    label: "Output exceeds the known input",
+    description:
+      "Only the net excess beyond what the rig is known to draw could be anomalous — and that assumes nothing else is plugged in. Meter every supply on the same instrument as the output before believing the difference.",
+  };
+}
+
 export function computeBudget(p: LeakageParams): LeakageBudget {
   const channels: LeakageChannel[] = [
     {

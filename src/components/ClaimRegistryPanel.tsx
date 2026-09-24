@@ -5,7 +5,8 @@ import Skeleton from "./ui/Skeleton";
 import PlainExplainer from "./ui/PlainExplainer";
 import Slider from "./ui/Slider";
 import MetricCard from "./ui/MetricCard";
-import { LeakageParams, computeBudget } from "../utils/leakage";
+import { LeakageParams, computeBudget, energyBalance } from "../utils/leakage";
+import EnergyBalanceCard from "./diagnostic/EnergyBalanceCard";
 import { ThrustParams, computeThrustBudget } from "../utils/thrustLeakage";
 import { formatPower } from "../utils/device";
 import { formatForce } from "../utils/physics";
@@ -451,6 +452,11 @@ export default function ClaimRegistryPanel() {
                 {budget.sigmaAssessment.description}
               </p>
             </div>
+            {claimType === "power" && (
+              <div className="mt-3">
+                <EnergyBalanceCard balance={energyBalance(power)} />
+              </div>
+            )}
           </Panel>
 
           <Panel title="3 · The public record">

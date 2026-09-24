@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { jouleW, rfLeakageW, blackbodyW, mechanicalW } from "./leakage";
+import { jouleW, rfLeakageW, blackbodyW, mechanicalW, energyBalance, type LeakageParams } from "./leakage";
 
 describe("jouleW", () => {
   it("is I²R", () => {
@@ -46,5 +46,34 @@ describe("mechanicalW — sustaining power of a driven resonator", () => {
 
   it("returns 0 for non-positive Q", () => {
     expect(mechanicalW(1e-9, 1, 5e5, 0)).toBe(0);
+  });
+});
+
+describe("energyBalance — does the output even exceed the input?", () => {
+  const P: LeakageParams = {
+    pClaimW: 1.3, vDriveV: 10, rDriveOhm: 50, shieldDb: 40, iBiasA: 0.1, rResOhm: 0.1,
+    tHotK: 350, tColdK: 300, aRadM2: 1e-4, emissivity: 0.9,
+    rotorMassKg: 1e-9, rotorAmpNm: 1, fmHz: 5e5, mechQ: 1e4,
+  };
+
+  it("counts the drive ½V²/R and the bias I²R as known input", () => {
+    // The panel defaults: 10 V into 50 Ω is 1 W before anything leaks.
+    const b = energyBalance(P);
+    expect(b.inputW).toBeCloseTo(1 + 1e-3, 12);
+    expect(b.ratio).toBeCloseTo(1.3 / 1.001, 12);
+    expect(b.netExcessW).toBeCloseTo(0.299, 12);
+    expect(b.key).toBe("exceeds-input");
+  });
+
+  it("calls a claim at or below the known input not over-unity", () => {
+    expect(energyBalance({ ...P, pClaimW: 0.9 }).key).toBe("within-input");
+    expect(energyBalance({ ...P, pClaimW: 1.001 }).key).toBe("within-input");
+  });
+
+  it("has no drive term without a drive resistance, and an infinite ratio with no input", () => {
+    const b = energyBalance({ ...P, rDriveOhm: 0, iBiasA: 0 });
+    expect(b.inputW).toBe(0);
+    expect(b.ratio).toBe(Infinity);
+    expect(b.key).toBe("exceeds-input");
   });
 });
