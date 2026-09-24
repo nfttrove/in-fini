@@ -1,6 +1,34 @@
 import Panel from "../ui/Panel";
 import InfoNote from "../ui/InfoNote";
-import { DevicePrediction, formatPower } from "../../utils/device";
+import { DevicePrediction, formatPower, predictDevice } from "../../utils/device";
+
+/** Rim acceleration beyond which no demonstrated micro-rotor survives (g). */
+const MATERIAL_VETO_G = 1e6;
+
+// Every slider at its limit. The generous ceiling does pass the claim here;
+// what stops it is materials, not the formula.
+const CORNER = predictDevice({
+  dNm: 1,
+  fmHz: 10e6,
+  beta: 1,
+  rotorRadiusNm: 100_000,
+  Q: 1e6,
+  areaMm2: 100,
+});
+
+// At the claim's own 50 nm and 500 kHz, the largest rotor that survives the
+// veto (a = (2πf)²·r) with every other knob at its limit.
+const CLAIM_FM_HZ = 500e3;
+const SURVIVABLE_R_NM =
+  ((MATERIAL_VETO_G * 9.80665) / (2 * Math.PI * CLAIM_FM_HZ) ** 2) * 1e9;
+const AT_CLAIM = predictDevice({
+  dNm: 50,
+  fmHz: CLAIM_FM_HZ,
+  beta: 1,
+  rotorRadiusNm: SURVIVABLE_R_NM,
+  Q: 1e6,
+  areaMm2: 100,
+});
 
 interface Props {
   p: DevicePrediction;
@@ -42,13 +70,24 @@ export default function DeviceNotes({ p }: Props) {
         </InfoNote>
         <InfoNote variant="warning">
           The experimental claim "1.3 W at 50 nm, 500 kHz" is overlaid on
-          every sweep as an orange dashed line. At the defaults this model
-          predicts roughly {p.P_output.toExponential(2)} W — a shortfall of
-          {" "}
-          {p.shortfall.toExponential(2)}× relative to the claim. Sweeping
-          every knob through its full physical range (d down to 1 nm, fₘ up
-          to 10 MHz, β up to 1, Q up to 10⁶, A up to 100 mm²) does not close
-          this gap; the (v/c)² factor alone costs ~10¹⁸.
+          every sweep as an orange dashed line. At the current settings this
+          model predicts roughly {p.P_output.toExponential(2)} W — a
+          shortfall of {p.shortfall.toExponential(2)}× relative to the claim;
+          at the defaults the (v/c)² factor alone costs ~10¹⁸.
+        </InfoNote>
+        <InfoNote variant="warning">
+          Push every slider to its limit (d = 1 nm, fₘ = 10 MHz, r = 100 µm,
+          β = 1, Q = 10⁶, A = 100 mm²) and this deliberately generous ceiling
+          reads {formatPower(CORNER.P_output)} — past the claim. The formula
+          does not stop it; materials do. That rotor's rim pulls{" "}
+          {CORNER.rimAccelerationG.toExponential(0)} g, and no micro-rotor
+          survives beyond ~10⁶ g (see the sanity checks). A 1 nm gap is also a
+          few atoms wide, far below the ~100 nm where real metals stop acting
+          as the ideal mirrors the d⁻⁴ law assumes. At the claim's own 50 nm
+          and 500 kHz, the largest rotor that survives (r ≈{" "}
+          {Math.round(SURVIVABLE_R_NM)} nm) leaves the ceiling{" "}
+          {AT_CLAIM.shortfall.toExponential(1)}× short even with every other
+          knob at its limit.
         </InfoNote>
         <InfoNote variant="warning">
           The unavoidable conclusion of this predictive model: if a real

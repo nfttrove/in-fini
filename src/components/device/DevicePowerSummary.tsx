@@ -100,9 +100,9 @@ export default function DevicePowerSummary({ p }: Props) {
                 </span>
               </div>
               <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 leading-relaxed">
-                {p.P_output < p.P_DCE_limit
-                  ? "Model output is below the DCE ceiling. The Lorentzian detuning accounts for the gap."
-                  : "Model output exceeds the DCE ceiling -- the excess must invoke a non-DCE mechanism (parametric resonance, vacuum friction, etc.)."}
+                {p.P_output >= 0.99 * p.P_DCE_limit
+                  ? "Model output sits at the DCE ceiling: the drive is well inside the cavity linewidth, so the Lorentzian costs nothing."
+                  : "Model output is below the DCE ceiling. The Lorentzian detuning accounts for the gap."}
               </p>
             </div>
           )}

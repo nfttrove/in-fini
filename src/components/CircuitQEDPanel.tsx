@@ -11,7 +11,8 @@ import {
   CircuitQEDParams,
   CqedPrediction,
 } from "../utils/circuitQED";
-import { formatFreq } from "../utils/device";
+import { formatFreq, predictDevice } from "../utils/device";
+import { DEVICE_DEFAULTS } from "./device/defaults";
 import { CQED_DEFAULTS } from "./cqed/defaults";
 
 export interface CqedState {
@@ -47,6 +48,9 @@ function VerdictBanner({ pred }: { pred: CqedPrediction }) {
     </div>
   );
 }
+
+// The Device Model's default rotor rim speed, for the "not speed" comparison.
+const DEVICE_ROTOR_V = predictDevice(DEVICE_DEFAULTS).v;
 
 export default function CircuitQEDPanel({
   initialState,
@@ -295,8 +299,10 @@ export default function CircuitQEDPanel({
               />
             </div>
             <p className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700 mt-4 leading-relaxed">
-              The boundary here moves at ~10² m/s — comparable to the spinning
-              rotor in the Device Model. The pairs/s rate is nonetheless
+              The boundary here moves at {pred.vEff.toFixed(0)} m/s — about{" "}
+              {Math.round(pred.vEff / DEVICE_ROTOR_V)}× the Device Model's
+              default rotor ({DEVICE_ROTOR_V.toFixed(2)} m/s), yet (v/c)² is
+              still hopelessly small. The pairs/s rate is nonetheless
               measurable because of the two things mechanics cannot offer:
               pumping <em>exactly at 2·f₀</em> (parametric resonance — needs
               f₀ in microwaves, not optics) and a cryogenic mode with n̄ ≈ 0.

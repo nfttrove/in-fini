@@ -11,7 +11,7 @@
  * exact structural analogue of the electromagnetic energy density whose
  * imbalance between two plates IS the vacuum Casimir effect. A perfect
  * absorber feels u; a reflector feels 2u (momentum reversal). Larraza &
- * Puttermann (1998) showed the deeper version: two plates in a diffuse
+ * Denardo (1998) showed the deeper version: two plates in a diffuse
  * acoustic field attract by excluding sound modes between them — a
  * laboratory-scale Casimir effect you can build for the price of a
  * speaker.
@@ -87,7 +87,7 @@ export function scaleVerdict(forceN: number): ScaleVerdict {
     return {
       key: "jewelry",
       label: "Visible on a jewelry scale (0.001 g)",
-      description: `About ${mg.toFixed(1)} mg of push. A €15 0.001 g scale next to the speaker will watch the needle move. This is a genuine kitchen-table field-fluctuation measurement.`,
+      description: `About ${mg.toFixed(1)} mg of push. A €15 0.001 g scale next to the speaker will watch the needle move. This is a genuine kitchen-table field-fluctuation measurement — and it takes painfully loud sound, so wear ear protection.`,
       tone: "emerald",
     };
   }

@@ -186,10 +186,11 @@ export default function AcousticCasimirPanel() {
 
           <Panel title="Build it tonight (the honest version)">
             <ul className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700 space-y-1.5 list-disc pl-4 leading-relaxed">
+              <li>Ear protection first: 120 dB is the threshold of pain and can damage hearing within seconds. Earmuffs on, short tone bursts.</li>
               <li>Any speaker; a tone-generator app set to a few hundred Hz.</li>
               <li>A 0.001 g jewelry scale (≈ €15). Put the plate ON the scale, speaker facing down above it.</li>
               <li>Tone ON vs OFF — the difference is the radiation pressure. That A/B is your null test.</li>
-              <li>Expect factors-of-a-few from near-field and standing-wave effects: this panel's plane-wave numbers are the floor, and the Larson–Puttermann two-plate geometry (a real "acoustic Casimir") needs more care.</li>
+              <li>Expect factors-of-a-few from near-field and standing-wave effects: this panel's plane-wave numbers are the floor, and the Larraza–Denardo two-plate geometry (a real "acoustic Casimir") needs more care.</li>
               <li>File your measured force in the Claim Registry with "sound" as the artifact — same rules as everything else.</li>
             </ul>
           </Panel>
