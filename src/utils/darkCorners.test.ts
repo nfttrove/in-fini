@@ -7,6 +7,8 @@ import {
   darkEnergyTide,
   accelerationVerdict,
   RHO_DARK_ENERGY_J,
+  QUIETEST_RIG_ACCEL,
+  LISA_PF_YEAR_FLOOR,
 } from "./darkCorners";
 
 describe("the 10^120 problem", () => {
@@ -78,9 +80,29 @@ describe("dark energy's tide across the desk", () => {
     expect(darkEnergyTide(2)).toBeCloseTo(2 * darkEnergyTide(1), 20);
   });
 
-  it("is unwitnessable by matter, by many orders", () => {
-    const v = accelerationVerdict(darkEnergyTide(1));
+  it("sits far below the quietest rig the Experiment Design tab can set", () => {
+    // The ratio is computed from the tab's real slider extremes (5 kg,
+    // 10 Hz, 10 mK, Q = 100, 10⁶ s), not a hand-typed 1e-9 — which once
+    // compared m/s² against a milligram threshold and printed "3e+26×".
+    expect(QUIETEST_RIG_ACCEL).toBeCloseTo(2.63e-16, 17);
+    const a = darkEnergyTide(1);
+    const v = accelerationVerdict(a);
     expect(v.key).toBe("thermal-floored");
+    expect(QUIETEST_RIG_ACCEL / a).toBeGreaterThan(5e19);
+    expect(QUIETEST_RIG_ACCEL / a).toBeLessThan(1e20);
+    expect(v.description).toContain(`${(QUIETEST_RIG_ACCEL / a).toExponential(0)}×`);
+    expect(v.description).not.toContain("3e+26");
     expect(v.description).toContain("telescopes");
+  });
+
+  it("stops calling an acceleration unmeasurable once it clears the rig floor", () => {
+    expect(accelerationVerdict(QUIETEST_RIG_ACCEL * 2).key).toBe("metrology");
+    expect(accelerationVerdict(QUIETEST_RIG_ACCEL / 2).key).toBe("thermal-floored");
+    expect(accelerationVerdict(9.80665e-7).key).toBe("jewelry");
+    expect(accelerationVerdict(9.80665e-5).key).toBe("kitchen");
+  });
+
+  it("puts LISA Pathfinder's year-averaged floor far above the tide", () => {
+    expect(LISA_PF_YEAR_FLOOR / darkEnergyTide(3)).toBeGreaterThan(1e16);
   });
 });

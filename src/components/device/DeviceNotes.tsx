@@ -91,10 +91,12 @@ export default function DeviceNotes({ p }: Props) {
           This model is honest about its own limits. The ceiling
           P_DCE = (ħc²/d⁴)(v/c)²·A is a scaling, not a first-principles
           calculation; the exact prefactor for a given geometry may differ by
-          one or two orders of magnitude. Even generously accounting for
-          geometric factors of 10²-10⁴, the remaining shortfall relative to
-          the claim is ≳ 10¹⁰. No tuning of the included physics brings the
-          prediction within range.
+          one or two orders of magnitude. Even granting a geometric factor of
+          10⁴, the best survivable setting at the claim's own 50 nm and
+          500 kHz stays {(AT_CLAIM.shortfall / 1e4).toExponential(0)}× short.
+          Within materials that survive, at the claim's stated gap and drive,
+          the included physics does not reach it; the slider corners only
+          get there on paper.
         </InfoNote>
       </div>
     </Panel>

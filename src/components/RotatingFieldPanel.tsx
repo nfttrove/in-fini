@@ -115,7 +115,7 @@ export default function RotatingFieldPanel() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2">
-          <RotatingNotes />
+          <RotatingNotes frequencyHz={frequency * 1e3} cavityLengthM={cavityLength} />
         </div>
         <PresetBar
           panel="rotating"

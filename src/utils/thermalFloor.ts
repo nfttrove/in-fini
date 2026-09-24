@@ -1,5 +1,5 @@
 /**
- * The thermal floor: the measurability limit imposed by matter itself.
+ * The thermal floor: the Brownian noise of the test mass itself.
  *
  * Any test mass at temperature T jiggles — Brownian motion, via the
  * fluctuation–dissipation theorem. For a measurement mode modelled as a
@@ -10,8 +10,8 @@
  *
  * (structural damping, Saulson-style; the house convention of dropping
  * O(1) prefactors applies). Integrated over a measurement of duration τ
- * (effective bandwidth ~ 1/τ), the smallest force any matter-based
- * instrument can resolve at temperature T is
+ * (effective bandwidth ~ 1/τ), the smallest force THIS oscillator can
+ * resolve against its own thermal noise is
  *
  *   F_min ≈ sqrt(4 k_B T m ω₀ / (Q τ))    [N]
  *
@@ -19,11 +19,14 @@
  *
  *   x_th = sqrt(k_B T / (m ω₀²))          [m]
  *
- * Together these give a claim a third possible status beyond true/false:
- * SUB-THERMAL — smaller than what any arrangement of atoms at that
- * temperature could ever distinguish from noise. Cooling helps as √T,
- * which is brutally slow: each 100× in sensitivity costs 10⁴× in
- * temperature.
+ * This is a floor for the rig as modelled, not for every instrument that
+ * could exist: F_min falls with lighter masses, higher Q (real resonators
+ * reach 10⁶–10⁹), lower T and longer τ, and quantum-limited or
+ * back-action-evading readouts change the accounting again. It does give
+ * a claim a third status beyond true/false for a given rig: SUB-THERMAL —
+ * below what this test mass at this temperature can distinguish from its
+ * own noise. Cooling alone helps only as √T: each 100× in sensitivity
+ * costs 10⁴× in temperature.
  *
  * For power claims the analogous bound is the matched-filter energy
  * floor, P_min ≈ k_B T / τ (one kT of energy per measurement).
@@ -59,6 +62,33 @@ export function thermalFloorDeltaG(p: ThermalFloorParams): Grams {
   return newtonsToGrams(newtons(thermalForceFloorN(p)));
 }
 
+/** The same floor as an acceleration of the test mass, F_min / m [m/s²]. */
+export function thermalAccelerationFloor(p: ThermalFloorParams): number {
+  return thermalForceFloorN(p) / p.massKg;
+}
+
+/**
+ * The Experiment Design tab's rig: its slider ranges and its fixed Q.
+ * Other tabs quote "the quietest rig the tab can set", so the numbers
+ * live here once rather than being retyped as a guess.
+ */
+export const ED_QUALITY_FACTOR = 100;
+export const ED_RIG_RANGE = {
+  massKg: { min: 0.01, max: 5 },
+  freqHz: { min: 10, max: 500 },
+  tempK: { min: 0.01, max: 400 },
+  integrationS: { min: 1, max: 1e6 },
+} as const;
+
+/** Lowest acceleration floor the tab can reach: heaviest, slowest, coldest, longest. */
+export const QUIETEST_ED_RIG: ThermalFloorParams = {
+  massKg: ED_RIG_RANGE.massKg.max,
+  freqHz: ED_RIG_RANGE.freqHz.min,
+  qualityFactor: ED_QUALITY_FACTOR,
+  tempK: ED_RIG_RANGE.tempK.min,
+  integrationS: ED_RIG_RANGE.integrationS.max,
+};
+
 /** rms thermal position jitter of the test mass [m] (equipartition). */
 export function thermalPositionNoiseM(p: ThermalFloorParams): number {
   const omega = 2 * Math.PI * p.freqHz;
@@ -93,7 +123,7 @@ export function assessDecidability(
       verdict: {
         key: "comfortable",
         label: "Decidable in principle",
-        description: `The claim sits ${ratio.toExponential(1)}× above the thermal noise of its own test mass. Matter can arbitrate this one — the only question is whether your artifacts (see the requirements above) let it. (Working ~10× above a fundamental noise floor is routine metrology.)`,
+        description: `The claim sits ${ratio.toExponential(1)}× above the thermal noise of its own test mass. Thermal noise is not what stops this rig — the question is whether your artifacts (see the requirements above) let it. (Working ~10× above a fundamental noise floor is routine metrology.)`,
         tone: "emerald",
         requiredTempK: null,
       },
@@ -121,8 +151,8 @@ export function assessDecidability(
     ratio,
     verdict: {
       key: "sub-thermal",
-      label: "Sub-thermal: undecidable by matter at this temperature",
-      description: `The claim is ${(1 / ratio).toExponential(1)}× SMALLER than the Brownian jitter of its own test mass at ${p.tempK.toFixed(0)} K. No shielding, vacuum, or budget fixes this — the rig is made of atoms. Decidability would demand cooling to ≈ ${requiredTempK.toExponential(1)} K${belowCMB ? ", below the cosmic microwave background: effectively colder than the universe allows" : ""}. The claim is not wrong; it is unwitnessable.`,
+      label: "Sub-thermal: below this rig's Brownian floor",
+      description: `The claim is ${(1 / ratio).toExponential(1)}× SMALLER than the Brownian jitter of this test mass at ${p.tempK.toFixed(p.tempK < 1 ? 2 : 0)} K (Q = ${p.qualityFactor}). Shielding and vacuum do not help here — the noise is the mass's own. Cooling alone would have to reach ≈ ${requiredTempK.toExponential(1)} K${belowCMB ? ", below the 2.7 K cosmic microwave background" : ""}; the other levers are a lighter mass, a higher-Q resonator (real ones reach 10⁶–10⁹), longer integration or a quantum-limited readout — a different instrument. The claim is not wrong; this rig cannot witness it.`,
       tone: "red",
       requiredTempK,
     },

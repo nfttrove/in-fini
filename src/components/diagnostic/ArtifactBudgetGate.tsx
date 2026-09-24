@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { PRESETS, computeGate, type ChannelDef, type GateValues } from "./artifactGate";
 
 /*
   IN FINI — MODULE: ARTIFACT BUDGET GATE
@@ -20,9 +21,6 @@ import { useState, useMemo } from "react";
   project, TU Dresden; CEAS Space J. 14, 31, 2022).
 */
 
-const C_LIGHT = 2.998e8;
-const EPS0 = 8.854e-12;
-
 const PALETTE = {
   bg: "#101418",
   panel: "#171d24",
@@ -36,97 +34,6 @@ const PALETTE = {
   fail: "#ff5d5d",
   warn: "#ffd66f",
 };
-
-interface GateValues {
-  claim: number;
-  P: number;
-  leak: number;
-  I: number;
-  Leff: number;
-  B: number;
-  pressure: number;
-  area: number;
-  epsGas: number;
-  cth: number;
-  V: number;
-  Aes: number;
-  gap: number;
-  noise: number;
-}
-
-interface PresetConfig {
-  label: string;
-  note: string;
-  values: GateValues;
-}
-
-const PRESETS: Record<string, PresetConfig> = {
-  eagleworks: {
-    label: "Eagleworks 2016 (EmDrive)",
-    note: "80 W RF, ~100 µN claimed (1.2 ± 0.1 mN/kW; White et al., J. Propul. Power 33, 830, 2017). Long unshielded DC run in Earth's field.",
-    values: {
-      claim: 100, P: 80, leak: 0.5, I: 2.2, Leff: 1.0, B: 50,
-      pressure: 1e-5, area: 100, epsGas: 0.005, cth: 20,
-      V: 40, Aes: 1, gap: 2, noise: 100,
-    },
-  },
-  shielded: {
-    label: "Clean lab (SpaceDrive-style)",
-    note: "Mu-metal shielding, twisted pairs, liquid-metal contacts: what a claim must beat. TU Dresden's SpaceDrive balance found no EmDrive thrust; earlier signals were thermal and cable artefacts (Tajmar, Neunzig & Weikert, CEAS Space J. 14, 31, 2022).",
-    values: {
-      claim: 100, P: 80, leak: 0.1, I: 2.2, Leff: 0.02, B: 1,
-      pressure: 1e-7, area: 100, epsGas: 0.001, cth: 2,
-      V: 5, Aes: 1, gap: 5, noise: 20,
-    },
-  },
-};
-
-interface ChannelDef {
-  key: string;
-  name: string;
-  formula: string;
-  compute: (v: GateValues) => number;
-}
-
-const CHANNEL_DEFS: ChannelDef[] = [
-  {
-    key: "photon",
-    name: "Photon pressure",
-    formula: "η · P / c",
-    compute: (v) => (v.leak * v.P) / C_LIGHT,
-  },
-  {
-    key: "magnetic",
-    name: "Magnetic cable coupling",
-    formula: "I · L_eff · B",
-    compute: (v) => v.I * v.Leff * v.B * 1e-6,
-  },
-  {
-    key: "thermal",
-    name: "Thermal balance drift",
-    formula: "c_th · P",
-    compute: (v) => v.cth * 1e-9 * v.P,
-  },
-  {
-    key: "gas",
-    name: "Gas-dynamic / outgassing",
-    formula: "ε · p · A",
-    compute: (v) => v.epsGas * (v.pressure * 100) * (v.area * 1e-4),
-  },
-  {
-    key: "electro",
-    name: "Electrostatic",
-    formula: "ε₀ A V² / 2d²",
-    compute: (v) =>
-      (EPS0 * (v.Aes * 1e-4) * v.V * v.V) / (2 * Math.pow(v.gap * 1e-3, 2)),
-  },
-  {
-    key: "noise",
-    name: "Balance noise floor",
-    formula: "instrument spec",
-    compute: (v) => v.noise * 1e-9,
-  },
-];
 
 function fmtForce(N: number): string {
   if (!isFinite(N)) return "—";
@@ -289,22 +196,18 @@ export default function ArtifactBudgetGate() {
     setActivePreset(null);
   };
 
-  const channels = useMemo(
-    () => CHANNEL_DEFS.map((c) => ({ ...c, value: c.compute(v) })),
+  const { channels, sum, rss, claimN, ratio, verdict: verdictKey, dominant } = useMemo(
+    () => computeGate(v),
     [v]
   );
-  const sum = channels.reduce((a, c) => a + c.value, 0);
-  const rss = Math.sqrt(channels.reduce((a, c) => a + c.value * c.value, 0));
-  const claimN = v.claim * 1e-6;
-  const ratio = sum > 0 ? claimN / sum : Infinity;
 
   let verdict: string, verdictColor: string, verdictDetail: string;
-  if (ratio <= 1) {
+  if (verdictKey === "inside") {
     verdict = "INSIDE BUDGET — NO ANOMALY";
     verdictColor = PALETTE.fail;
     verdictDetail =
       "The claimed thrust is fully reproducible by known artifacts. This is a null result, and null results are findings: publish the budget, not the claim.";
-  } else if (ratio <= 5) {
+  } else if (verdictKey === "marginal") {
     verdict = "MARGINAL — INDISTINGUISHABLE";
     verdictColor = PALETTE.warn;
     verdictDetail =
@@ -315,8 +218,6 @@ export default function ArtifactBudgetGate() {
     verdictDetail =
       "The claim clears the summed budget by more than 5×. Now the real work starts: independent replication on a second balance, blinded analysis, pre-registered protocol.";
   }
-
-  const dominant = channels.reduce((a, c) => (c.value > a.value ? c : a), channels[0]);
 
   const applyPreset = (key: string) => {
     setV(PRESETS[key].values);

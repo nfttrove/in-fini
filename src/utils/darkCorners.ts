@@ -8,6 +8,8 @@
  * and lives in the panel's prose, not in these numbers.
  */
 
+import { QUIETEST_ED_RIG, thermalAccelerationFloor } from "./thermalFloor";
+
 export const HBAR = 1.054571817e-34;
 export const C = 2.99792458e8;
 export const G_ACC = 9.80665;
@@ -111,23 +113,40 @@ export function darkEnergyTide(rMeters: number): number {
 }
 
 export interface DeskVerdict {
-  key: "thermal-floored" | "jewelry" | "kitchen";
+  key: "thermal-floored" | "metrology" | "jewelry" | "kitchen";
   label: string;
   description: string;
 }
 
+/** Brownian acceleration floor of the quietest rig the Experiment Design tab can set [m/s²]. */
+export const QUIETEST_RIG_ACCEL = thermalAccelerationFloor(QUIETEST_ED_RIG);
+
+/**
+ * LISA Pathfinder's free-fall acceleration noise, 1.74 fm s⁻² /√Hz above
+ * 2 mHz (Armano et al., PRL 120, 061101 (2018)) — the quietest test masses
+ * yet flown. Averaging a year assumes the noise stays white, which it does
+ * not at low frequency, so the "one year" figure is generous to it.
+ */
+export const LISA_PF_ASD = 1.74e-15;
+const YEAR_S = 3.156e7;
+export const LISA_PF_YEAR_FLOOR = LISA_PF_ASD / Math.sqrt(YEAR_S);
+
 /** Compare an acceleration to what instruments can do. */
 export function accelerationVerdict(a: number): DeskVerdict {
   const mg = a / G_ACC * 1e6;
-  if (mg < 1e-9) {
+  if (a < QUIETEST_RIG_ACCEL) {
+    const r = QUIETEST_ED_RIG;
     return {
       key: "thermal-floored",
-      label: "Unwitnessable by matter",
-      description: `${a.toExponential(1)} m/s² — ${(1 / (a / 1e-9)).toExponential(0)}× below the Brownian floor of the quietest rig the Experiment Design tab can imagine. Only the universe as a whole can run this experiment; telescopes are the instrument.`,
+      label: "Far below any instrument yet built",
+      description: `${a.toExponential(1)} m/s² — ${(QUIETEST_RIG_ACCEL / a).toExponential(0)}× below the Brownian floor of the quietest rig the Experiment Design tab can set (${r.massKg} kg at ${r.tempK * 1000} mK, ${r.freqHz} Hz, Q = ${r.qualityFactor}, ${(r.integrationS / 86400).toFixed(0)} days). LISA Pathfinder's free-falling test masses, the quietest yet flown, reached about ${LISA_PF_ASD.toExponential(1)} m/s² per √Hz; a year of averaging, generously assuming white noise, would still leave them ${(LISA_PF_YEAR_FLOOR / a).toExponential(0)}× short. On desk scales this is beyond measurement for now; telescopes measure Λ instead, across billions of light-years.`,
     };
   }
+  if (mg < 1e-3) {
+    return { key: "metrology", label: "Precision-metrology territory", description: `Equivalent to ${mg.toExponential(1)} mg per kg — below a laboratory balance; torsion balances and space accelerometers work here.` };
+  }
   if (mg < 1) {
-    return { key: "thermal-floored", label: "Below household scales", description: `Equivalent to ${mg.toExponential(1)} mg — real, but laboratory-balance territory.` };
+    return { key: "jewelry", label: "Below household scales", description: `Equivalent to ${mg.toExponential(1)} mg — real, but laboratory-balance territory.` };
   }
   return { key: "kitchen", label: "Desk-measurable", description: `About ${mg.toFixed(1)} mg-equivalent — your desk can see this.` };
 }

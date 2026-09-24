@@ -264,7 +264,7 @@ function classifyVerdict(
       key: "excess",
       label: "Unexplained excess",
       description:
-        "Leakage cannot account for the claimed output. Either the claim is wrong by many orders of magnitude, or an unidentified power source is present.",
+        "The modelled leakage cannot account for the claimed output. Check the energy balance and look for a channel this budget leaves out; failing those, the measurement is wrong or an unidentified power source is present.",
       tone: "orange",
     };
   }

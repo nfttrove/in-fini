@@ -1,7 +1,9 @@
 /**
  * Microwave dynamic Casimir effect in a circuit-QED setup — the regime where
- * vacuum photon production has actually been measured (Wilson et al.,
- * Nature 479, 376 (2011)).
+ * vacuum photon production has actually been measured. This models the
+ * cavity-pumped version (Lähteenmäki et al., PNAS 110, 4234 (2013)); the
+ * first observation (Wilson et al., Nature 479, 376 (2011)) used an open
+ * line whose SQUID mirror moved at ~5% of c, with no cavity.
  *
  * The physical picture:
  *   A half-wave transmission-line resonator (fundamental f0, linewidth
@@ -10,9 +12,11 @@
  *   x_eff(t) = x0 + δx·sin(2π fm·t). Modulating at fm ≈ 2·f0 drives degenerate
  *   parametric down-conversion of vacuum into photon PAIRS — the DCE.
  *
- * Why this works when spinning rotors never can:
+ * Why this works where spinning rotors fall short:
  *   1. Parametric resonance at 2ω₀ needs fm = 2·f0. For a 100 nm optical
- *      cavity f0 ~ 10¹⁵ Hz — unmodulatable. For a 10 GHz microwave resonator
+ *      cavity f0 ~ 10¹⁵ Hz — beyond any mechanical modulation (an optical
+ *      pump can do it, and that is ordinary parametric down-conversion).
+ *      For a 10 GHz microwave resonator
  *      it is just electronics.
  *   2. The pair rate scales with the loaded Q (rate ≈ (δx/L)²·f0·Q on
  *      resonance), so a high-Q resonator multiplies a nanometre wiggle.
@@ -201,7 +205,7 @@ function classifyVerdict(
     key: "clean",
     label: "Vacuum pairs measurable",
     description:
-      "Pair production exceeds thermal noise with counting significance ≥ 3σ — the regime of the 2011 microwave DCE measurements. Correlation spectroscopy (g² coincidence of the pair photons) is what seals the vacuum origin in a real experiment.",
+      "Pair production exceeds thermal noise with counting significance ≥ 3σ — the regime of the microwave DCE measurements (2011 open line, 2013 cavity). Correlation spectroscopy (g² coincidence of the pair photons) is what seals the vacuum origin in a real experiment.",
     tone: "emerald",
   };
 }

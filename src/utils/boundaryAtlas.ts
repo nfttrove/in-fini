@@ -137,6 +137,14 @@ export function atlasThrust(): AtlasMap {
 // B. Device model: plausibility frontier — gap × area
 // ---------------------------------------------------------------------------
 
+/**
+ * The atlas's fixed device knobs. β = 1.88 sits beyond the Device Model's
+ * 0–1 slider, near the peak of J₁ (β ≈ 1.84), the most generous sideband
+ * weight; the rim figures below are computed from these, not typed.
+ */
+export const ATLAS_DEVICE = { fmHz: 1e6, beta: 1.88, rotorRadiusNm: 71000, Q: 7442 } as const;
+const ATLAS_RIM = predictDevice({ ...ATLAS_DEVICE, dNm: 50, areaMm2: 1 });
+
 export function atlasDevice(): AtlasMap {
   const meta = {
     xLabel: "Casimir gap (nm)",
@@ -150,14 +158,7 @@ export function atlasDevice(): AtlasMap {
     for (let i = 0; i < W; i++) {
       const dNm = xAt(i, meta);
       const areaMm2 = yAt(j, meta);
-      const p = predictDevice({
-        dNm,
-        fmHz: 1e6,
-        beta: 1.88,
-        rotorRadiusNm: 71000,
-        Q: 7442,
-        areaMm2,
-      });
+      const p = predictDevice({ ...ATLAS_DEVICE, dNm, areaMm2 });
       // 0: far below ceiling; 1: within 10× of claim; 2: ceiling ≥ claim
       // (the "plausible under the generous bound" corner); 3: ditto AND the
       // rotor would already be beyond demonstrated material limits.
@@ -175,7 +176,7 @@ export function atlasDevice(): AtlasMap {
     ...meta,
     cells,
     fixed:
-      "Fixed: 1 MHz drive, β = 1.88, 71 µm rotor (458 m/s rim — see the material veto), Q ≈ 7.4k. Ceiling deliberately generous (π²/720 dropped).",
+      `Fixed: ${ATLAS_DEVICE.fmHz / 1e6} MHz drive, β = ${ATLAS_DEVICE.beta} (beyond the Device Model's 0–1 slider, near J₁'s peak), ${ATLAS_DEVICE.rotorRadiusNm / 1000} µm rotor (${ATLAS_RIM.v.toFixed(0)} m/s rim, ${ATLAS_RIM.rimAccelerationG.toExponential(1)} g — past the 10⁶ g material veto, so every cell that meets the claim is dark red), Q ≈ ${(ATLAS_DEVICE.Q / 1000).toFixed(1)}k. Ceiling deliberately generous (π²/720 dropped).`,
     legend: [
       { code: 0, label: "claim ≫ ceiling", color: "#1e3a5f" },
       { code: 1, label: "within 10× of ceiling", color: "#f59e0b" },
@@ -264,13 +265,13 @@ export function atlasDecidability(): AtlasMap {
   }
   return {
     key: "decide",
-    title: "Decidability — can matter itself arbitrate the claim?",
+    title: "Decidability — can this test mass resolve the claim?",
     ...meta,
     cells,
     fixed:
-      "Fixed: 100 g test mass, 100 Hz mode, Q = 100, 100 s integration. The red region's floor is the Brownian jitter of the rig's own atoms.",
+      "Fixed: 100 g test mass, 100 Hz mode, Q = 100, 100 s integration. The red region's floor is this test mass's own Brownian jitter — a floor for this rig, not for every instrument.",
     legend: [
-      { code: 0, label: "unwitnessable by matter", color: "#7f1d1d" },
+      { code: 0, label: "below this rig's thermal floor", color: "#7f1d1d" },
       { code: 1, label: "marginal", color: "#f59e0b" },
       { code: 2, label: "decidable", color: "#10b981" },
     ],

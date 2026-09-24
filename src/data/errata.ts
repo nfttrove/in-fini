@@ -1,7 +1,11 @@
 import { formatForceG, ionWindForceG } from "../utils/thrustLeakage";
 import { formatPower, predictDevice } from "../utils/device";
 import { AT_CLAIM, CORNER, DEVICE_DEFAULTS } from "../components/device/defaults";
-import { darkMatterFlux } from "../utils/darkCorners";
+import { darkEnergyTide, darkMatterFlux, QUIETEST_RIG_ACCEL } from "../utils/darkCorners";
+import { casimirPressure } from "../utils/physics";
+import { ED_QUALITY_FACTOR } from "../utils/thermalFloor";
+import { ATLAS_DEVICE } from "../utils/boundaryAtlas";
+import { PRESETS, computeGate } from "../components/diagnostic/artifactGate";
 
 /**
  * What this site got wrong, and what changed. Old values are history and
@@ -27,6 +31,14 @@ const cornerPower = formatPower(CORNER.P_output);
 const cornerRimG = CORNER.rimAccelerationG.toExponential(0);
 const atClaimShortfall = AT_CLAIM.shortfall.toExponential(0);
 const darkNgPerDay = (darkMatterFlux().kgPerDayPerM2 * 1e12).toFixed(1);
+const tideRatio = (QUIETEST_RIG_ACCEL / darkEnergyTide(1)).toExponential(0);
+const casimir1um = Math.abs(casimirPressure(1e-6)).toExponential(1);
+const deviceGeometric = (AT_CLAIM.shortfall / 1e4).toExponential(0);
+const atlasRim = ((2 * Math.PI * ATLAS_DEVICE.fmHz * ATLAS_DEVICE.rotorRadiusNm * 1e-9)).toFixed(0);
+const emdrive = computeGate(PRESETS.eagleworks.values);
+const emdriveThermalShare = Math.round(
+  (100 * emdrive.channels.find((c) => c.key === "thermal")!.value) / emdrive.sum
+);
 
 export const ERRATA: Erratum[] = [
   {
@@ -76,5 +88,47 @@ export const ERRATA: Erratum[] = [
     was: "The Replication Network called median/√N \"the honest detection limit of this fleet\".",
     now: "It is the best case for a coordinated round (every rig measuring the same effect at the same time); on its own a typical rig sees about the median.",
     tab: "Replication Network",
+  },
+  {
+    title: "Floors stated as if they bound every instrument",
+    was: "The thermal floor was \"the smallest force any matter-based instrument can resolve\"; a claim below it was \"unwitnessable by matter\", and \"no instrument made of atoms\" could arbitrate it. Dark Corners put dark energy's desk tide \"3e+26×\" below the quietest rig, from a hand-typed 1e-9 that compared m/s² with a milligram threshold.",
+    now: `It is the Brownian floor of the modelled test mass (Q fixed at ${ED_QUALITY_FACTOR}); a lighter, higher-Q or longer-running rig, or a quantum-limited readout, goes lower. The Dark Corners ratio is computed from the Experiment Design tab's quietest settings: ${tideRatio}× at 1 m.`,
+    tab: "Experiment Design, Boundary Atlas, Dark Corners",
+  },
+  {
+    title: "Prose more certain than the model",
+    was: "The Casimir force was \"negligible above ~1 μm\"; the Device Model's notes still said \"no tuning of the included physics\" reaches the claim (the slider corners do, on paper); the Teacher's Guide called the (v/c)² suppression \"thermodynamics\"; the nm-cavity tab put a 50 nm gap in the \"UV / soft-X-ray\" regime; Home promised \"the truth about your experiment\" and showed \"where vacuum energy extraction actually works\".",
+    now: `At 1 µm the Casimir pressure is ${casimir1um} Pa — small, and measured (Lamoreaux 1997, 0.6–6 µm); below ~100 nm the force is labelled an ideal-mirror bound. Within materials that survive, at the claim's own gap and drive, the Device Model stays ${deviceGeometric}× short even with a 10⁴ geometric allowance. The suppression is the model's physics; a 50 nm gap resonates in the deep UV, past where gold reflects well. The microwave DCE's pump pays for every photon.`,
+    tab: "Casimir Effect, Device Model, Teacher's Guide, nm-Cavity, Home",
+  },
+  {
+    title: "The microwave DCE, told as one experiment",
+    was: "The Circuit QED tab said \"the GHz trick is resonance and quiet, not speed\" and modelled \"that experiment\" (Wilson et al. 2011) — but Wilson's open line had no cavity and relied on its SQUID mirror moving at about 5% of c; the cavity-pumped version is Lähteenmäki et al. (2013). Home called these \"the only experiments\" to make photon pairs from vacuum.",
+    now: "Both routes are described: raw effective-mirror speed (2011) and cavity resonance (2013, the regime the panel models). They are the first moving-mirror observations, not the only vacuum-pair experiments.",
+    tab: "Circuit QED, Home",
+  },
+  {
+    title: "A speaker is not a fluctuation force",
+    was: "The acoustic tab offered \"the one fluctuation force you can measure tonight\", called a jewelry-scale reading \"a genuine kitchen-table field-fluctuation measurement\", took tone ON vs OFF as the null test and called the plane-wave numbers \"the floor\".",
+    now: "A single tone on one plate is ordinary radiation pressure; the true acoustic Casimir effect (Larraza & Denardo) needs broadband noise between two plates. The build now separates radiation pressure from vibration, airflow and the speaker's magnet: reflector against absorber (the push should halve), a blocked sound path and a 3 dB step. The plane-wave figure is an estimate either way.",
+    tab: "Acoustic Casimir, Home",
+  },
+  {
+    title: "The EmDrive preset's thermal drift was 50× low",
+    was: "The Artifact Budget Gate's Eagleworks preset set thermal drift at 20 nN/W and assumed a metre of unshielded cable (\"long unshielded DC run\", no source), so it read 98% magnetic.",
+    now: `Thermal drift is set to ≈ 1 µN/W, the size TU Dresden measured from their own EmDrive's thermal expansion ("similar to … White et al."), with a few centimetres of cable, their best estimate for an earlier false positive. Thermal is now ${emdriveThermalShare}% of the budget and the claim sits ${emdrive.ratio.toFixed(1)}× above it: indistinguishable. The values are labelled illustrative.`,
+    tab: "Thrust & Weight Diagnostic (Artifact Budget Gate)",
+  },
+  {
+    title: "Smaller slips",
+    was: `The Boundary Atlas labelled its rotor rim "458 m/s"; Rotating Field printed a 600 m wavelength as "599584.92 mm"; the leakage budget said it summed four channels (it sums five) and its excess verdict said "wrong by many orders of magnitude" for claims within 10⁶× of leakage; micrograms printed as "ug"; Dark Corners called the Casimir and cosmic vacuum energies "as far as we know, the same phenomenon".`,
+    now: `The rim is computed (${atlasRim} m/s at ${ATLAS_DEVICE.fmHz / 1e6} MHz, ${ATLAS_DEVICE.rotorRadiusNm / 1000} µm); wavelengths print in m or km, with a note that the cavity never reaches resonance at these settings; the excess verdicts point to missing channels first; µg; and the Casimir force can be derived without vacuum energy (Jaffe 2005), so the lab does not settle it.`,
+    tab: "Boundary Atlas, Rotating Field, Leakage Diagnostic, Dark Corners",
+  },
+  {
+    title: "Pre-registrations could be backdated",
+    was: "A client filing a claim, pre-registration or census run could set the row's own timestamp and id, so a pre-registration could be dated before the data it predicts; nothing limited how fast rows could be filed.",
+    now: "The database stamps every new row's time and id itself, whatever the client sends, and caps filings per rolling hour (30 claims, 30 pre-registrations, 60 census runs).",
+    tab: "Claim Registry, Replication Network",
   },
 ];

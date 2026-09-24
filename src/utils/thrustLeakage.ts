@@ -424,7 +424,7 @@ function classifyThrustVerdict(
       key: "excess",
       label: "Unexplained excess",
       description:
-        "Known artifact forces cannot account for the claimed weight change. Either the measurement is flawed, or an unidentified force is present.",
+        "The modelled artifact forces cannot account for the claimed weight change. Look for a channel this budget leaves out; failing that, the measurement is flawed or an unidentified force is present.",
       tone: "orange",
     };
   }
@@ -445,7 +445,7 @@ export function formatForceG(g: Grams): string {
   if (a < 1e-14) return `${g.toExponential(2)} g`;
   if (a < 1e-9) return `${(g * 1e12).toFixed(2)} pg`;
   if (a < 1e-6) return `${(g * 1e9).toFixed(2)} ng`;
-  if (a < 1e-3) return `${(g * 1e6).toFixed(2)} ug`;
+  if (a < 1e-3) return `${(g * 1e6).toFixed(2)} µg`;
   if (a < 1) return `${(g * 1e3).toFixed(3)} mg`;
   return `${g.toFixed(4)} g`;
 }

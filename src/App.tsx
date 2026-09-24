@@ -114,13 +114,13 @@ const TABS = [
     id: "network",
     label: "Replication Network",
     description:
-      "Calibration Census 001: record 60 seconds of your rig's environment and join the fleet's collective detection floor",
+      "Calibration Census 001: record 60 seconds of your rig's environment and add its noise floor to a census for planning coordinated replications",
   },
   {
     id: "acoustic",
     label: "Acoustic Casimir (build it)",
     description:
-      "Radiation pressure from sound side-by-side with the vacuum Casimir force — the one fluctuation force you can measure tonight for €25",
+      "Radiation pressure from sound side-by-side with the vacuum Casimir force — a classroom analogue you can try tonight for about €25, with the null tests that make a reading mean something",
   },
   {
     id: "atlas",

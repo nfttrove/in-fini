@@ -4,7 +4,7 @@ import { AlertTriangle, CheckCircle2, Info } from "lucide-react";
 /**
  * IN FINI — CONSCIENCE METER ("Halve dt")
  * ---------------------------------------
- * The definitive test for numerical artifacts.
+ * A necessary test for timestep artifacts (not a sufficient one).
  *
  * Real physics doesn't care about your timestep.
  * If a "discovery" changes when you halve dt, it was never real.

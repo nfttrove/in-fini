@@ -1,4 +1,8 @@
 import PlainExplainer from "./ui/PlainExplainer";
+import { equivalentVacuumGapNm, soundForceN } from "../utils/acousticCasimir";
+
+// 120 dB on a 100 cm² reflecting plate — the Acoustic Casimir tab's defaults.
+const ACOUSTIC_GAP_NM = equivalentVacuumGapNm(soundForceN(120, 0.01, true), 0.01);
 
 export default function HomePanel() {
   return (
@@ -21,12 +25,12 @@ export default function HomePanel() {
       <section className="space-y-3">
         <h2 className="text-xl font-semibold dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-slate-100">What's on the desk</h2>
         <ul className="list-disc pl-6 space-y-2 dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <li><strong>Interactive tabs</strong>, from Casimir forces to the only experiment that ever coaxed photon pairs out of empty space (microwave circuit QED), to the 95% of the universe your instruments can't reach.</li>
+          <li><strong>Interactive tabs</strong>, from Casimir forces to the first experiments to coax photon pairs out of empty space with a moving mirror — an electrical one, in microwave circuit QED — to the 95% of the universe your instruments can't reach.</li>
           <li><strong>Real mathematics, not vignettes</strong>: logarithmic sweeps, Lorentzian resonances, Bessel sidebands, g² correlation spectroscopy, FFT residual hunting — the same machinery used in real quantum electrodynamics.</li>
           <li><strong>Artifact budgets with error bars</strong>: load a famous claim (Podkletnov, Searl, Biefeld–Brown, the ionocraft lifter) and watch the mundane channels — vibration, ion wind, electrostatics, thermal buoyancy — account for it, with uncertainties.</li>
-          <li><strong>The experiment-design inverter</strong>: don't just judge claims — state the effect you want to detect and learn what your rig must achieve, down to the thermal noise floor of matter itself.</li>
+          <li><strong>The experiment-design inverter</strong>: don't just judge claims — state the effect you want to detect and learn what your rig must achieve, down to the thermal noise floor of its own test mass.</li>
           <li><strong>A public record</strong>: file claims with their budgets, pre-register predictions before you measure, and join the Replication Network's calibration census with the phone in your pocket.</li>
-          <li><strong>Things you can build tonight</strong>: an acoustic Casimir — the vacuum Casimir effect's big, cheap cousin — with a speaker and a jewelry scale.</li>
+          <li><strong>Things you can build tonight</strong>: acoustic radiation pressure — a classroom analogue of the vacuum Casimir force — with a speaker and a jewelry scale.</li>
         </ul>
       </section>
 
@@ -42,8 +46,8 @@ export default function HomePanel() {
             <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">A "virtual rotor" is just a rotating electric field. No moving parts, no physics violated, no matter how good the patent drawing looks.</p>
           </div>
           <div>
-            <h3 className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">3. Show where vacuum energy extraction actually works</h3>
-            <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">The Device Model shows why spinning rotors drown in the (v/c)² wall; the Circuit QED tab shows the one 2011 experiment that beat it — with a cryogenic GHz pump and a stiff invoice. Compare the two side by side.</p>
+            <h3 className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">3. Show where photons from the vacuum actually appear — and who pays</h3>
+            <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">The Device Model shows why spinning rotors drown in the (v/c)² wall; the Circuit QED tab shows the microwave experiments that beat it (2011, 2013) — with a cryogenic GHz pump that supplies every joule the photons carry. Compare the two side by side.</p>
           </div>
           <div>
             <h3 className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">4. Put a famous claim on trial — with error bars</h3>
@@ -51,7 +55,7 @@ export default function HomePanel() {
           </div>
           <div>
             <h3 className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">5. Design an experiment that survives its own budget</h3>
-            <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">The Experiment Design tab inverts the physics: pick an effect size and a σ threshold, get the rig requirements. Push the claim small enough and hit the thermal floor — where matter itself can no longer arbitrate.</p>
+            <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">The Experiment Design tab inverts the physics: pick an effect size and a σ threshold, get the rig requirements. Push the claim small enough and hit the thermal floor — where the test mass's own jitter swamps it.</p>
           </div>
         </div>
       </section>
@@ -63,7 +67,7 @@ export default function HomePanel() {
           <strong className="dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-slate-100"> platform for thinking</strong>: a tool thousands of students and researchers can use to understand vacuum physics, stress-test their own ideas, and avoid the pitfalls that have trapped so many before.
         </p>
         <p className="dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <strong className="dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-slate-100">This simulator doesn't hand you free energy — it hands you the truth about your experiment.</strong>
+          <strong className="dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-slate-100">This simulator doesn't hand you free energy — it hands you the artifact budget your experiment has to beat.</strong>
         </p>
       </section>
 
@@ -84,8 +88,8 @@ export default function HomePanel() {
         </p>
         <div className="space-y-3 dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300 text-sm">
           <div>
-            <p className="font-semibold dark-mode:text-slate-100 light-mode:text-slate-800 coffee-mode:text-slate-100">Tonight: an acoustic Casimir (≈ €25)</p>
-            <p>A speaker, a tone-generator app, and a 0.001 g jewelry scale. Sound's radiation pressure pushes a plate with the same force the vacuum Casimir exerts across a ~700 nm gap — and your scale will watch it happen. The <strong>Acoustic Casimir</strong> tab has the parts list.</p>
+            <p className="font-semibold dark-mode:text-slate-100 light-mode:text-slate-800 coffee-mode:text-slate-100">Tonight: acoustic radiation pressure (≈ €25)</p>
+            <p>A speaker, a tone-generator app, and a 0.001 g jewelry scale. Sound's radiation pressure pushes a plate with the same force the vacuum Casimir exerts across a ~{(Math.round(ACOUSTIC_GAP_NM / 10) * 10).toFixed(0)} nm gap — and a jewelry scale can register it, once it survives the null tests. The <strong>Acoustic Casimir</strong> tab has the parts list and the tests.</p>
           </div>
           <div>
             <p className="font-semibold dark-mode:text-slate-100 light-mode:text-slate-800 coffee-mode:text-slate-100">Sixty seconds: join the fleet</p>
@@ -97,7 +101,7 @@ export default function HomePanel() {
           </div>
         </div>
         <p className="dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300 text-sm">
-          When you've built something, come back and file it in the <strong>Claim Registry</strong> — pre-registered if you're serious. Let the tool say "Unexplained excess" or "Fully explained by mundane artifacts." Either way, you'll know the truth, and so will everyone else.
+          When you've built something, come back and file it in the <strong>Claim Registry</strong> — pre-registered if you're serious. Let the tool say "Unexplained excess" or "Fully explained by mundane artifacts." Either way, you'll know where your claim stands against the known artifacts — and so will everyone else.
         </p>
         <p className="dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200 italic font-medium">
           The vacuum is infinite. Your curiosity should be, too.

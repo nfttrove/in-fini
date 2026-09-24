@@ -7,8 +7,15 @@ interface RotatingMetricsProps {
   simTimeUs: number;
 }
 
+/** A wavelength in the unit a person would say: mm, m or km. */
+function formatWavelength(m: number): string {
+  if (m >= 1000) return `${(m / 1000).toFixed(2)} km`;
+  if (m >= 1) return `${m.toFixed(1)} m`;
+  return `${(m * 1000).toFixed(2)} mm`;
+}
+
 export default function RotatingMetrics({ omega, k, simTimeUs }: RotatingMetricsProps) {
-  const wavelengthMm = ((2 * Math.PI) / k) * 1000;
+  const wavelengthM = (2 * Math.PI) / k;
 
   return (
     <Panel title="Field Properties">
@@ -25,7 +32,7 @@ export default function RotatingMetrics({ omega, k, simTimeUs }: RotatingMetrics
         />
         <MetricCard
           label="Wavelength (λ = 2π/k)"
-          value={`${wavelengthMm.toFixed(2)} mm`}
+          value={formatWavelength(wavelengthM)}
           color="text-teal-400"
         />
         <MetricCard

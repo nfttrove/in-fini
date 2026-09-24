@@ -9,6 +9,9 @@ import {
   formatScientific,
 } from "../../utils/physics";
 
+/** Below this gap the ideal-conductor formula is an upper bound, not a prediction. */
+const IDEAL_MIRROR_MIN_M = 100e-9;
+
 interface CasimirMetricsProps {
   sepM: number;
   areaM2: number;
@@ -25,7 +28,11 @@ export default function CasimirMetrics({ sepM, areaM2 }: CasimirMetricsProps) {
         <MetricCard
           label="Casimir Force"
           value={formatForce(newtons(Math.abs(force)))}
-          sub="attractive (toward each other)"
+          sub={
+            sepM < IDEAL_MIRROR_MIN_M
+              ? "attractive · ideal-mirror bound: real metals give much less below ~100 nm"
+              : "attractive (toward each other)"
+          }
           color="text-cyan-400"
         />
         <MetricCard

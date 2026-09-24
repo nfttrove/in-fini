@@ -227,7 +227,7 @@ export default function ClaimRegistryPanel() {
       <PlainExplainer title="File a claim. Get a budget. Join the record.">
         <p>
           The internet is full of extraordinary claims — over-unity generators,
-          weight-loss thrusters — that never survive contact with a leakage
+          weight-loss thrusters — that have yet to survive contact with a leakage
           budget. This registry makes that contact permanent: state the claim,
           state the setup, and the app files both together with the artifact
           budget it computes. Anyone can reproduce the verdict from the

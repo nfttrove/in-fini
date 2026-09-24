@@ -21,7 +21,7 @@ export default function TeacherGuidePanel() {
         <h3 className="text-lg font-semibold dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-slate-100">1. The Vacuum Isn't Empty—It's Just Shy (30 min)</h3>
         <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400"><strong>Tab:</strong> Casimir Effect</p>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <strong>Activity:</strong> Squeeze two plates together and watch the force explode. Vary separation from 1000 nm down to 1 nm. Does it obey F ∝ 1/d⁴? Plot it on a log-log graph—if it's a straight line, the universe is elegant.
+          <strong>Activity:</strong> Squeeze two plates together and watch the force explode. Vary separation from 1000 nm down to 1 nm. Does it obey F ∝ 1/d⁴? Plot it on a log-log graph—the simulator's ideal-mirror line is straight; real metals fall below it under ~100 nm, which is a good discussion question.
         </p>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
           <strong>Why this matters:</strong> The Casimir force is real, measurable, and weird. But it's also conservative—like a spring, not a battery. You can't extract net energy from it. So when someone says they built a Casimir motor, ask: "Which law of thermodynamics did you break?"
@@ -75,10 +75,10 @@ export default function TeacherGuidePanel() {
         <ul className="list-disc pl-6 space-y-1 text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
           <li>Predicted power: {formatPower(PUSHED.P_output)}</li>
           <li>Claimed power: 1.3 W (Watts)</li>
-          <li>Shortfall: {PUSHED.shortfall.toExponential(1)}×. That's not an oopsie, it's a cosmological reality check.</li>
+          <li>Shortfall: {PUSHED.shortfall.toExponential(1)}×. That's not an oopsie, it's a reality check.</li>
         </ul>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <strong>Why?</strong> The (v/c)² term. At {DEVICE_PUSHED.fmHz / 1e6} MHz your {DEVICE_PUSHED.rotorRadiusNm} nm rotor's rim moves at {PUSHED.v.toFixed(1)} m/s. Light moves at 3×10⁸ m/s. The ratio squared is {(PUSHED.vOverC ** 2).toExponential(1)}. You can't escape this. It's not a design flaw—it's thermodynamics.
+          <strong>Why?</strong> The (v/c)² term. At {DEVICE_PUSHED.fmHz / 1e6} MHz your {DEVICE_PUSHED.rotorRadiusNm} nm rotor's rim moves at {PUSHED.v.toFixed(1)} m/s. Light moves at 3×10⁸ m/s. The ratio squared is {(PUSHED.vOverC ** 2).toExponential(1)}. Within this model you can't escape it: moving-mirror photon production is suppressed by (v/c)² whenever the mirror is slow, and every material mirror is slow. That is the model's physics, not a design flaw — the Circuit QED tab shows the one lab route around it, a mirror that is electrical rather than material.
         </p>
       </section>
 

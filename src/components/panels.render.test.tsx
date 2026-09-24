@@ -174,7 +174,9 @@ describe("ErrataPanel", () => {
         <ErrataPanel />
       </ThemeProvider>
     ).replace(/<!-- -->/g, "");
-    for (const e of ERRATA) expect(html).toContain(e.title.replace(/"/g, "&quot;"));
+    for (const e of ERRATA) {
+      expect(html).toContain(e.title.replace(/"/g, "&quot;").replace(/'/g, "&#x27;"));
+    }
     // "Now" figures come from the same functions the panels use.
     expect(html).toContain(formatForceG(ionWindForceG(10_000, 101_325, 0.01)));
     expect(html).toContain(formatPower(CORNER.P_output));

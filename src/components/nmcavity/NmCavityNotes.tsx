@@ -1,6 +1,13 @@
 import Panel from "../ui/Panel";
 import InfoNote from "../ui/InfoNote";
 
+const C = 299_792_458;
+// Gold's plasma wavelength (ħω_p ≈ 9 eV): above this frequency metal
+// mirrors stop reflecting well, so an "ideal cavity" there is on paper only.
+const GOLD_PLASMA_NM = 140;
+const GOLD_PLASMA_THZ = C / (GOLD_PLASMA_NM * 1e-9) / 1e12;
+const F50_HZ = C / (2 * 50e-9);
+
 interface NmCavityNotesProps {
   f0THz: number;
   ratio500kHz: number;
@@ -13,9 +20,18 @@ export default function NmCavityNotes({ f0THz, ratio500kHz }: NmCavityNotesProps
         <InfoNote>
           A plane-parallel EM cavity of gap <em>d</em> supports standing modes
           at f<sub>n</sub> = n·c / (2d). A 50 nm gap therefore resonates near
-          3 × 10<sup>15</sup> Hz (≈ 3 PHz), well into the UV / soft-X-ray
-          regime. The current cavity shows f₀ ≈ {f0THz >= 1000 ? `${(f0THz / 1000).toFixed(2)} PHz` : `${f0THz.toFixed(1)} THz`}.
+          {(F50_HZ / 1e15).toFixed(0)} × 10<sup>15</sup> Hz (≈ {(F50_HZ / 1e15).toFixed(0)} PHz,
+          λ ≈ 100 nm), in the deep (vacuum) ultraviolet; soft X-rays begin
+          near 10 nm. The current cavity shows f₀ ≈ {f0THz >= 1000 ? `${(f0THz / 1000).toFixed(2)} PHz` : `${f0THz.toFixed(1)} THz`}.
         </InfoNote>
+        {f0THz > GOLD_PLASMA_THZ && (
+          <InfoNote variant="warning">
+            That is above gold's plasma frequency (λ<sub>p</sub> ≈ {GOLD_PLASMA_NM} nm),
+            where real metal mirrors stop reflecting well. At this gap the
+            ideal-mirror cavity — and every resonance built on it — is an
+            idealisation, and a generous one.
+          </InfoNote>
+        )}
         <InfoNote variant="warning">
           The device's 500 kHz drive is ≈ {ratio500kHz.toExponential(1)} times
           the natural cavity frequency — roughly {Math.round(Math.log10(1 / Math.max(ratio500kHz, 1e-30)))} orders of

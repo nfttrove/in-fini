@@ -1,25 +1,27 @@
 /**
- * The acoustic Casimir: radiation pressure from sound, side by side with
- * the vacuum Casimir force it mirrors.
+ * Acoustic radiation pressure, side by side with the vacuum Casimir force
+ * it mirrors.
  *
- * A sound wave carries momentum. The pressure it exerts on a surface is
- * the acoustic energy density
+ * A sound wave carries momentum. The mean pressure it exerts on a surface
+ * (Langevin radiation pressure) is the acoustic energy density
  *
  *   u = p²/(ρ c²)      [Pa]
  *
  * with p the RMS acoustic pressure and ρc² the air's stiffness — the
- * exact structural analogue of the electromagnetic energy density whose
+ * structural analogue of the electromagnetic energy density whose
  * imbalance between two plates IS the vacuum Casimir effect. A perfect
- * absorber feels u; a reflector feels 2u (momentum reversal). Larraza &
- * Denardo, Phys. Lett. A 248, 151 (1998) showed the deeper version: two
- * plates in a diffuse
- * acoustic field attract by excluding sound modes between them — a
- * laboratory-scale Casimir effect you can build for the price of a
- * speaker.
+ * absorber feels u; a reflector feels 2u (momentum reversal).
+ *
+ * A single tone on one plate is ordinary radiation pressure, not a
+ * fluctuation force. The genuine acoustic Casimir effect — Larraza &
+ * Denardo, Phys. Lett. A 248, 151 (1998) — is the force between two rigid
+ * plates in band-limited noise, from the modes excluded between them; it
+ * needs a noise source and a controlled geometry, not just a speaker.
  *
  * The teaching point this panel exists to make: a speaker at the
- * threshold of pain pushes about as hard on a plate as empty space does
- * across a 100-nanometre gap.
+ * threshold of pain (120 dB on a reflecting plate) pushes about as hard as
+ * empty space does across a ~700-nanometre gap — computed by
+ * equivalentVacuumGapNm below and pinned in the tests.
  */
 
 import { casimirForce } from "./physics";
@@ -88,7 +90,7 @@ export function scaleVerdict(forceN: number): ScaleVerdict {
     return {
       key: "jewelry",
       label: "Visible on a jewelry scale (0.001 g)",
-      description: `About ${mg.toFixed(1)} mg of push. A €15 0.001 g scale next to the speaker will watch the needle move. This is a genuine kitchen-table field-fluctuation measurement — and it takes painfully loud sound, so wear ear protection.`,
+      description: `About ${mg.toFixed(1)} mg of push — within a €15 0.001 g scale's resolution. A reading is only radiation pressure once it survives the null tests below (reflector vs absorber, blocked path); otherwise it is vibration or airflow. It takes painfully loud sound, so wear ear protection.`,
       tone: "emerald",
     };
   }

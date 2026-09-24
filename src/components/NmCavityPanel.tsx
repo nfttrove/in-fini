@@ -48,8 +48,10 @@ export default function NmCavityPanel() {
         <p>
           Imagine two mirrors almost touching — separated by only a few
           nanometres (millionths of a millimetre). Light bouncing between
-          them resonates at incredibly high frequencies, landing in the
-          visible, ultraviolet, or even X-ray range depending on the gap.
+          them would resonate at incredibly high frequencies — visible,
+          ultraviolet, even X-ray, depending on the gap — if the mirrors
+          kept reflecting. Real metals stop reflecting well in the
+          ultraviolet, so the smallest gaps here are ideal-mirror arithmetic.
         </p>
         <p className="dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
           <span className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">Try this:</span>{" "}

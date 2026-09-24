@@ -111,8 +111,9 @@ export default function BoundaryAtlasPanel() {
           the maps show where the <em>app's</em> classifications flip —
           sensitivity terrain, not truth claims. A claim sitting in "excess"
           territory means the budget can't explain it, never that it's real;
-          a claim in the sub-thermal region means no instrument made of
-          atoms at that temperature could arbitrate it at all.
+          a claim in the sub-thermal region is below the Brownian noise of
+          that map's test mass, which a lighter, higher-Q or longer-running rig
+          could still beat.
         </p>
       </PlainExplainer>
 

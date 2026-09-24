@@ -10,7 +10,12 @@ import {
   ThrustDesignContext,
   PowerDesignContext,
 } from "../utils/experimentDesign";
-import { assessDecidability, thermalPowerFloorW } from "../utils/thermalFloor";
+import {
+  ED_QUALITY_FACTOR,
+  ED_RIG_RANGE,
+  assessDecidability,
+  thermalPowerFloorW,
+} from "../utils/thermalFloor";
 
 type Mode = "thrust" | "power";
 
@@ -88,7 +93,7 @@ export default function ExperimentDesignPanel() {
   const decidability = assessDecidability(Math.pow(10, claimedDeltaGLog), {
     massKg: deviceMassKg,
     freqHz: vibrationFreqHz,
-    qualityFactor: 100,
+    qualityFactor: ED_QUALITY_FACTOR,
     tempK: rigTempK,
     integrationS: rigIntegrationS,
   });
@@ -180,8 +185,8 @@ export default function ExperimentDesignPanel() {
                   label="Device mass"
                   value={deviceMassKg}
                   displayValue={`${(deviceMassKg * 1000).toFixed(0)} g`}
-                  min={0.01}
-                  max={5}
+                  min={ED_RIG_RANGE.massKg.min}
+                  max={ED_RIG_RANGE.massKg.max}
                   step={0.01}
                   onChange={setDeviceMassKg}
                   minLabel="10 g"
@@ -191,8 +196,8 @@ export default function ExperimentDesignPanel() {
                   label="Vibration frequency"
                   value={vibrationFreqHz}
                   displayValue={`${vibrationFreqHz.toFixed(0)} Hz`}
-                  min={10}
-                  max={500}
+                  min={ED_RIG_RANGE.freqHz.min}
+                  max={ED_RIG_RANGE.freqHz.max}
                   step={5}
                   onChange={setVibrationFreqHz}
                   minLabel="10 Hz"
@@ -399,15 +404,15 @@ export default function ExperimentDesignPanel() {
             </ul>
           </Panel>
 
-          <Panel title="The thermal floor — can matter itself arbitrate this?">
+          <Panel title="The thermal floor — can this test mass resolve it?">
             <div className="space-y-5">
               <div className="grid grid-cols-2 gap-3">
                 <Slider
                   label="Rig temperature"
                   value={rigTempK}
-                  displayValue={`${rigTempK.toFixed(0)} K`}
-                  min={0.01}
-                  max={400}
+                  displayValue={rigTempK < 1 ? `${(rigTempK * 1000).toFixed(0)} mK` : `${rigTempK.toFixed(0)} K`}
+                  min={ED_RIG_RANGE.tempK.min}
+                  max={ED_RIG_RANGE.tempK.max}
                   step={0.01}
                   onChange={setRigTempK}
                   minLabel="10 mK"
@@ -417,8 +422,8 @@ export default function ExperimentDesignPanel() {
                   label="Integration time"
                   value={rigIntegrationS}
                   displayValue={rigIntegrationS >= 3600 ? `${(rigIntegrationS / 3600).toFixed(1)} h` : `${rigIntegrationS.toFixed(0)} s`}
-                  min={1}
-                  max={1e6}
+                  min={ED_RIG_RANGE.integrationS.min}
+                  max={ED_RIG_RANGE.integrationS.max}
                   step={1}
                   onChange={setRigIntegrationS}
                   minLabel="1 s"
@@ -431,12 +436,12 @@ export default function ExperimentDesignPanel() {
                     <MetricCard
                       label="Thermal force floor of the test mass"
                       value={`${decidability.floorG.toExponential(2)} Δg`}
-                      sub="√(4k_B·T·m·ω/Qτ) — Brownian limit"
+                      sub={`√(4k_B·T·m·ω/Qτ) — Brownian limit at Q = ${ED_QUALITY_FACTOR}`}
                     />
                     <MetricCard
                       label="Claim ÷ floor"
                       value={decidability.ratio.toExponential(2) + "×"}
-                      sub="how much matter can arbitrate"
+                      sub="headroom over the test mass's own noise"
                       color={
                         decidability.verdict.tone === "emerald"
                           ? "dark-mode:text-emerald-400 light-mode:text-emerald-600 coffee-mode:text-emerald-400"
@@ -475,10 +480,12 @@ export default function ExperimentDesignPanel() {
               )}
               <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-amber-600 leading-relaxed">
                 Beyond artifacts and error bars there is a third wall: the test
-                mass is made of atoms, and atoms at temperature T jitter. A
-                claim below that jitter is not false — it is unwitnessable by
-                any matter-based instrument at that temperature. Cooling helps
-                only as √T.
+                mass itself jitters at temperature T. A claim below that jitter
+                is not false — this rig cannot witness it. The floor belongs to
+                the rig as modelled (Q fixed at {ED_QUALITY_FACTOR}), not to
+                every possible instrument: a lighter mass, a resonator with Q
+                of 10⁶ or more, longer integration or a quantum-limited readout
+                can go lower. Cooling alone helps only as √T.
               </p>
             </div>
           </Panel>

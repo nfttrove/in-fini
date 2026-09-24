@@ -49,8 +49,12 @@ function VerdictBanner({ pred }: { pred: CqedPrediction }) {
   );
 }
 
-// The Device Model's default rotor rim speed, for the "not speed" comparison.
+// The Device Model's default rotor rim speed, for the speed comparison.
 const DEVICE_ROTOR_V = predictDevice(DEVICE_DEFAULTS).v;
+// Effective mirror speed in the first observation (Wilson et al., Nature
+// 479, 376 (2011)): the SQUID moved the line's electrical end at roughly 5%
+// of the speed of light (Chalmers; MIT Technology Review, 26 May 2011).
+const WILSON_2011_V = 0.05 * 299_792_458;
 
 export default function CircuitQEDPanel({
   initialState,
@@ -84,14 +88,19 @@ export default function CircuitQEDPanel({
 
   return (
     <div className="space-y-6">
-      <PlainExplainer title="The one place the dynamical Casimir effect actually worked">
+      <PlainExplainer title="Where the dynamical Casimir effect was first seen — with an electrical mirror">
         <p>
           Every mechanical rotor in the Device Model panel is buried under the
-          (v/c)² wall. In 2011 a Swedish team got around it by not moving
-          matter at all: they wobbled the <em>electrical</em> position of a
-          superconducting boundary in a microwave resonator, pumping at twice
-          the resonator's frequency. Vacuum flickered into photon pairs at a
-          measurable rate. This panel models that experiment.
+          (v/c)² wall. In 2011 a Swedish team (Wilson et al., Chalmers) got
+          around it by not moving matter at all: a SQUID at the end of a
+          superconducting microwave line shifted the line's{" "}
+          <em>electrical</em> length, so its effective mirror moved at about
+          5% of the speed of light — far beyond any material — and photon
+          pairs appeared out of the vacuum at half the pump frequency. In 2013
+          a Finnish team (Lähteenmäki et al., Aalto) did it inside a cavity
+          pumped at twice its resonance, where resonance lets a far gentler
+          wiggle build up a measurable rate. This panel models that cavity
+          version.
         </p>
         <p className="mt-2 dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
           <span className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">Try this:</span>{" "}
@@ -302,11 +311,15 @@ export default function CircuitQEDPanel({
               The boundary here moves at {pred.vEff.toFixed(0)} m/s — about{" "}
               {Math.round(pred.vEff / DEVICE_ROTOR_V)}× the Device Model's
               default rotor ({DEVICE_ROTOR_V.toFixed(2)} m/s), yet (v/c)² is
-              still hopelessly small. The pairs/s rate is nonetheless
-              measurable because of the two things mechanics cannot offer:
-              pumping <em>exactly at 2·f₀</em> (parametric resonance — needs
-              f₀ in microwaves, not optics) and a cryogenic mode with n̄ ≈ 0.
-              The GHz trick is resonance and quiet, not speed.
+              still hopelessly small. In a cavity that is enough, because of
+              the two things mechanics cannot offer: pumping{" "}
+              <em>exactly at 2·f₀</em> (parametric resonance — needs f₀ in
+              microwaves, not optics) and a cryogenic mode with n̄ ≈ 0. The 2011
+              open-line experiment had no cavity to help, so it used raw speed
+              instead: its SQUID mirror reached about 5% of c,{" "}
+              {(WILSON_2011_V / pred.vEff).toExponential(0)}× this setting.
+              Either way the trick is electrical — no material mirror could
+              move like that.
             </p>
           </Panel>
         </div>
@@ -327,8 +340,8 @@ export default function CircuitQEDPanel({
           A count rate alone never proves vacuum origin — a warm resistor
           emits photons too. The pair signature is correlation: vacuum pairs
           exit in twos, one into each output mode, so coincidences violate
-          the classical Cauchy–Schwarz bound. This is the measurement that
-          sealed the 2011 result.
+          the classical Cauchy–Schwarz bound. Correlations like these are how
+          the microwave experiments told vacuum pairs from thermal noise.
         </p>
         <G2Correlation
           defaultPairNumber={defaultPairNumber}
@@ -338,8 +351,11 @@ export default function CircuitQEDPanel({
 
       <Panel title="Scope and honesty">
         <p className="text-xs leading-relaxed dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700">
-          This is a teaching model of the microwave DCE (Wilson et al., Nature
-          479, 376 (2011)), not a design tool: O(1) prefactors are dropped,
+          This is a teaching model of the cavity-pumped microwave DCE (the
+          regime of Lähteenmäki et al., PNAS 110, 4234 (2013)); the first
+          observation, Wilson et al., Nature 479, 376 (2011), used an open
+          line and a very fast effective mirror instead. It is not a design
+          tool: O(1) prefactors are dropped,
           the SQUID is treated as an ideal effective boundary, and detection
           inefficiency is ignored — so measured rates in a real lab come out
           lower. A real claim of vacuum photons also needs pair-correlation

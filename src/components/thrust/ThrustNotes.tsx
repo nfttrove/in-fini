@@ -48,8 +48,9 @@ export default function ThrustNotes() {
         </ul>
         <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500">
           A verdict of <strong>Unexplained excess</strong> means the claim
-          cannot be closed with ordinary artifact forces -- either the
-          measurement is wrong, or something interesting is happening. A
+          cannot be closed with the artifact forces this budget models -- a
+          channel it leaves out, a measurement error, or something
+          interesting. A
           verdict of <strong>Fully explained</strong> means the claim is
           quantitatively reproduced by mundane forces; no anomalous thrust is
           required.

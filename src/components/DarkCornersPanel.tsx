@@ -47,11 +47,13 @@ export default function DarkCornersPanel() {
         </p>
         <p className="mt-2 dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
           <span className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">The honest punchline:</span>{" "}
-          the vacuum energy your Casimir panels measure and the vacuum
-          energy filling the cosmos are, as far as we know, the same
-          phenomenon — and quantum theory gets their relative sizes wrong by
-          40 to 120 orders of magnitude. That is the biggest open crack in
-          the wall, and nobody, human or alien, has explained it.
+          the vacuum energy behind your Casimir panels and the vacuum
+          energy filling the cosmos are usually described as the same
+          phenomenon (the Casimir force can also be derived without
+          zero-point energy at all — Jaffe, Phys. Rev. D 72, 021301 (2005) —
+          so the lab does not settle it). Taken naively, quantum theory gets
+          their relative sizes wrong by 40 to 120 orders of magnitude. That
+          is the biggest open crack in the wall, and nobody has explained it.
         </p>
       </PlainExplainer>
 
@@ -104,9 +106,10 @@ export default function DarkCornersPanel() {
                 Some unknown cancellation erases between 40 and 120 orders
                 of magnitude and leaves the remainder. Every "zero-point
                 energy device" claim silently assumes this problem is
-                solved. It is not — not by us, and not in any physics any
-                alien could plausibly be using either, because their
-                particle colliders would face the same sum.
+                solved. It is not solved in any physics we have; anyone else,
+                alien engineers included, would be summing the same measured
+                fields, so a device that tapped this would have to solve the
+                problem first — and show its working.
               </p>
             </div>
           </Panel>
@@ -226,9 +229,9 @@ export default function DarkCornersPanel() {
               <p className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700 leading-relaxed">
                 This is the one place the vacuum's invoice genuinely blurs:
                 as space expands, more of this energy exists, not less. The
-                universe runs the experiment across billions of light-years
-                because no arrangement of atoms can arbitrate it at 10⁻³⁶
-                m/s². Here endeth the desk.
+                universe runs the experiment across billions of light-years,
+                where the effect adds up; at 10⁻³⁶ m/s² across a desk, no
+                instrument yet built comes close. Here endeth the desk.
               </p>
             </div>
           </Panel>
