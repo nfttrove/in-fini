@@ -61,12 +61,16 @@ function rowToParams(row: ThrustPresetRow): ThrustParams {
   };
 }
 
+// The card shows the engine's verdict, not the stored string: the stored
+// ones were written by hand and drifted (Podkletnov read "Fully explained"
+// while the budget said "Partially explained").
 function rowToItem(row: ThrustPresetRow): PresetItem {
+  const params = rowToParams(row);
   return {
     name: row.name,
     tagline: row.tagline,
-    verdict: row.verdict,
-    params: rowToParams(row),
+    verdict: computeThrustBudget(params).verdict.label,
+    params,
   };
 }
 
@@ -74,7 +78,7 @@ function builtInPresets(): PresetItem[] {
   return Object.entries(THRUST_PRESETS).map(([name, preset]) => ({
     name,
     tagline: preset.tagline,
-    verdict: preset.verdict,
+    verdict: computeThrustBudget(preset.params).verdict.label,
     params: preset.params,
   }));
 }
@@ -162,15 +166,17 @@ export default function ThrustPresetPicker({ onLoad }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Robustness of each built-in preset's verdict under ±20% jitter,
-  // computed once from the same engine the verdicts come from.
-  const stabilityByParams = useMemo(() => {
-    const map = new Map<ThrustParams, { dominantShare: number; tally: Record<string, number> }>();
-    for (const preset of Object.values(THRUST_PRESETS)) {
-      map.set(preset.params, verdictStability(preset.params, { trials: 120 }));
+  // Robustness of each listed preset's verdict under ±20% jitter, computed
+  // from the same engine the verdicts come from. Keyed by name: the cloud
+  // list builds fresh params objects, so an identity-keyed map never
+  // matched and the badge only ever showed offline.
+  const stabilityByName = useMemo(() => {
+    const map = new Map<string, { dominantShare: number; tally: Record<string, number> }>();
+    for (const preset of presets) {
+      map.set(preset.name, verdictStability(preset.params, { trials: 120 }));
     }
     return map;
-  }, []);
+  }, [presets]);
 
   useEffect(() => {
     const fetchPresets = async () => {
@@ -236,7 +242,7 @@ export default function ThrustPresetPicker({ onLoad }: Props) {
               key={preset.name}
               item={preset}
               onLoad={() => onLoad(preset.params)}
-              stability={stabilityByParams.get(preset.params)}
+              stability={stabilityByName.get(preset.name)}
             />
           ))}
         </div>
