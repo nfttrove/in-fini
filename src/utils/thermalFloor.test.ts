@@ -40,9 +40,19 @@ describe("thermal floor scaling", () => {
   });
 });
 
+describe("thermalFloorDeltaG — same grams as the thrust channels", () => {
+  it("is the force floor as a weight in grams, independent of the mass it came from", () => {
+    // Claims and artifact channels are F/g × 1000 (grams). Dividing by the
+    // test mass as well gave milli-g of acceleration: 10× off at 100 g.
+    expect(thermalFloorDeltaG(BASE)).toBeCloseTo((thermalForceFloorN(BASE) / 9.80665) * 1000, 20);
+    expect(thermalFloorDeltaG(BASE)).toBeGreaterThan(5e-10);
+    expect(thermalFloorDeltaG(BASE)).toBeLessThan(2e-9);
+  });
+});
+
 describe("assessDecidability", () => {
   it("calls ordinary claims decidable with a big margin", () => {
-    const r = assessDecidability(0.1, BASE); // 0.1 milli-g vs ~1e-9 floor
+    const r = assessDecidability(0.1, BASE); // 0.1 g vs ~1e-9 g floor
     expect(r.verdict.key).toBe("comfortable");
     expect(r.ratio).toBeGreaterThan(1e4);
   });

@@ -7,6 +7,7 @@ import {
   ionWindForceG,
   ionWindCollisionalG,
   ionWindPressureLimitPa,
+  thermalConvectionG,
   G,
   type ThrustParams,
 } from "./thrustLeakage";
@@ -239,5 +240,14 @@ describe("ionWindForceG — ions push air, so no air means no wind", () => {
       computeThrustBudget({ ...p, ambientPressurePa: pa }).channels.find((c) => c.key === "ionWind")!.valueG;
     expect(ion(101325)).toBeCloseTo(atm, 12);
     expect(ion(1e-6)).toBeLessThan(atm * 1e-5);
+  });
+});
+
+describe("thermalConvectionG — buoyancy needs air", () => {
+  it("is unchanged at 1 atm and scales with pressure (air density)", () => {
+    const atm = thermalConvectionG(2, 0.1, 0.01);
+    expect(thermalConvectionG(2, 0.1, 0.01, 101325)).toBe(atm);
+    expect(thermalConvectionG(2, 0.1, 0.01, 101325 / 10) / atm).toBeCloseTo(0.1, 12);
+    expect(thermalConvectionG(2, 0.1, 0.01, 1e-6) / atm).toBeLessThan(1e-10);
   });
 });

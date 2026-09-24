@@ -90,7 +90,7 @@ const THRUST_CODE: Record<string, number> = {
 
 export function atlasThrust(): AtlasMap {
   const meta = {
-    xLabel: "claimed Δg (milli-g)",
+    xLabel: "claimed Δg (grams)",
     yLabel: "drive voltage (V)",
     xMin: 0.001, xMax: 100, yMin: 1, yMax: 5e4,
     log: true, width: W, height: H,
@@ -239,7 +239,7 @@ export function atlasCqed(): AtlasMap {
 
 export function atlasDecidability(): AtlasMap {
   const meta = {
-    xLabel: "claimed Δg (milli-g)",
+    xLabel: "claimed Δg (grams)",
     yLabel: "rig temperature (K)",
     xMin: 1e-13, xMax: 10, yMin: 0.01, yMax: 400,
     log: true, width: W, height: H,

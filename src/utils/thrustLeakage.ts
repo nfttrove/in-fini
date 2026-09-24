@@ -191,10 +191,14 @@ export function electrostaticForceG(
 export function thermalConvectionG(
   tempGradKPerM: number,
   heightM: number,
-  areaM2: number
+  areaM2: number,
+  pressurePa: number = P_ATM
 ): number {
+  // Buoyancy of heated air scales with the air's density, ∝ pressure:
+  // in hard vacuum there is no air to heat.
   const deltaT = tempGradKPerM * heightM;
-  const deltaRho = RHO_AIR_STP * BETA_AIR * deltaT;
+  const rhoAir = RHO_AIR_STP * (Math.max(pressurePa, 0) / P_ATM);
+  const deltaRho = rhoAir * BETA_AIR * deltaT;
   const buoyancyN = deltaRho * areaM2 * heightM * G;
   return (buoyancyN / G) * 1000;
 }
@@ -269,9 +273,13 @@ export function computeThrustBudget(p: ThrustParams): ThrustBudget {
     },
     {
       key: "vibration",
-      label: "Vibration-induced apparent force",
+      // The peak inertial force. A linear balance averages a sinusoidal
+      // shake to zero; it only reads as a steady weight change through a
+      // nonlinearity (bouncing contact, saturating or filtering readout).
+      // Counted at the peak, so this channel is an upper bound.
+      label: "Vibration (peak inertial force, upper bound)",
       valueG: vibrationForceG(p.deviceMassKg, p.vibrationAmpNm, p.vibrationFreqHz),
-      formula: "m ω² x / g",
+      formula: "m ω² x / g (peak)",
     },
     {
       key: "electrostatic",
@@ -282,8 +290,13 @@ export function computeThrustBudget(p: ThrustParams): ThrustBudget {
     {
       key: "thermal",
       label: "Thermal buoyancy (heated air)",
-      valueG: thermalConvectionG(p.tempGradientKPerM, p.deviceHeightM, p.plateAreaM2),
-      formula: "Δρ · A · h",
+      valueG: thermalConvectionG(
+        p.tempGradientKPerM,
+        p.deviceHeightM,
+        p.plateAreaM2,
+        p.ambientPressurePa
+      ),
+      formula: "Δρ · A · h (Δρ ∝ p)",
     },
   ];
 

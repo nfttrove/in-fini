@@ -45,7 +45,7 @@ export interface DesignResult {
   unit: string;
   k: number;
   channels: number;
-  /** Per-channel artifact allowance in claim units (milli-g or W). */
+  /** Per-channel artifact allowance in claim units (grams or W). */
   sigmaPerChannel: number;
   requirements: Requirement[];
 }
@@ -78,7 +78,7 @@ export function thrustRequirements(ctx: ThrustDesignContext): DesignResult {
   const N = 4; // ion wind, vibration, electrostatic, thermal buoyancy
   const allow = ctx.claimedDeltaG / (k * Math.sqrt(N));
 
-  // vibration: value_mG = m ω² x / g × 1000 → x_max
+  // vibration: value_g = m ω² x / g × 1000 → x_max
   const omega = 2 * Math.PI * ctx.vibrationFreqHz;
   const vibMaxM = (allow * G) / (1000 * ctx.deviceMassKg * omega * omega);
   const vibNowM = ctx.vibrationAmpNm * 1e-9;
@@ -99,21 +99,22 @@ export function thrustRequirements(ctx: ThrustDesignContext): DesignResult {
   const vMaxIon =
     ionNow > 0 ? ctx.driveVoltageV * Math.sqrt(allow / ionNow) : Infinity;
 
-  // electrostatic: value_mG = ½ ε₀ E² A / g × 1000 → E_max
+  // electrostatic: value_g = ½ ε₀ E² A / g × 1000 → E_max
   const eMax = Math.sqrt((2 * allow * G) / (1000 * EPS0 * ctx.plateAreaM2));
 
   // The thermal channel is linear in the temperature gradient.
   const convNow = thermalConvectionG(
     ctx.tempGradKPerM,
     ctx.deviceHeightM,
-    ctx.plateAreaM2
+    ctx.plateAreaM2,
+    ctx.ambientPressurePa
   );
   const gradMax =
     convNow > 0 ? (allow * ctx.tempGradKPerM) / convNow : Infinity;
 
   return {
     claim: ctx.claimedDeltaG,
-    unit: "Δg (milli-g)",
+    unit: "Δg (grams)",
     k,
     channels: N,
     sigmaPerChannel: allow,

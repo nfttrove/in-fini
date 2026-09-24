@@ -7,21 +7,26 @@ export default function ThrustNotes() {
         <p>
           Every claim of anomalous thrust or weight reduction must first survive
           a quantitative artifact budget. Enter the measured or specified values
-          for your experiment on the left; the tool sums five mundane force
+          for your experiment on the left; the tool sums four mundane force
           channels and reports the <em>residual</em> -- the portion of the
           claimed weight change that is <em>not</em> accounted for by known
-          physics.
+          physics. Each channel is a generous allowance (an upper bound), so a
+          claim inside the budget is one the artifacts <em>could</em> produce.
         </p>
         <ul className="list-disc list-inside space-y-1 dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
           <li>
             <span className="text-cyan-300">Ion wind / corona:</span> charged
             particles accelerated by high-voltage electrodes push air and create
-            a net thrust indistinguishable from antigravity.
+            a net thrust indistinguishable from antigravity. It needs air: pump
+            down until the ions' mean free path passes the electrode gap and
+            it vanishes.
           </li>
           <li>
-            <span className="text-amber-300">Vibration force:</span> mechanical
-            oscillations of the device create a time-averaged apparent weight
-            change on the scale.
+            <span className="text-amber-300">Vibration force:</span> a shaking
+            device pushes on the scale with a peak force m ω² x. A linear
+            balance averages that to zero; it reads as a steady weight change
+            only through a nonlinearity (a bouncing contact, a saturating or
+            filtering readout), so the peak is counted as an upper bound.
           </li>
           <li>
             <span className="text-rose-300">Electrostatic image:</span>{" "}
@@ -29,13 +34,10 @@ export default function ThrustNotes() {
             nearby conductors (including the balance pan).
           </li>
           <li>
-            <span className="text-emerald-300">Thermal convection:</span>{" "}
-            heated air around the device rises and creates a buoyant lift force.
-          </li>
-          <li>
-            <span className="text-sky-300">Buoyancy shift:</span> local heating
-            reduces air density, decreasing the effective weight of displaced
-            air.
+            <span className="text-emerald-300">Thermal buoyancy:</span>{" "}
+            heated air around the device is lighter and rises, lifting it.
+            One channel, counted once; it scales with air density, so it too
+            fades in vacuum.
           </li>
         </ul>
         <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500">

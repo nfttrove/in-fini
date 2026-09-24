@@ -79,7 +79,8 @@ describe("thrustRequirements (round-trip against the real channels)", () => {
     const v = thermalConvectionG(
       byKey.thermal.value,
       TCTX.deviceHeightM,
-      TCTX.plateAreaM2
+      TCTX.plateAreaM2,
+      TCTX.ambientPressurePa
     );
     expect(v).toBeCloseTo(res.sigmaPerChannel, 6);
   });

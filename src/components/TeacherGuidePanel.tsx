@@ -62,7 +62,7 @@ export default function TeacherGuidePanel() {
           <li><strong>Manchester Spheres:</strong> Micro-scale "levitation". Reduce pressure to hard vacuum. Does it still float? (Spoiler: no.)</li>
         </ul>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <strong>Key insight:</strong> Vibration is the best liar in experimental physics. A shaky scale averages acceleration over time, faking a weight change. This is why serious experiments sit inside multi-layer vibration isolators that cost more than a car.
+          <strong>Key insight:</strong> Vibration is the best liar in experimental physics. A perfectly linear scale would average a steady shake to zero — but real ones aren't: a contact that bounces, a readout that saturates or filters, and the shake becomes a steady fake weight change. The budget counts the peak shaking force as the most it could fake. This is why serious experiments sit inside multi-layer vibration isolators that cost more than a car.
         </p>
       </section>
 

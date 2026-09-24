@@ -47,9 +47,14 @@ export function thermalForceFloorN(p: ThermalFloorParams): number {
   return Math.sqrt((4 * KB * p.tempK * p.massKg * omega) / (p.qualityFactor * p.integrationS));
 }
 
-/** The same floor expressed in the app's Δg (milli-g) units. */
+/**
+ * The same floor in the app's Δg units: grams-equivalent weight change,
+ * F/g × 1000 — the unit every thrust channel and claim uses. (It once
+ * divided by the test mass too, giving milli-g of acceleration, which put
+ * the claim ÷ floor ratio off by the mass in kg — 10× at 100 g.)
+ */
 export function thermalFloorDeltaG(p: ThermalFloorParams): number {
-  return (thermalForceFloorN(p) / (p.massKg * G)) * 1000;
+  return (thermalForceFloorN(p) / G) * 1000;
 }
 
 /** rms thermal position jitter of the test mass [m] (equipartition). */
