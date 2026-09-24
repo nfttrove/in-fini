@@ -169,9 +169,14 @@ pasting them into the SQL editor in creation order). Six tables:
   string). Filed claims matching a prior pre-registration are flagged
   "pre-registered" in the registry list.
 
-Two later migrations are security fixes worth knowing about before forking the schema:
+Later migrations that are security fixes, worth knowing about before forking the schema:
 `20260710002212` hides `owner_token` from the API (it was previously readable by
-anyone), and `20260710003928` bounds the size of anon-writable JSONB payloads.
+anyone), `20260710003928` bounds the size of anon-writable JSONB payloads, and
+`20260924130000` makes the server stamp `created_at` and `id` on every anonymous
+insert into the three public tables (a client could previously backdate a
+pre-registration) and caps each table's anonymous inserts per rolling hour
+(30 claims, 30 pre-registrations, 60 census runs; global caps, no client
+identifiers stored).
 
 ## Project structure
 
