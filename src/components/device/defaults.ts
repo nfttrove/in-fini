@@ -14,7 +14,10 @@ export const DEVICE_DEFAULTS: DeviceParams = {
   areaMm2: 1,
 };
 
-/** The four knobs the worksheet and guide push to their slider limits. */
+/**
+ * The four knobs the worksheet and guide push hard. Frequency, Q and area sit
+ * at their slider limits; the gap stops at 10 nm (the slider goes to 1 nm).
+ */
 export const DEVICE_PUSHED: DeviceParams = {
   ...DEVICE_DEFAULTS,
   dNm: 10,

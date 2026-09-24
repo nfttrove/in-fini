@@ -364,10 +364,10 @@ export default function ExperimentDesignPanel() {
             </div>
             <ul className="space-y-2.5">
               {result.requirements.map((r) => {
-                // frac() writes exponent notation ("1.2e+2× current").
-                const ratioMatch = r.asFractionOfReference.match(/^([\d.]+(?:e[+-]?\d+)?)× current$/);
-                const ratio = ratioMatch ? parseFloat(ratioMatch[1]) : null;
+                const ratio = r.ratio;
                 const alreadyOk = ratio !== null && ratio >= 1;
+                // Near 1, one decimal would print 0.9987 as "1.0e+0".
+                const fmtRatio = (x: number) => x.toExponential(x > 0.9 && x < 1.1 ? 3 : 1);
                 return (
                   <li
                     key={r.key}
@@ -393,10 +393,10 @@ export default function ExperimentDesignPanel() {
                     </div>
                     <div className="text-[10px] dark-mode:text-slate-500 light-mode:text-slate-500 coffee-mode:text-amber-700 mt-1">
                       {alreadyOk
-                        ? `your current setup already satisfies this (${ratio!.toExponential(1)}× headroom)`
+                        ? `your current setup already satisfies this${isFinite(ratio!) ? ` (${fmtRatio(ratio!)}× headroom)` : ""}`
                         : ratio === null
                           ? "absolute requirement"
-                          : `need ${ratio.toExponential(1)}× today's value`}
+                          : `need ${fmtRatio(ratio)}× today's value`}
                     </div>
                   </li>
                 );

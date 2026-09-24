@@ -71,7 +71,7 @@ function buildReport(budget: ThrustBudget, params: ThrustParams): string {
   }
   lines.push("");
 
-  const dceThrustLimit_mg = dceThrustLimitG(params);
+  const dceLimitG = dceThrustLimitG(params);
 
   lines.push("KEY PARAMETERS");
   lines.push("-".repeat(40));
@@ -107,7 +107,7 @@ function buildReport(budget: ThrustBudget, params: ThrustParams): string {
   lines.push(`  Cavity Q:            ${params.cavityQ.toExponential(2)}`);
   lines.push(`  Active area:         ${params.activeArea_cm2.toFixed(2)} cm²`);
   lines.push(`  Drive frequency:     ${(params.driveFrequency_Hz / 1e3).toFixed(0)} kHz`);
-  lines.push(`  Maximum DCE thrust:  ${formatForceG(dceThrustLimit_mg / 1000)}`);
+  lines.push(`  Maximum DCE thrust:  ${formatForceG(dceLimitG)}`);
   lines.push("");
 
   if (

@@ -70,7 +70,7 @@ export default function TeacherGuidePanel() {
         <h3 className="text-lg font-semibold dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-slate-100">5. Why Your 500 kHz Buzzer Won't Power a Lightbulb (30 min)</h3>
         <p className="text-sm dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400"><strong>Tab:</strong> Device Model — Power from Vacuum</p>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
-          <strong>Activity:</strong> Push four knobs to their limits. Tiny gap ({DEVICE_PUSHED.dNm} nm). Insane Q (10⁶). The biggest area ({DEVICE_PUSHED.areaMm2} mm²). Run at {DEVICE_PUSHED.fmHz / 1e6} MHz:
+          <strong>Activity:</strong> Push four knobs hard. Tiny gap ({DEVICE_PUSHED.dNm} nm). Insane Q (10⁶). The biggest area ({DEVICE_PUSHED.areaMm2} mm²). Run at {DEVICE_PUSHED.fmHz / 1e6} MHz:
         </p>
         <ul className="list-disc pl-6 space-y-1 text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
           <li>Predicted power: {formatPower(PUSHED.P_output)}</li>

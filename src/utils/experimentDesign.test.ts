@@ -122,3 +122,21 @@ describe("powerRequirements (round-trip against the real channels)", () => {
     );
   });
 });
+
+describe("requirement ratio — compare the number, not its rounded label", () => {
+  it("a limit 0.13% short of today's value is unmet even though the label rounds to 1.0e+0", () => {
+    // Reachable slider state found by review: claim 10^-1.1 g, 1.4 kV.
+    const res = thrustRequirements({ ...TCTX, claimedDeltaG: 10 ** -1.1, driveVoltageV: 1400 });
+    const ion = res.requirements.find((r) => r.key === "ion-wind")!;
+    expect(ion.asFractionOfReference).toBe("1.0e+0× current");
+    expect(ion.ratio).not.toBeNull();
+    expect(ion.ratio!).toBeLessThan(1);
+    expect(ion.ratio!).toBeCloseTo(ion.value / 1400, 12);
+  });
+
+  it("is null only for absolute limits", () => {
+    for (const r of thrustRequirements(TCTX).requirements) {
+      expect(r.ratio === null).toBe(r.key === "electrostatic");
+    }
+  });
+});

@@ -33,8 +33,9 @@ describe("known points land in known regions", () => {
   it("tiny claims at low voltage are explained; huge claims read as excess", () => {
     // bottom-left: 0.001 Δg at ~1 V → explained
     expect(idx(thrust, 0.02, 0.02)).toBe(0);
-    // top-right: 100 Δg at 50 kV — leakage caps near 0.4 mΔg in this slice,
-    // so the verdict family is excess (never explained):
+    // top-right: 100 Δg at 50 kV — leakage reaches ~26 g in this slice
+    // (mostly ion wind), well short of the claim, so the verdict family is
+    // excess (never explained):
     expect(idx(thrust, 0.98, 0.98)).toBeGreaterThanOrEqual(2);
   });
 

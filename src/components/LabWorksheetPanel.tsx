@@ -69,7 +69,7 @@ export default function LabWorksheetPanel() {
         <div className="space-y-2 text-sm text-slate-300">
           <p><strong>Step 1:</strong> Open the Device Model tab. Leave parameters at defaults ({DEVICE_DEFAULTS.dNm} nm, {DEVICE_DEFAULTS.fmHz / 1e3} kHz).</p>
           <p><strong>Step 2:</strong> What is the predicted power? (Should be ~{DEFAULT_POWER}.)</p>
-          <p><strong>Step 3:</strong> Now push these four knobs to their limits:</p>
+          <p><strong>Step 3:</strong> Now push these four knobs hard:</p>
           <ul className="list-disc pl-4 space-y-1">
             <li>Reduce cavity gap to {DEVICE_PUSHED.dNm} nm</li>
             <li>Increase frequency to {DEVICE_PUSHED.fmHz / 1e6} MHz</li>

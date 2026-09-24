@@ -10,6 +10,9 @@ import TeacherGuidePanel from "./TeacherGuidePanel";
 import { DEVICE_DEFAULTS, DEVICE_PUSHED } from "./device/defaults";
 import { summarizePreset } from "../data/thrustPresets";
 import { formatPower, predictDevice } from "../utils/device";
+import ThrustDceLimit from "./thrust/ThrustDceLimit";
+import { computeThrustBudget, formatForceG } from "../utils/thrustLeakage";
+import { THRUST_PRESETS } from "../data/thrustPresets";
 import { ThemeProvider } from "../contexts/ThemeContext";
 
 /**
@@ -137,10 +140,23 @@ describe("ExperimentDesignPanel requirement wording", () => {
         <ExperimentDesignPanel />
       </ThemeProvider>
     ).replace(/<!-- -->/g, "");
-    // Default: 10 kV and 2 K/m are inside their allowances; vibration is not.
+    // Default: 2 K/m is inside its allowance; vibration and 10 kV are not
+    // (ion wind needs ~1.6 kV), and the stray field is an absolute limit.
     expect(html).toContain("already satisfies this");
     expect(html).toMatch(/need [\d.]+e-\d+× today&#x27;s value/);
     expect(html).not.toContain("of today&#x27;s value");
     expect(html).toContain("absolute requirement");
+  });
+});
+
+describe("ThrustDceLimit units", () => {
+  it("shows dceThrustLimitG as grams, and the claim ratio against grams", () => {
+    // dceThrustLimitG returns grams like every channel; the card once
+    // treated it as milligrams — ceiling 1000× too small, ratio 1000× too big.
+    const budget = computeThrustBudget(THRUST_PRESETS["Podkletnov Effect (1992)"].params);
+    const html = renderToString(<ThrustDceLimit dceThrustLimitG={1.5e-27} budget={budget} />)
+      .replace(/<!-- -->/g, "");
+    expect(html).toContain(formatForceG(1.5e-27));
+    expect(html).toContain(`${((budget.claimedG / 1.5e-27) * 100).toExponential(1)}%`);
   });
 });

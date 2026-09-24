@@ -10,8 +10,11 @@ export default function ThrustNotes() {
           for your experiment on the left; the tool sums four mundane force
           channels and reports the <em>residual</em> -- the portion of the
           claimed weight change that is <em>not</em> accounted for by known
-          physics. Each channel is a generous allowance (an upper bound), so a
-          claim inside the budget is one the artifacts <em>could</em> produce.
+          physics. The vibration, electrostatic and thermal channels are generous
+          allowances (upper bounds), so a claim inside them is one the artifacts{" "}
+          <em>could</em> produce. The ion-wind channel is a heuristic scaled to a
+          desktop corona rig's ~10 cm² discharge area; a large-electrode rig can
+          push harder.
         </p>
         <ul className="list-disc list-inside space-y-1 dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
           <li>

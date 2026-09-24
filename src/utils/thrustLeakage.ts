@@ -123,8 +123,9 @@ const EHD_AREA_M2 = 1e-3;
  * Ion wind in the collisional limit, grams-equivalent. Thrust is T = I·d/μ
  * (ions drift across the gap and hand their momentum to the air). With a
  * space-charge-limited current, J = 9/8·ε₀μV²/d³, the mobility cancels:
- * T = 9/8·ε₀·(V/d)²·A. Real corona rigs sit below this, so as an artifact
- * allowance it is generous.
+ * T = 9/8·ε₀·(V/d)²·A, here over a fixed ~10 cm² discharge area. Corona
+ * rigs of that size sit below it; a large-electrode rig can exceed it, so
+ * this is a heuristic, not an upper bound for every geometry.
  */
 export function ionWindCollisionalG(voltageV: number, gapM: number): number {
   if (gapM <= 0) return 0;
@@ -227,9 +228,9 @@ export function dceThrustLimitG(p: ThrustParams): number {
   const pDCE_W = (hbar * Math.pow(c, 2) / Math.pow(d_m, 4)) * Math.pow(v / c, 2) * A_m2;
   const power_W = pDCE_W * sidebandEfficiency * Lorentzian;
   const force_N = power_W / c;
-  const force_mg = (force_N / G) * 1000;
+  const force_g = (force_N / G) * 1000; // grams-equivalent, like every channel
 
-  return force_mg;
+  return force_g;
 }
 
 /**

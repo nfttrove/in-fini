@@ -87,7 +87,7 @@ export default function ThrustDiagnosticPanel() {
         <div className="lg:col-span-3 space-y-6">
           <ThrustVerdict budget={budget} />
           <ThrustBudgetPanel budget={budget} />
-          <ThrustDceLimit dceThrustLimit_mg={dceThrustLimit} budget={budget} />
+          <ThrustDceLimit dceThrustLimitG={dceThrustLimit} budget={budget} />
         </div>
       </div>
 

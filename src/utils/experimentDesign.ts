@@ -38,6 +38,12 @@ export interface Requirement {
   unit: string;
   /** The same limit expressed relative to the current (reference) setup. */
   asFractionOfReference: string;
+  /**
+   * limit ÷ today's value: ≥ 1 means the current rig already meets it.
+   * Null for absolute limits with no reference. Compare this, not the
+   * rounded asFractionOfReference string (0.9987 prints as "1.0e+0").
+   */
+  ratio: number | null;
 }
 
 export interface DesignResult {
@@ -48,6 +54,10 @@ export interface DesignResult {
   /** Per-channel artifact allowance in claim units (grams or W). */
   sigmaPerChannel: number;
   requirements: Requirement[];
+}
+
+function ratioOf(reference: number, limit: number): number | null {
+  return reference > 0 && limit >= 0 ? limit / reference : null;
 }
 
 function frac(reference: number, limit: number): string {
@@ -125,6 +135,7 @@ export function thrustRequirements(ctx: ThrustDesignContext): DesignResult {
         value: vibMaxM * 1e9,
         unit: "nm",
         asFractionOfReference: frac(vibNowM, vibMaxM),
+        ratio: ratioOf(vibNowM, vibMaxM),
       },
       {
         key: "ion-wind",
@@ -132,6 +143,7 @@ export function thrustRequirements(ctx: ThrustDesignContext): DesignResult {
         value: vMaxIon,
         unit: "V",
         asFractionOfReference: frac(ctx.driveVoltageV, vMaxIon),
+        ratio: ratioOf(ctx.driveVoltageV, vMaxIon),
       },
       {
         key: "electrostatic",
@@ -139,6 +151,7 @@ export function thrustRequirements(ctx: ThrustDesignContext): DesignResult {
         value: eMax,
         unit: "V/m",
         asFractionOfReference: "absolute limit",
+        ratio: null,
       },
       {
         key: "thermal",
@@ -146,6 +159,7 @@ export function thrustRequirements(ctx: ThrustDesignContext): DesignResult {
         value: gradMax,
         unit: "K/m",
         asFractionOfReference: frac(ctx.tempGradKPerM, gradMax),
+        ratio: ratioOf(ctx.tempGradKPerM, gradMax),
       },
     ],
   };
@@ -203,6 +217,7 @@ export function powerRequirements(ctx: PowerDesignContext): DesignResult {
         value: iMax,
         unit: "A",
         asFractionOfReference: frac(ctx.iBiasA, iMax),
+        ratio: ratioOf(ctx.iBiasA, iMax),
       },
       {
         key: "rf",
@@ -210,6 +225,7 @@ export function powerRequirements(ctx: PowerDesignContext): DesignResult {
         value: sMin,
         unit: "dB",
         asFractionOfReference: "absolute minimum",
+        ratio: null,
       },
       {
         key: "blackbody",
@@ -217,6 +233,7 @@ export function powerRequirements(ctx: PowerDesignContext): DesignResult {
         value: tHotMax,
         unit: "K",
         asFractionOfReference: frac(ctx.tHotK, tHotMax),
+        ratio: ratioOf(ctx.tHotK, tHotMax),
       },
       {
         key: "mechanical",
@@ -224,6 +241,7 @@ export function powerRequirements(ctx: PowerDesignContext): DesignResult {
         value: allow,
         unit: "W",
         asFractionOfReference: "per-channel allowance",
+        ratio: null,
       },
     ],
   };

@@ -100,7 +100,7 @@ export default function ClaimRegistryPanel() {
       : {
           claimed: thrust.claimedDeltaG,
           unit: "Δg",
-          format: (g: number) => `${g.toExponential(2)} Δg (${formatForce(g * 9.80665)})`,
+          format: (g: number) => `${g.toExponential(2)} Δg (${formatForce((g / 1000) * 9.80665)})`,
           leakage: thrustBudget.totalLeakageG,
           residual: thrustBudget.residualG,
           residualFrac: thrustBudget.residualFrac,

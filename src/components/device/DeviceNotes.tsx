@@ -19,8 +19,11 @@ const CORNER = predictDevice({
 // At the claim's own 50 nm and 500 kHz, the largest rotor that survives the
 // veto (a = (2πf)²·r) with every other knob at its limit.
 const CLAIM_FM_HZ = 500e3;
-const SURVIVABLE_R_NM =
-  ((MATERIAL_VETO_G * 9.80665) / (2 * Math.PI * CLAIM_FM_HZ) ** 2) * 1e9;
+// Floored: at the exact radius the rim sits on the veto (and rounding up
+// would put it past it, failing the panel's own sanity check).
+const SURVIVABLE_R_NM = Math.floor(
+  ((MATERIAL_VETO_G * 9.80665) / (2 * Math.PI * CLAIM_FM_HZ) ** 2) * 1e9
+);
 const AT_CLAIM = predictDevice({
   dNm: 50,
   fmHz: CLAIM_FM_HZ,
@@ -85,7 +88,7 @@ export default function DeviceNotes({ p }: Props) {
           few atoms wide, far below the ~100 nm where real metals stop acting
           as the ideal mirrors the d⁻⁴ law assumes. At the claim's own 50 nm
           and 500 kHz, the largest rotor that survives (r ≈{" "}
-          {Math.round(SURVIVABLE_R_NM)} nm) leaves the ceiling{" "}
+          {SURVIVABLE_R_NM} nm) leaves the ceiling{" "}
           {AT_CLAIM.shortfall.toExponential(1)}× short even with every other
           knob at its limit.
         </InfoNote>
