@@ -11,12 +11,26 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { CORNER } from "./components/device/defaults";
 import { formatPower } from "./utils/device";
 import { formatDeltaG } from "./utils/format";
+import ThrustPresetPicker from "./components/thrust/ThrustPresetPicker";
+import PresetCard from "./components/thrust/PresetCard";
+import TeacherGuidePanel from "./components/TeacherGuidePanel";
+import NetworkPanel from "./components/NetworkPanel";
+import ThrustDiagnosticPanel from "./components/ThrustDiagnosticPanel";
+import DiagnosticPanel from "./components/DiagnosticPanel";
+import { builtInPresets } from "./data/presetItems";
 
 /**
- * Guards for the corrections listed on the Errata tab that are words, not
- * numbers: each fails if the old text comes back. (Numerical fixes are
- * pinned by the engine and render tests next to the code they cover.)
+ * Guards for the corrections listed on the Errata tab, checked through the
+ * rendered components where possible: each fails if the old behaviour or
+ * text comes back. (Numerical fixes are also pinned by the engine tests
+ * next to the code they cover.)
  */
+const html = (el: JSX.Element) =>
+  renderToString(<ThemeProvider>{el}</ThemeProvider>)
+    .replace(/<!-- -->/g, "")
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'")
+    .replace(/&amp;/g, "&");
 describe("errata guards: citations and copy", () => {
   it("the EmDrive work is TU Dresden's SpaceDrive project, not \"SUPERDRAG\"", () => {
     expect(gateSrc).not.toMatch(/SUPERDRAG/i);
@@ -48,5 +62,39 @@ describe("errata guards: citations and copy", () => {
 
   it("the Claim Registry weighs thrust claims in grams (0.1 g is 980.7 µN, not mN)", () => {
     expect(formatDeltaG(0.1)).toBe("1.00e-1 Δg (980.6650 μN)");
+  });
+
+  it("preset cards show the boundary badge through the real picker", () => {
+    // The live bug: the picker looked stability up by object identity, so
+    // cloud cards never showed the badge. Podkletnov is boundary-sensitive.
+    expect(html(<ThrustPresetPicker onLoad={() => {}} />)).toContain("boundary-sensitive");
+  });
+
+  it("every preset card shows its source when expanded", () => {
+    for (const item of builtInPresets()) {
+      const out = html(<PresetCard item={item} onLoad={() => {}} initiallyExpanded />);
+      expect(out).toContain("Source:");
+      expect(out).toContain(item.source!.slice(0, 30));
+    }
+  });
+
+  it("the Teacher's Guide labels Podkletnov's 2% as the 1997 claim", () => {
+    const out = html(<TeacherGuidePanel />);
+    expect(out).toContain("Podkletnov (1997 claim):");
+    expect(out).not.toContain("Podkletnov (1992)");
+  });
+
+  it("the Replication Network calls median/√N a best case, not a detection limit", () => {
+    const out = html(<NetworkPanel />);
+    expect(out).toContain("best case");
+    expect(out).not.toMatch(/honest detection limit/i);
+  });
+
+  it("the thrust pressure slider reaches hard vacuum", () => {
+    expect(html(<ThrustDiagnosticPanel />)).toMatch(/aria-label="Ambient pressure[^"]*" min="-6"/);
+  });
+
+  it("the Leakage diagnostic shows the energy balance", () => {
+    expect(html(<DiagnosticPanel />)).toMatch(/Energy balance: Output exceeds the known input/);
   });
 });

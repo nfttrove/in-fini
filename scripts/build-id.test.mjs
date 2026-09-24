@@ -38,7 +38,24 @@ describe("build ID", () => {
     expect(computeBuildId(root)).not.toBe(id2);
   });
 
-  it("ignores CRLF line endings and dotfiles, so no environment raises a false alarm", () => {
+  it("hashes non-text files raw: different bytes never collide (review: lossy decode)", () => {
+    const a = fixture();
+    const b = fixture();
+    writeFileSync(join(a, "public", "blob.bin"), Buffer.from([0xff, 0x41, 0xfe, 0x42]));
+    writeFileSync(join(b, "public", "blob.bin"), Buffer.from([0xfe, 0x41, 0xff, 0x42]));
+    expect(computeBuildId(a)).not.toBe(computeBuildId(b));
+  });
+
+  it("stamps shipped dotfiles such as public/.well-known", () => {
+    const root = fixture();
+    mkdirSync(join(root, "public", ".well-known"));
+    writeFileSync(join(root, "public", ".well-known", "security.txt"), "Contact: a");
+    const id = computeBuildId(root);
+    writeFileSync(join(root, "public", ".well-known", "security.txt"), "Contact: b");
+    expect(computeBuildId(root)).not.toBe(id);
+  });
+
+  it("ignores CRLF line endings and OS junk, so no environment raises a false alarm", () => {
     const root = fixture();
     const id = computeBuildId(root);
     writeFileSync(join(root, "src", "App.tsx"), "export default 1;".replace(/;/, ";\r\n"));

@@ -3,10 +3,12 @@
 // .github/workflows/live-drift.yml). It hashes file paths and contents,
 // never dependencies or timestamps, so the same commit gives the same ID
 // in CI, locally and in Bolt's build. Tests are excluded: a test-only
-// commit changes nothing users see. Dotfiles (.DS_Store, …) are skipped and
-// text files are hashed with LF line endings, so an OS or checkout setting
-// cannot raise a false alarm. Dependency versions (package-lock.json) are
-// deliberately outside the stamp.
+// commit changes nothing users see. OS junk (.DS_Store, Thumbs.db) is
+// skipped, but other dotfiles ship (Vite copies public/.well-known/…) and
+// are hashed. Text files are hashed with CRLF turned into LF at the byte
+// level (no decoding, so nothing else can collide); every other file is
+// hashed raw. So an OS or checkout setting cannot raise a false alarm.
+// Dependency versions (package-lock.json) are deliberately outside it.
 //
 //   node scripts/build-id.mjs            -> prints the ID for this checkout
 
@@ -24,10 +26,23 @@ const TOP_FILES = [
 ];
 const TREES = ["src", "public"];
 const EXCLUDE = /\.test\.[cm]?[jt]sx?$/;
+const OS_JUNK = new Set([".DS_Store", "Thumbs.db", "desktop.ini"]);
+const TEXT = /\.(?:[cm]?[jt]sx?|css|html?|svg|json|txt|md|xml|webmanifest|ya?ml)$/i;
+
+/** CRLF -> LF on raw bytes: lossless for everything except the CR itself. */
+function lfBytes(buf) {
+  const out = Buffer.allocUnsafe(buf.length);
+  let n = 0;
+  for (let i = 0; i < buf.length; i++) {
+    if (buf[i] === 0x0d && buf[i + 1] === 0x0a) continue;
+    out[n++] = buf[i];
+  }
+  return out.subarray(0, n);
+}
 
 function walk(dir, out) {
   for (const name of readdirSync(dir)) {
-    if (name.startsWith(".")) continue;
+    if (OS_JUNK.has(name)) continue;
     const p = join(dir, name);
     if (statSync(p).isDirectory()) walk(p, out);
     else out.push(p);
@@ -51,9 +66,7 @@ export function computeBuildId(root) {
     hash.update(rel);
     hash.update("\0");
     const bytes = readFileSync(join(root, rel));
-    // Binary files (they contain NUL bytes) are hashed as-is; text files
-    // with CRLF normalised to LF.
-    hash.update(bytes.includes(0) ? bytes : bytes.toString("utf8").replace(/\r\n/g, "\n"));
+    hash.update(TEXT.test(rel) ? lfBytes(bytes) : bytes);
     hash.update("\0");
   }
   return hash.digest("hex").slice(0, 12);
