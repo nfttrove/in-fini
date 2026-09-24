@@ -72,7 +72,7 @@ const TABS = [
     id: "device",
     label: "Device Model — Power from Vacuum",
     description:
-      "End-to-end prediction combining Casimir gap, rotor drive and Bessel up-conversion, with experimental claim overlay",
+      "End-to-end prediction combining Casimir gap, rotor drive and Bessel up-conversion, with an illustrative 1.3 W claim overlaid",
   },
   {
     id: "diagnostic",

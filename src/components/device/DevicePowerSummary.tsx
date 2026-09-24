@@ -111,7 +111,7 @@ export default function DevicePowerSummary({ p }: Props) {
         <div className="col-span-2 dark-mode:bg-slate-900 light-mode:bg-slate-100 coffee-mode:bg-slate-900 rounded-lg p-4 border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 uppercase tracking-wider">
-              Experimental claim
+              Illustrative claim (no published source)
             </span>
             <span className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500">1.3 W @ 50 nm, 500 kHz</span>
           </div>

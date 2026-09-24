@@ -86,6 +86,9 @@ export function predictDevice(p: DeviceParams): DevicePrediction {
 
   const P_DCE_limit = P_upconverted;
 
+  // Illustrative: no published source for "1.3 W at 50 nm, 500 kHz" has
+  // been found; it dates from the site's first build and is kept as the
+  // yardstick, labelled illustrative wherever it is shown.
   const claimedW = 1.3;
   const shortfall = P_output > 0 ? claimedW / P_output : Infinity;
   const rimAccelerationG = r > 0 ? (v * v) / r / 9.80665 : 0;

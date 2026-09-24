@@ -164,4 +164,10 @@ export const ERRATA: Erratum[] = [
     now: "Both paths take m/s² and convert once. A database migration rescales the phone runs already filed and marks every row with its units; the page rescales any phone row still unmarked, such as one filed by a cached old page.",
     tab: "Replication Network",
   },
+  {
+    title: "An unsourced claim presented as experimental",
+    was: "The Device Model called \"1.3 W at 50 nm, 500 kHz\" \"the experimental claim\", the Lab Worksheet said \"Real claims are often 1 W or higher\", and the Leakage preset was \"Claimed 1.3 W rotor device\". No published source for the figure has been found; it dates from the site's first build.",
+    now: "It is labelled an illustrative claim with no published source, like the charged-sphere preset, and kept as the yardstick; a sourced claim can replace it.",
+    tab: "Device Model, Lab Worksheet, Teacher's Guide, Boundary Atlas, Leakage & Artifact Diagnostic",
+  },
 ];

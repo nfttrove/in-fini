@@ -65,7 +65,7 @@ export default function LabWorksheetPanel() {
 
       <section className="bg-slate-800/30 border border-slate-700/40 p-4 rounded space-y-3">
         <h3 className="text-lg font-semibold text-slate-100">Part 5 – DCE Theoretical Limit (Simulation)</h3>
-        <p className="text-sm text-slate-300"><strong>Objective:</strong> Compare DCE prediction to real claims and understand orders of magnitude.</p>
+        <p className="text-sm text-slate-300"><strong>Objective:</strong> Compare the DCE prediction with the tab's illustrative 1.3 W claim and understand orders of magnitude.</p>
         <div className="space-y-2 text-sm text-slate-300">
           <p><strong>Step 1:</strong> Open the Device Model tab. Leave parameters at defaults ({DEVICE_DEFAULTS.dNm} nm, {DEVICE_DEFAULTS.fmHz / 1e3} kHz).</p>
           <p><strong>Step 2:</strong> What is the predicted power? (Should be ~{DEFAULT_POWER}.)</p>
@@ -78,7 +78,7 @@ export default function LabWorksheetPanel() {
           </ul>
           <p><strong>Step 4:</strong> What is the new predicted power?</p>
           <p><strong>Step 5:</strong> Now push the rotor radius to its maximum too. The ceiling passes the claim. Open the Sanity Checks: what happens to a rotor rim moving that fast, and does the d⁻⁴ law hold at a {DEVICE_PUSHED.dNm} nm gap?</p>
-          <p><strong>Analysis:</strong> Real claims are often 1 W or higher. How many orders of magnitude short are we?</p>
+          <p><strong>Analysis:</strong> The tab's illustrative claim is 1.3 W. How many orders of magnitude short are we?</p>
         </div>
       </section>
 

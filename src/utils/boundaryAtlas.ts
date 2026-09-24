@@ -172,7 +172,7 @@ export function atlasDevice(): AtlasMap {
   }
   return {
     key: "device",
-    title: "Device model — where the 1.3 W claim meets its ceiling",
+    title: "Device model — where the illustrative 1.3 W claim meets its ceiling",
     ...meta,
     cells,
     fixed:

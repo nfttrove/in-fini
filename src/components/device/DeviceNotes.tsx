@@ -58,8 +58,10 @@ export default function DeviceNotes({ p }: Props) {
           .
         </InfoNote>
         <InfoNote variant="warning">
-          The experimental claim "1.3 W at 50 nm, 500 kHz" is overlaid on
-          every sweep as an orange dashed line. At the current settings this
+          The illustrative claim "1.3 W at 50 nm, 500 kHz" is overlaid on
+          every sweep as an orange dashed line. It has no published source —
+          it stands in for the kind of figure a vacuum-energy device might be
+          sold on, and a sourced claim can replace it. At the current settings this
           model predicts roughly {p.P_output.toExponential(2)} W — a
           shortfall of {p.shortfall.toExponential(2)}× relative to the claim;
           at the defaults the (v/c)² factor alone costs{" "}

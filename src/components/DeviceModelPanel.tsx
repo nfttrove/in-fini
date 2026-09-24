@@ -50,7 +50,7 @@ export default function DeviceModelPanel() {
         <p className="dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
           <span className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">Try this:</span>{" "}
           Wiggle every slider to maximize the predicted output. Compare it
-          to what real-world claims advertise.
+          with the illustrative 1.3 W claim drawn on every chart.
         </p>
       </PlainExplainer>
 

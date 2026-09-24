@@ -79,7 +79,7 @@ export default function TeacherGuidePanel() {
         </p>
         <ul className="list-disc pl-6 space-y-1 text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">
           <li>Predicted power: {formatPower(PUSHED.P_output)}</li>
-          <li>Claimed power: 1.3 W (Watts)</li>
+          <li>Illustrative claim: 1.3 W (no published source; a stand-in yardstick)</li>
           <li>Shortfall: {PUSHED.shortfall.toExponential(1)}×. That's not an oopsie, it's a reality check.</li>
         </ul>
         <p className="text-sm dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300">

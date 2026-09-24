@@ -14,6 +14,7 @@ import { formatDeltaG } from "./utils/format";
 import ThrustPresetPicker from "./components/thrust/ThrustPresetPicker";
 import PresetCard from "./components/thrust/PresetCard";
 import TeacherGuidePanel from "./components/TeacherGuidePanel";
+import LabWorksheetPanel from "./components/LabWorksheetPanel";
 import NetworkPanel from "./components/NetworkPanel";
 import ThrustDiagnosticPanel from "./components/ThrustDiagnosticPanel";
 import DiagnosticPanel from "./components/DiagnosticPanel";
@@ -295,5 +296,17 @@ describe("errata guards: verdicts and copy say only what the model computes", ()
     // Out of slider range, but the check must follow fₘ, not a fixed 500 kHz.
     const narrow = { ...predictDevice(DEVICE_DEFAULTS), gammaHz: 2e6 };
     expect(html(<DeviceSanity p={narrow} Q={1e4} beta={0.3} fmHz={5e6} />)).toContain("outside the linewidth");
+  });
+});
+
+describe("errata guards: the 1.3 W claim is labelled illustrative", () => {
+  it("no page presents the unsourced figure as an experimental or typical real claim", () => {
+    const dev = html(<DeviceModelPanel />);
+    expect(dev).not.toMatch(/experimental claim|real-world claims advertise/i);
+    expect(dev).toContain("Illustrative claim (no published source)");
+    expect(html(<LabWorksheetPanel />)).not.toMatch(/Real claims are often|to real claims/);
+    expect(html(<TeacherGuidePanel />)).not.toContain("Claimed power: 1.3 W");
+    expect(appSrc).not.toMatch(/experimental claim/i);
+    expect(html(<BoundaryAtlasPanel />)).toContain("illustrative 1.3 W claim");
   });
 });
