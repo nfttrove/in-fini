@@ -179,9 +179,9 @@ export default function NetworkPanel() {
         <p className="mt-2 dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
           <span className="font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200">Why it matters:</span>{" "}
           N independent rigs measuring the same effect at the same time can in
-          principle average their noise down to about median/√N. Once the
-          census is populated, that is the best case to plan a coordinated
-          replication round against — not what any single table can see.
+          principle average their noise down to about median/√N: the best
+          case for a coordinated replication round, not what any single table
+          can see.
           No location is collected, ever.
         </p>
         {!supabaseConfigured && (
@@ -236,7 +236,7 @@ export default function NetworkPanel() {
             <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-amber-600 mb-2 leading-relaxed">
               No motion sensors (desktop, or permission denied)? Paste any
               accelerometer CSV — time (s), acceleration (m/s²) — from any
-              logging app. Same analysis, same fleet.
+              logging app. Same analysis.
             </p>
             <textarea
               value={csvText}

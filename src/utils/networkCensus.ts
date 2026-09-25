@@ -26,9 +26,9 @@ interface UnitRow {
 
 /**
  * Phone runs filed before the units fix were converted to milli-g twice
- * (≈ 102× too high). The database rescales them and marks them 'milli-g'
- * (migration 20260924150000); any phone row still marked legacy — say one
- * filed by a cached old page — is rescaled here on read. CSV runs were
+ * (≈ 102× too high). Migration 20260924150000 was to rescale them in the
+ * database but was probably never applied (the database was shut down), so
+ * any phone row marked legacy is rescaled here on read. CSV runs were
  * converted once and are left alone.
  */
 export function normalizeRunUnits<T extends UnitRow>(r: T): T {

@@ -149,7 +149,7 @@ export const ERRATA: Erratum[] = [
   {
     title: "Units and labels",
     was: "The Replication Network labelled acceleration in milli-g as \"mΔg\" (Δg is grams-equivalent weight everywhere else) and called every filed run an \"independent rig\"; the g² panel said \"λ²/κ gives nₚ\" and always described \"the 20 mK mode\"; Experiment Design printed \"impossible\" for a channel that is simply zero; the Device Model's sideband check compared the linewidth with a fixed 500 kHz whatever the drive, and labelled a model-vs-claim ratio \"Energy conservation\".",
-    now: "Census values are labelled milli-g and N counts filed runs; nₚ = (λ/κ)² at the live temperature; a zero channel reads \"no limit\"; the sideband check uses the live drive frequency; the claim check is labelled as the shortfall it shows (1.3 W ÷ predicted).",
+    now: "Census values are labelled milli-g; nₚ = (λ/κ)² at the live temperature; a zero channel reads \"no limit\"; the sideband check uses the live drive frequency; the claim check is labelled as the shortfall it shows (1.3 W ÷ predicted).",
     tab: "Replication Network, Circuit QED, Experiment Design, Device Model",
   },
   {
@@ -160,8 +160,8 @@ export const ERRATA: Erratum[] = [
   },
   {
     title: "An unsourced claim presented as experimental",
-    was: "The Device Model called \"1.3 W at 50 nm, 500 kHz\" \"the experimental claim\", the Lab Worksheet said \"Real claims are often 1 W or higher\", and the Leakage preset was \"Claimed 1.3 W rotor device\". No published source for the figure has been found; it dates from the site's first build.",
+    was: "The Device Model called \"1.3 W at 50 nm, 500 kHz\" \"the experimental claim\", and the Lab Worksheet said \"Real claims are often 1 W or higher\". No published source for the figure has been found; it dates from the site's first build.",
     now: "It is labelled an illustrative claim with no published source, like the charged-sphere preset, and kept as the yardstick; a sourced claim can replace it.",
-    tab: "Device Model, Lab Worksheet, Teacher's Guide, Boundary Atlas, Leakage & Artifact Diagnostic",
+    tab: "Device Model, Lab Worksheet, Teacher's Guide, Boundary Atlas",
   },
 ];

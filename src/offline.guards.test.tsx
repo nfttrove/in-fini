@@ -4,6 +4,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import ClaimRegistryPanel from "./components/ClaimRegistryPanel";
 import NetworkPanel from "./components/NetworkPanel";
 import networkPanelSrc from "./components/NetworkPanel.tsx?raw";
+import type { ComponentType } from "react";
 
 /**
  * The site's Supabase project was shut down in September 2026. These fail if
@@ -61,7 +62,19 @@ describe("the database is offline", () => {
     expect(networkPanelSrc).toMatch(/\{supabaseConfigured && \(\s*<button\s+onClick=\{file\}/);
   });
 
-  it("no copy invites visitors to file, save or join, or claims the database was fixed", () => {
+  it("no tab invites visitors to file, save, pre-register or join the fleet", () => {
+    const panels = import.meta.glob<{ default: ComponentType }>("./components/*Panel.tsx", { eager: true });
+    expect(Object.keys(panels).length).toBeGreaterThanOrEqual(20);
+    for (const [path, mod] of Object.entries(panels)) {
+      // The Errata tab quotes the old copy as history.
+      if (path.endsWith("/ErrataPanel.tsx")) continue;
+      const text = html(<mod.default />).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+      const hits = text.match(/[^.]{0,60}\b(file (it|your|this)|filed runs|pre-register (it|this|your)|same fleet|join the (fleet|census|record)|census is populated|saved presets|log run)\b[^.]{0,40}/gi);
+      expect(hits, path).toBeNull();
+    }
+  });
+
+  it("retired phrases stay out of the source, and no copy claims the database was fixed", () => {
     for (const phrase of [
       "file it in the Claim Registry",
       "File it in the Claim Registry",
@@ -75,6 +88,11 @@ describe("the database is offline", () => {
       "database migration rescales",
       "works for the cloud presets",
       "(see the Claim Registry)",
+      "File your measured force in the Claim Registry",
+      "same fleet",
+      "Once the census is populated",
+      "Claimed 1.3 W rotor device",
+      "N counts filed runs",
     ]) {
       expect(SOURCE, phrase).not.toContain(phrase);
     }

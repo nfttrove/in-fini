@@ -208,7 +208,7 @@ export default function AcousticCasimirPanel() {
               <li>Tone ON vs OFF gives a difference, not yet radiation pressure: table vibration, acoustic streaming (the steady airflow loud sound drives), the speaker's magnet and its heating all switch on with the tone.</li>
               <li>Null tests that pull them apart: (1) swap the reflecting plate for an absorbing one of the same mass and area (foam-faced) — radiation pressure should roughly halve (2u → u) while vibration and magnetic pull stay the same; (2) put a solid barrier in the sound path with the tone on — whatever the scale still reads is not sound; (3) raise the level by 3 dB — radiation pressure doubles (∝ p²), but so does streaming, which is why (1) matters.</li>
               <li>Expect factors of a few either way from near-field and standing-wave effects: the plane-wave numbers are an estimate, not a floor. The Larraza–Denardo two-plate geometry (Phys. Lett. A 248, 151, 1998) — the real "acoustic Casimir" — needs more care still.</li>
-              <li>File your measured force in the Claim Registry with "sound" as the artifact — same rules as everything else.</li>
+              <li>Compare your measured force with the prediction on this tab, once the null tests above have pulled the artifacts apart.</li>
             </ul>
           </Panel>
         </div>
