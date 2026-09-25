@@ -80,8 +80,9 @@ describe("the database is offline", () => {
       "sensor calibration traceable to a standard, a pre-registered analysis plan, A/B null tests with the effect source off, and someone trying their hardest to prove you wrong.",
       "pre-register the setup and budget before powering on",
       "Which contributes more:",
+      "and a jewelry scale can register it, once it survives the null tests.", // a scale registering a force
     ]);
-    const VOCAB = /\b(fil(e|es|ed|ing)|submit\w*|sav(e|es|ed|ing)|join\w*|contribut\w*|pre-?regist\w*|census|fleet|upload\w*|shared|sharing|public record)\b/i;
+    const VOCAB = /\b(fil(e|es|ed|ing)|submit\w*|sav(e|es|ed|ing)|join\w*|contribut\w*|pre-?regist\w*|census|fleet|upload\w*|shared|sharing|public record|filings|log (this )?run|(share|publish|register|send|post|add) (it|this|yours?|the result)\b)\b/i;
     const decode = (x: string) =>
       x.replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
     // Inline tags sit inside a sentence; every other tag ends one.
