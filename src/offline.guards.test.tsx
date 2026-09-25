@@ -65,32 +65,38 @@ describe("the database is offline", () => {
   });
 
   it("no tab invites visitors to file, submit, save, pre-register or join", () => {
-    // Broad on purpose: any filing/joining vocabulary fails unless it is one
-    // of the sentences below, each checked to be offline notes or general
-    // lab advice. Covers each tab's first render (text plus placeholder,
-    // title and aria-label), the tab descriptions and the Errata intro; the
-    // Errata entries are history and are checked by the phrase list below.
-    const ALLOWED = [
-      "The public registry is offline",
-      "The census is offline",
-      "Calibration Census 001",
-      "a pre-registered analysis plan",
-      "pre-register the setup and budget",
-      "contributes more",
-      "nothing is uploaded",
-    ];
+    // Broad on purpose: any filing/joining vocabulary fails unless the whole
+    // sentence is one of these, each an offline note or general lab advice.
+    // Covers each tab's first render (text plus placeholder, title and
+    // aria-label), the tab descriptions, the Errata intro and every
+    // erratum's "now"; only the "was" history is skipped.
+    const ALLOWED = new Set([
+      "The public registry is offline, so claims can no longer be filed or pre-registered.",
+      "The census is offline, so runs can no longer be filed or compared with other rigs.",
+      "Calibration Census 001.", // the Replication Network heading
+      "Calibration Census 001:", // its tab description
+      "Census values are labelled milli-g;", // an erratum's "now"
+      "nothing is uploaded.",
+      "sensor calibration traceable to a standard, a pre-registered analysis plan, A/B null tests with the effect source off, and someone trying their hardest to prove you wrong.",
+      "pre-register the setup and budget before powering on",
+      "Which contributes more:",
+    ]);
     const VOCAB = /\b(fil(e|es|ed|ing)|submit\w*|sav(e|es|ed|ing)|join\w*|contribut\w*|pre-?regist\w*|census|fleet|upload\w*|shared|sharing|public record)\b/i;
+    const decode = (x: string) =>
+      x.replace(/&quot;/g, '"').replace(/&#x27;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+    // Inline tags sit inside a sentence; every other tag ends one.
+    const INLINE = /<\/?(?:strong|em|b|i|a|span|code|sub|sup|br)\b[^>]*>/g;
     const texts: [string, string][] = [];
     const panels = import.meta.glob<{ default: ComponentType }>("./components/*Panel.tsx", { eager: true });
     expect(Object.keys(panels).length).toBeGreaterThanOrEqual(20);
     for (const [path, mod] of Object.entries(panels)) {
-      const page = html(<mod.default />).replace(/&quot;/g, '"').replace(/&amp;/g, "&");
-      const attrs = [...page.matchAll(/\s(?:placeholder|title|aria-label)="([^"]*)"/g)].map((m) => m[1]);
-      let text = page.replace(/<[^>]+>/g, " ") + " . " + attrs.join(" . ");
+      const page = html(<mod.default />);
+      const attrs = [...page.matchAll(/\s(?:placeholder|title|aria-label)="([^"]*)"/g)].map((m) => decode(m[1]));
+      let text = decode(page.replace(INLINE, " ").replace(/<[^>]+>/g, " . ")) + " . " + attrs.join(" . ");
       if (path.endsWith("/ErrataPanel.tsx")) {
         // Longest first, so a short tab name can't break a longer entry's match.
-        const parts = ERRATA.flatMap((e) => [e.title, e.was, e.now, e.tab]).sort((x, y) => y.length - x.length);
-        for (const v of parts) text = text.split(v).join(" . ");
+        const history = ERRATA.flatMap((e) => [e.title, e.was, e.tab]).sort((x, y) => y.length - x.length);
+        for (const v of history) text = text.split(v).join(" . ");
       }
       texts.push([path, text.replace(/\s+/g, " ")]);
     }
@@ -98,10 +104,9 @@ describe("the database is offline", () => {
     expect(texts.length).toBeGreaterThanOrEqual(40);
     const hits: string[] = [];
     for (const [where, text] of texts) {
-      for (const sentence of text.split(/(?<=[.!?:;—])\s+/)) {
-        if (VOCAB.test(sentence) && !ALLOWED.some((a) => sentence.includes(a))) {
-          hits.push(`${where}: ${sentence.trim().slice(0, 160)}`);
-        }
+      for (const raw of text.split(/(?<=[.!?:;—])\s+|\s*·\s*/)) {
+        const sentence = raw.replace(/\s+([.;:])/g, "$1").trim();
+        if (VOCAB.test(sentence) && !ALLOWED.has(sentence)) hits.push(`${where}: ${sentence}`);
       }
     }
     expect(hits).toEqual([]);
