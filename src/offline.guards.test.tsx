@@ -5,6 +5,8 @@ import ClaimRegistryPanel from "./components/ClaimRegistryPanel";
 import NetworkPanel from "./components/NetworkPanel";
 import networkPanelSrc from "./components/NetworkPanel.tsx?raw";
 import type { ComponentType } from "react";
+import appSrc from "./App.tsx?raw";
+import { ERRATA } from "./data/errata";
 
 /**
  * The site's Supabase project was shut down in September 2026. These fail if
@@ -62,16 +64,47 @@ describe("the database is offline", () => {
     expect(networkPanelSrc).toMatch(/\{supabaseConfigured && \(\s*<button\s+onClick=\{file\}/);
   });
 
-  it("no tab invites visitors to file, save, pre-register or join the fleet", () => {
+  it("no tab invites visitors to file, submit, save, pre-register or join", () => {
+    // Broad on purpose: any filing/joining vocabulary fails unless it is one
+    // of the sentences below, each checked to be offline notes or general
+    // lab advice. Covers each tab's first render (text plus placeholder,
+    // title and aria-label), the tab descriptions and the Errata intro; the
+    // Errata entries are history and are checked by the phrase list below.
+    const ALLOWED = [
+      "The public registry is offline",
+      "The census is offline",
+      "Calibration Census 001",
+      "a pre-registered analysis plan",
+      "pre-register the setup and budget",
+      "contributes more",
+      "nothing is uploaded",
+    ];
+    const VOCAB = /\b(fil(e|es|ed|ing)|submit\w*|sav(e|es|ed|ing)|join\w*|contribut\w*|pre-?regist\w*|census|fleet|upload\w*|shared|sharing|public record)\b/i;
+    const texts: [string, string][] = [];
     const panels = import.meta.glob<{ default: ComponentType }>("./components/*Panel.tsx", { eager: true });
     expect(Object.keys(panels).length).toBeGreaterThanOrEqual(20);
     for (const [path, mod] of Object.entries(panels)) {
-      // The Errata tab quotes the old copy as history.
-      if (path.endsWith("/ErrataPanel.tsx")) continue;
-      const text = html(<mod.default />).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-      const hits = text.match(/[^.]{0,60}\b(file (it|your|this)|filed runs|pre-register (it|this|your)|same fleet|join the (fleet|census|record)|census is populated|saved presets|log run)\b[^.]{0,40}/gi);
-      expect(hits, path).toBeNull();
+      const page = html(<mod.default />).replace(/&quot;/g, '"').replace(/&amp;/g, "&");
+      const attrs = [...page.matchAll(/\s(?:placeholder|title|aria-label)="([^"]*)"/g)].map((m) => m[1]);
+      let text = page.replace(/<[^>]+>/g, " ") + " . " + attrs.join(" . ");
+      if (path.endsWith("/ErrataPanel.tsx")) {
+        // Longest first, so a short tab name can't break a longer entry's match.
+        const parts = ERRATA.flatMap((e) => [e.title, e.was, e.now, e.tab]).sort((x, y) => y.length - x.length);
+        for (const v of parts) text = text.split(v).join(" . ");
+      }
+      texts.push([path, text.replace(/\s+/g, " ")]);
     }
+    for (const m of appSrc.matchAll(/description:\s*"([^"]+)"/g)) texts.push(["App.tsx tab description", m[1]]);
+    expect(texts.length).toBeGreaterThanOrEqual(40);
+    const hits: string[] = [];
+    for (const [where, text] of texts) {
+      for (const sentence of text.split(/(?<=[.!?:;—])\s+/)) {
+        if (VOCAB.test(sentence) && !ALLOWED.some((a) => sentence.includes(a))) {
+          hits.push(`${where}: ${sentence.trim().slice(0, 160)}`);
+        }
+      }
+    }
+    expect(hits).toEqual([]);
   });
 
   it("retired phrases stay out of the source, and no copy claims the database was fixed", () => {
