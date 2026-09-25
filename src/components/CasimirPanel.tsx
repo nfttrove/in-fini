@@ -3,7 +3,6 @@ import CasimirControls from "./casimir/CasimirControls";
 import CasimirMetrics from "./casimir/CasimirMetrics";
 import CasimirChart from "./casimir/CasimirChart";
 import CasimirNotes from "./casimir/CasimirNotes";
-import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
 
 export default function CasimirPanel() {
@@ -43,19 +42,7 @@ export default function CasimirPanel() {
 
       <CasimirChart sepNm={separation} areaM2={areaM2} />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <CasimirNotes />
-        </div>
-        <PresetBar
-          panel="casimir"
-          currentParams={{ separation, areaMm2 }}
-          onLoad={(p) => {
-            if (typeof p.separation === "number") setSeparation(p.separation);
-            if (typeof p.areaMm2 === "number") setAreaMm2(p.areaMm2);
-          }}
-        />
-      </div>
+      <CasimirNotes />
     </div>
   );
 }

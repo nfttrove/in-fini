@@ -4,10 +4,8 @@ import DiagnosticControls from "./diagnostic/DiagnosticControls";
 import DiagnosticBudget from "./diagnostic/DiagnosticBudget";
 import DiagnosticVerdict from "./diagnostic/DiagnosticVerdict";
 import DiagnosticSweeps from "./diagnostic/DiagnosticSweeps";
-import DiagnosticRunsLog from "./diagnostic/DiagnosticRunsLog";
 import DiagnosticReport from "./diagnostic/DiagnosticReport";
 import DiagnosticNotes from "./diagnostic/DiagnosticNotes";
-import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
 import { LeakageParams, computeBudget, energyBalance } from "../utils/leakage";
 import EnergyBalanceCard from "./diagnostic/EnergyBalanceCard";
@@ -45,11 +43,6 @@ export default function DiagnosticPanel() {
     value: LeakageParams[K]
   ) => setParams((prev) => ({ ...prev, [key]: value }));
 
-  const paramsForSave = useMemo(
-    () => ({ ...params }) as Record<string, number>,
-    [params]
-  );
-
   return (
     <div className="space-y-6">
       <PlainExplainer title="Is that extra power real, or just a leak?" status={explainerStatus}>
@@ -82,30 +75,8 @@ export default function DiagnosticPanel() {
 
       <DiagnosticSweeps base={params} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3 space-y-6">
-          <DiagnosticReport budget={budget} params={params} />
-          <DiagnosticNotes />
-          <DiagnosticRunsLog params={paramsForSave} budget={budget} />
-        </div>
-        <div className="lg:col-span-2">
-          <PresetBar
-            panel="diagnostic"
-            currentParams={paramsForSave}
-            onLoad={(p) => {
-              const next: LeakageParams = { ...params };
-              (Object.keys(DEFAULT_PARAMS) as (keyof LeakageParams)[]).forEach(
-                (k) => {
-                  if (typeof p[k] === "number") {
-                    (next[k] as number) = p[k] as number;
-                  }
-                }
-              );
-              setParams(next);
-            }}
-          />
-        </div>
-      </div>
+      <DiagnosticReport budget={budget} params={params} />
+      <DiagnosticNotes />
     </div>
   );
 }

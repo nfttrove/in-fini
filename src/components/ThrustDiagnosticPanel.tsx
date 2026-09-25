@@ -8,7 +8,6 @@ import ThrustReport from "./thrust/ThrustReport";
 import ThrustNotes from "./thrust/ThrustNotes";
 import ThrustPresetPicker from "./thrust/ThrustPresetPicker";
 import ThrustDceLimit from "./thrust/ThrustDceLimit";
-import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
 import GoverningEquation from "./ui/GoverningEquation";
 import ArtifactBudgetGate from "./diagnostic/ArtifactBudgetGate";
@@ -16,7 +15,6 @@ import {
   ThrustParams,
   computeThrustBudget,
   dceThrustLimitG,
-  mergeSavedThrustParams,
 } from "../utils/thrustLeakage";
 
 const DEFAULT_PARAMS: ThrustParams = {
@@ -56,11 +54,6 @@ export default function ThrustDiagnosticPanel() {
     value: ThrustParams[K]
   ) => setParams((prev) => ({ ...prev, [key]: value }));
 
-  const paramsForSave = useMemo(
-    () => ({ ...params }) as Record<string, number>,
-    [params]
-  );
-
   return (
     <div className="space-y-6">
       <PlainExplainer
@@ -98,19 +91,8 @@ export default function ThrustDiagnosticPanel() {
 
       <ThrustSweeps base={params} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3 space-y-6">
-          <ThrustReport budget={budget} params={params} />
-          <ThrustNotes />
-        </div>
-        <div className="lg:col-span-2">
-          <PresetBar
-            panel="thrust"
-            currentParams={paramsForSave}
-            onLoad={(p) => setParams(mergeSavedThrustParams(params, p))}
-          />
-        </div>
-      </div>
+      <ThrustReport budget={budget} params={params} />
+      <ThrustNotes />
 
       <div className="mt-8 pt-8 border-t dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-amber-700">
         <h3 className="text-lg font-semibold dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-amber-200 mb-4">

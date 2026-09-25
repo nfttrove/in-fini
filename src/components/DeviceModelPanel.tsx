@@ -6,7 +6,6 @@ import DeviceSweepGap from "./device/DeviceSweepGap";
 import DeviceSweepBeta from "./device/DeviceSweepBeta";
 import DeviceSanity from "./device/DeviceSanity";
 import DeviceNotes from "./device/DeviceNotes";
-import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
 import GoverningEquation from "./ui/GoverningEquation";
 import { DEVICE_DEFAULTS } from "./device/defaults";
@@ -83,24 +82,7 @@ export default function DeviceModelPanel() {
         <DeviceSanity p={prediction} Q={Q} beta={beta} fmHz={fmKHz * 1e3} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <DeviceNotes p={prediction} />
-        </div>
-        <PresetBar
-          panel="device"
-          currentParams={{ dNm, fmKHz, beta, rotorRadiusNm, Q, areaMm2 }}
-          onLoad={(p) => {
-            if (typeof p.dNm === "number") setDNm(p.dNm);
-            if (typeof p.fmKHz === "number") setFmKHz(p.fmKHz);
-            if (typeof p.beta === "number") setBeta(p.beta);
-            if (typeof p.rotorRadiusNm === "number")
-              setRotorRadiusNm(p.rotorRadiusNm);
-            if (typeof p.Q === "number") setQ(p.Q);
-            if (typeof p.areaMm2 === "number") setAreaMm2(p.areaMm2);
-          }}
-        />
-      </div>
+      <DeviceNotes p={prediction} />
     </div>
   );
 }

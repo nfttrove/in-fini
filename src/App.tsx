@@ -96,7 +96,7 @@ const TABS = [
     id: "registry",
     label: "Claim Registry",
     description:
-      "File an anomalous power or thrust claim together with its computed artifact budget — a public, reproducible record",
+      "Put an anomalous power or thrust claim through its computed artifact budget, reproducible from the parameters",
   },
   {
     id: "design",
@@ -114,7 +114,7 @@ const TABS = [
     id: "network",
     label: "Replication Network",
     description:
-      "Calibration Census 001: record 60 seconds of your rig's environment and add its noise floor to a census for planning coordinated replications",
+      "Calibration Census 001: record 60 seconds of your rig's environment and see its noise floor, mains hum and loudest vibration line",
   },
   {
     id: "acoustic",

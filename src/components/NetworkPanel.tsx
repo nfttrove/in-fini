@@ -173,7 +173,7 @@ export default function NetworkPanel() {
           Before a crowd can test an extraordinary claim, it has to know its
           own eyes. This campaign is pure calibration: put your phone flat on
           the table you'd use for an experiment, record 60 seconds of its
-          accelerometer, and file what your corner of the physical world
+          accelerometer, and see what your corner of the physical world
           sounds like — noise floor, mains hum, the loudest vibration line.
         </p>
         <p className="mt-2 dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
@@ -184,6 +184,12 @@ export default function NetworkPanel() {
           replication round against — not what any single table can see.
           No location is collected, ever.
         </p>
+        {!supabaseConfigured && (
+          <p className="mt-2 dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
+            The census is offline, so runs can no longer be filed or compared
+            with other rigs. Your own profile still computes here.
+          </p>
+        )}
       </PlainExplainer>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -191,7 +197,11 @@ export default function NetworkPanel() {
           <ol className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700 space-y-1.5 mb-4 list-decimal pl-4">
             <li>Place the phone flat on the experiment table. Don't touch it.</li>
             <li>Press Record and let it run the full 60 seconds.</li>
-            <li>Check the profile it extracts, give your rig a label, file it.</li>
+            <li>
+              {supabaseConfigured
+                ? "Check the profile it extracts, give your rig a label, file it."
+                : "Check the profile it extracts."}
+            </li>
           </ol>
           <button
             onClick={startRecording}
@@ -206,19 +216,21 @@ export default function NetworkPanel() {
             {recording ? `Recording… ${Math.max(secondsLeft, 0)}s — hands off` : "Record 60 seconds"}
           </button>
 
-          <div className="mt-4">
-            <label className="block text-sm dark-mode:text-slate-400 light-mode:text-slate-700 coffee-mode:text-amber-700 mb-1.5">
-              Rig label (optional, ≤ 40 chars)
-            </label>
-            <input
-              type="text"
-              value={deviceLabel}
-              onChange={(e) => setDeviceLabel(e.target.value)}
-              placeholder='e.g. "school lab, 2nd floor"'
-              maxLength={40}
-              className="w-full dark-mode:bg-slate-900 light-mode:bg-slate-100 coffee-mode:bg-slate-900 dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-amber-100 rounded-lg px-3 py-2 text-sm border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700 focus:border-cyan-500 focus:outline-none"
-            />
-          </div>
+          {supabaseConfigured && (
+            <div className="mt-4">
+              <label className="block text-sm dark-mode:text-slate-400 light-mode:text-slate-700 coffee-mode:text-amber-700 mb-1.5">
+                Rig label (optional, ≤ 40 chars)
+              </label>
+              <input
+                type="text"
+                value={deviceLabel}
+                onChange={(e) => setDeviceLabel(e.target.value)}
+                placeholder='e.g. "school lab, 2nd floor"'
+                maxLength={40}
+                className="w-full dark-mode:bg-slate-900 light-mode:bg-slate-100 coffee-mode:bg-slate-900 dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-amber-100 rounded-lg px-3 py-2 text-sm border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700 focus:border-cyan-500 focus:outline-none"
+              />
+            </div>
+          )}
 
           <div className="mt-4 pt-4 border-t dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700">
             <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-amber-600 mb-2 leading-relaxed">
@@ -283,19 +295,15 @@ export default function NetworkPanel() {
                     {percentile > 0.5 ? " — your table is one of the calm ones; the fleet wants your floor." : " — a noisy corner; every rig counts anyway (√N does not care)."}
                   </p>
                 )}
-                <button
-                  onClick={file}
-                  disabled={busy || !supabaseConfigured}
-                  className="mt-4 w-full bg-cyan-600 hover:bg-cyan-700 disabled:opacity-40 text-white rounded-lg px-3 py-2.5 text-sm font-medium flex items-center justify-center gap-2 transition-colors"
-                >
-                  <Globe2 className="w-4 h-4" />
-                  File into the census
-                </button>
-                {!supabaseConfigured && (
-                  <p className="text-xs text-red-400 bg-red-900/20 rounded px-3 py-2 mt-2">
-                    Cloud census unavailable (Supabase not configured) — your
-                    profile still computes locally.
-                  </p>
+                {supabaseConfigured && (
+                  <button
+                    onClick={file}
+                    disabled={busy}
+                    className="mt-4 w-full bg-cyan-600 hover:bg-cyan-700 disabled:opacity-40 text-white rounded-lg px-3 py-2.5 text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <Globe2 className="w-4 h-4" />
+                    File into the census
+                  </button>
                 )}
               </>
             ) : (
@@ -305,39 +313,41 @@ export default function NetworkPanel() {
             )}
           </Panel>
 
-          <Panel title="3 · The fleet">
-            {fleetLoading && fleet.length === 0 && supabaseConfigured ? (
-              <Skeleton rows={4} />
-            ) : stats && stats.n > 0 ? (
-              <>
-                <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4 mb-4">
-                  <div className="text-xs dark-mode:text-cyan-200 light-mode:text-cyan-900 coffee-mode:text-cyan-200 leading-relaxed">
-                    {collectiveBoundStatement(stats)}
+          {supabaseConfigured && (
+            <Panel title="3 · The fleet">
+              {fleetLoading && fleet.length === 0 && supabaseConfigured ? (
+                <Skeleton rows={4} />
+              ) : stats && stats.n > 0 ? (
+                <>
+                  <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4 mb-4">
+                    <div className="text-xs dark-mode:text-cyan-200 light-mode:text-cyan-900 coffee-mode:text-cyan-200 leading-relaxed">
+                      {collectiveBoundStatement(stats)}
+                    </div>
                   </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <MetricCard label="Runs filed" value={String(stats.n)} sub="census runs; not deduplicated by rig" />
-                  <MetricCard
-                    label="Collective floor"
-                    value={stats.n >= 5 ? `${stats.collectiveFloor.toExponential(1)} milli-g` : "—"}
-                    sub={stats.n >= 5 ? "median / √N, N = runs filed (one rig can file several) · best case" : "needs ≥ 5 runs"}
-                  />
-                  <MetricCard label="Quietest run" value={`${stats.quietestNoise.toExponential(1)} milli-g`} />
-                  <MetricCard label="Median run" value={`${stats.medianNoise.toExponential(1)} milli-g`} />
-                </div>
-                <div className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700">
-                  Mains split: {stats.mains50} × 50 Hz · {stats.mains60} × 60 Hz
-                  {stats.mainsNone > 0 ? ` · ${stats.mainsNone} clean` : ""}
-                </div>
-              </>
-            ) : (
-              <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 italic">
-                {supabaseConfigured
-                  ? "No census runs filed yet. The first 60 seconds are yours."
-                  : "Fleet view needs the configured backend."}
-              </p>
-            )}
-          </Panel>
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <MetricCard label="Runs filed" value={String(stats.n)} sub="census runs; not deduplicated by rig" />
+                    <MetricCard
+                      label="Collective floor"
+                      value={stats.n >= 5 ? `${stats.collectiveFloor.toExponential(1)} milli-g` : "—"}
+                      sub={stats.n >= 5 ? "median / √N, N = runs filed (one rig can file several) · best case" : "needs ≥ 5 runs"}
+                    />
+                    <MetricCard label="Quietest run" value={`${stats.quietestNoise.toExponential(1)} milli-g`} />
+                    <MetricCard label="Median run" value={`${stats.medianNoise.toExponential(1)} milli-g`} />
+                  </div>
+                  <div className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700">
+                    Mains split: {stats.mains50} × 50 Hz · {stats.mains60} × 60 Hz
+                    {stats.mainsNone > 0 ? ` · ${stats.mainsNone} clean` : ""}
+                  </div>
+                </>
+              ) : (
+                <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 italic">
+                  {supabaseConfigured
+                    ? "No census runs filed yet. The first 60 seconds are yours."
+                    : "Fleet view needs the configured backend."}
+                </p>
+              )}
+            </Panel>
+          )}
         </div>
       </div>
     </div>

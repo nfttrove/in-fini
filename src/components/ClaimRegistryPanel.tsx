@@ -224,19 +224,18 @@ export default function ClaimRegistryPanel() {
 
   return (
     <div className="space-y-6">
-      <PlainExplainer title="File a claim. Get a budget. Join the record.">
+      <PlainExplainer title="State a claim. Get its budget.">
         <p>
           The internet is full of extraordinary claims — over-unity generators,
           weight-loss thrusters — that have yet to survive contact with a leakage
-          budget. This registry makes that contact permanent: state the claim,
-          state the setup, and the app files both together with the artifact
-          budget it computes. Anyone can reproduce the verdict from the
+          budget. State the claim and the setup, and the app computes the
+          artifact budget they face. Anyone can reproduce the verdict from the
           parameters. No budget, no mystery.
         </p>
         <p className="mt-2 dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
           The sliders below expose the channels that usually decide the
           verdict; the full 14/17-knob versions live in the two diagnostic
-          tabs. Claims are public and cannot be deleted — file honestly.
+          tabs.
         </p>
       </PlainExplainer>
 
@@ -358,58 +357,61 @@ export default function ClaimRegistryPanel() {
               </>
             )}
 
-            <div>
-              <label className="block text-sm dark-mode:text-slate-400 light-mode:text-slate-700 coffee-mode:text-amber-700 mb-2">
-                Claim title
-              </label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder='e.g. "Desktop Casimir generator, 1.3 W"'
-                maxLength={80}
-                className="w-full dark-mode:bg-slate-900 light-mode:bg-slate-100 coffee-mode:bg-slate-900 dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-amber-100 rounded-lg px-3 py-2 text-sm border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700 focus:border-cyan-500 focus:outline-none"
-              />
-            </div>
+            {supabaseConfigured ? (
+              <>
+                <div>
+                  <label className="block text-sm dark-mode:text-slate-400 light-mode:text-slate-700 coffee-mode:text-amber-700 mb-2">
+                    Claim title
+                  </label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder='e.g. "Desktop Casimir generator, 1.3 W"'
+                    maxLength={80}
+                    className="w-full dark-mode:bg-slate-900 light-mode:bg-slate-100 coffee-mode:bg-slate-900 dark-mode:text-slate-100 light-mode:text-slate-900 coffee-mode:text-amber-100 rounded-lg px-3 py-2 text-sm border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700 focus:border-cyan-500 focus:outline-none"
+                  />
+                </div>
 
-            <button
-              onClick={handleFile}
-              disabled={busy || !supabaseConfigured}
-              className="w-full bg-cyan-600 hover:bg-cyan-700 disabled:dark-mode:bg-slate-700 disabled:light-mode:bg-slate-300 disabled:coffee-mode:bg-slate-700 disabled:dark-mode:text-slate-500 text-white disabled:light-mode:text-slate-600 rounded-lg px-3 py-2.5 text-sm font-medium flex items-center justify-center gap-2 transition-colors"
-            >
-              <Send className="w-4 h-4" />
-              File this claim in the public registry
-            </button>
+                <button
+                  onClick={handleFile}
+                  disabled={busy || !supabaseConfigured}
+                  className="w-full bg-cyan-600 hover:bg-cyan-700 disabled:dark-mode:bg-slate-700 disabled:light-mode:bg-slate-300 disabled:coffee-mode:bg-slate-700 disabled:dark-mode:text-slate-500 text-white disabled:light-mode:text-slate-600 rounded-lg px-3 py-2.5 text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                >
+                  <Send className="w-4 h-4" />
+                  File this claim in the public registry
+                </button>
 
-            <button
-              onClick={handlePreregister}
-              disabled={busy || !supabaseConfigured}
-              className="w-full dark-mode:bg-slate-700 hover:dark-mode:bg-slate-600 light-mode:bg-slate-200 hover:light-mode:bg-slate-300 coffee-mode:bg-slate-700 hover:coffee-mode:bg-slate-600 disabled:opacity-40 dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-amber-100 rounded-lg px-3 py-2.5 text-sm font-medium flex items-center justify-center gap-2 transition-colors"
-            >
-              <BookmarkCheck className="w-4 h-4" />
-              Pre-register this prediction (before you run the experiment)
-            </button>
+                <button
+                  onClick={handlePreregister}
+                  disabled={busy || !supabaseConfigured}
+                  className="w-full dark-mode:bg-slate-700 hover:dark-mode:bg-slate-600 light-mode:bg-slate-200 hover:light-mode:bg-slate-300 coffee-mode:bg-slate-700 hover:coffee-mode:bg-slate-600 disabled:opacity-40 dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-amber-100 rounded-lg px-3 py-2.5 text-sm font-medium flex items-center justify-center gap-2 transition-colors"
+                >
+                  <BookmarkCheck className="w-4 h-4" />
+                  Pre-register this prediction (before you run the experiment)
+                </button>
 
-            {preregNote && (
-              <p className="text-xs text-sky-300 bg-sky-900/20 rounded px-3 py-2 leading-relaxed">
-                {preregNote}
-              </p>
-            )}
+                {preregNote && (
+                  <p className="text-xs text-sky-300 bg-sky-900/20 rounded px-3 py-2 leading-relaxed">
+                    {preregNote}
+                  </p>
+                )}
 
-            {!supabaseConfigured && (
-              <p className="text-xs text-red-400 bg-red-900/20 rounded px-3 py-2">
-                Cloud registry is unavailable: Supabase is not configured. The
-                budget below still computes locally.
-              </p>
-            )}
-            {filed && (
-              <p className="text-xs text-emerald-300 bg-emerald-900/20 rounded px-3 py-2">
-                {filed}
-              </p>
-            )}
-            {error && (
-              <p className="text-xs text-red-400 bg-red-900/20 rounded px-3 py-2">
-                {error}
+                {filed && (
+                  <p className="text-xs text-emerald-300 bg-emerald-900/20 rounded px-3 py-2">
+                    {filed}
+                  </p>
+                )}
+                {error && (
+                  <p className="text-xs text-red-400 bg-red-900/20 rounded px-3 py-2">
+                    {error}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700 rounded-lg border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700 px-3 py-2 leading-relaxed">
+                The public registry is offline, so claims can no longer be
+                filed or pre-registered. The budget still computes here.
               </p>
             )}
           </div>
@@ -447,7 +449,7 @@ export default function ClaimRegistryPanel() {
               <MetricCard
                 label="Reproducibility"
                 value={`${Object.keys(budget.params).length} params`}
-                sub="all filed with the claim"
+                sub="the verdict reproduces from them"
               />
             </div>
             <div className="mt-4 rounded-lg border dark-mode:border-slate-700 light-mode:border-slate-300 coffee-mode:border-slate-700 px-3.5 py-3">
@@ -465,74 +467,76 @@ export default function ClaimRegistryPanel() {
             )}
           </Panel>
 
-          <Panel title="3 · The public record">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-amber-600">
-                Latest filings (newest first)
-              </span>
-              {supabaseConfigured && (
-                <button
-                  onClick={refresh}
-                  disabled={busy}
-                  className="dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 hover:text-cyan-400 transition-colors"
-                  title="Refresh"
-                >
-                  <RefreshCw className={`w-4 h-4 ${busy ? "animate-spin" : ""}`} />
-                </button>
-              )}
-            </div>
-            {!supabaseConfigured ? (
-              <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 italic">
-                Registry list needs the configured backend; the budget above is
-                fully local.
-              </p>
-            ) : busy && claims.length === 0 && !error ? (
-              <Skeleton rows={4} />
-            ) : claims.length === 0 ? (
-              <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 italic">
-                Nothing filed yet. The first claim is yours.
-              </p>
-            ) : (
-              <ul className="space-y-2 max-h-72 overflow-y-auto pr-1">
-                {claims.map((c) => (
-                  <li
-                    key={c.id}
-                    className="dark-mode:bg-slate-900 light-mode:bg-slate-100 coffee-mode:bg-slate-900 rounded-lg px-3 py-2.5 border dark-mode:border-slate-700/50 light-mode:border-slate-300/50 coffee-mode:border-slate-700/50"
+          {supabaseConfigured && (
+            <Panel title="3 · The public record">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-amber-600">
+                  Latest filings (newest first)
+                </span>
+                {supabaseConfigured && (
+                  <button
+                    onClick={refresh}
+                    disabled={busy}
+                    className="dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 hover:text-cyan-400 transition-colors"
+                    title="Refresh"
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="text-sm dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-amber-100 font-medium truncate flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 flex-shrink-0 dark-mode:text-slate-600 light-mode:text-slate-400 coffee-mode:text-slate-600" />
-                        {c.title}
-                      </span>
-                      <span className="text-[10px] dark-mode:text-slate-600 light-mode:text-slate-500 coffee-mode:text-slate-600 font-mono flex-shrink-0">
-                        {new Date(c.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <div className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700/80 mt-1">
-                      claims {c.claimed_value.toExponential(2)} {c.claimed_unit} ·{" "}
-                      {matchedClaimIds.has(c.id) && (
-                        <span className="text-sky-400 mr-1" title="Matches a prior pre-registration">
-                          pre-registered ✓
+                    <RefreshCw className={`w-4 h-4 ${busy ? "animate-spin" : ""}`} />
+                  </button>
+                )}
+              </div>
+              {!supabaseConfigured ? (
+                <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 italic">
+                  Registry list needs the configured backend; the budget above is
+                  fully local.
+                </p>
+              ) : busy && claims.length === 0 && !error ? (
+                <Skeleton rows={4} />
+              ) : claims.length === 0 ? (
+                <p className="text-xs dark-mode:text-slate-500 light-mode:text-slate-600 coffee-mode:text-slate-500 italic">
+                  Nothing filed yet. The first claim is yours.
+                </p>
+              ) : (
+                <ul className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                  {claims.map((c) => (
+                    <li
+                      key={c.id}
+                      className="dark-mode:bg-slate-900 light-mode:bg-slate-100 coffee-mode:bg-slate-900 rounded-lg px-3 py-2.5 border dark-mode:border-slate-700/50 light-mode:border-slate-300/50 coffee-mode:border-slate-700/50"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="text-sm dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-amber-100 font-medium truncate flex items-center gap-1.5">
+                          <FileText className="w-3.5 h-3.5 flex-shrink-0 dark-mode:text-slate-600 light-mode:text-slate-400 coffee-mode:text-slate-600" />
+                          {c.title}
                         </span>
-                      )}
-                      <span
-                        className={
-                          c.verdict_key === "explained" ||
-                          c.verdict_key === "consistent"
-                            ? "text-emerald-400"
-                            : c.verdict_key === "gross-excess"
-                              ? "text-red-400"
-                              : "text-amber-400"
-                        }
-                      >
-                        {c.verdict_label}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Panel>
+                        <span className="text-[10px] dark-mode:text-slate-600 light-mode:text-slate-500 coffee-mode:text-slate-600 font-mono flex-shrink-0">
+                          {new Date(c.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <div className="text-xs dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-amber-700/80 mt-1">
+                        claims {c.claimed_value.toExponential(2)} {c.claimed_unit} ·{" "}
+                        {matchedClaimIds.has(c.id) && (
+                          <span className="text-sky-400 mr-1" title="Matches a prior pre-registration">
+                            pre-registered ✓
+                          </span>
+                        )}
+                        <span
+                          className={
+                            c.verdict_key === "explained" ||
+                            c.verdict_key === "consistent"
+                              ? "text-emerald-400"
+                              : c.verdict_key === "gross-excess"
+                                ? "text-red-400"
+                                : "text-amber-400"
+                          }
+                        >
+                          {c.verdict_label}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Panel>
+          )}
         </div>
       </div>
     </div>

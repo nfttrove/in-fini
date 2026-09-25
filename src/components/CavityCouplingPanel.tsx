@@ -4,7 +4,6 @@ import CavityMetrics from "./coupling/CavityMetrics";
 import CavitySpectrum from "./coupling/CavitySpectrum";
 import CavityField from "./coupling/CavityField";
 import CavityNotes from "./coupling/CavityNotes";
-import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
 import { cavityResonantFrequency, couplingStrength } from "../utils/physics";
 
@@ -76,23 +75,7 @@ export default function CavityCouplingPanel() {
         Q={Q}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <CavityNotes />
-        </div>
-        <PresetBar
-          panel="coupling"
-          currentParams={{ cavityLength, modeNumber, drivingFreqMHz, Q }}
-          onLoad={(p) => {
-            if (typeof p.cavityLength === "number") setCavityLength(p.cavityLength);
-            if (typeof p.modeNumber === "number") setModeNumber(p.modeNumber);
-            if (typeof p.drivingFreqMHz === "number") setDrivingFreqMHz(p.drivingFreqMHz);
-            // Presets saved before the kHz→MHz rescale stored drivingFreqKHz.
-            else if (typeof p.drivingFreqKHz === "number") setDrivingFreqMHz(p.drivingFreqKHz / 1e3);
-            if (typeof p.Q === "number") setQ(p.Q);
-          }}
-        />
-      </div>
+      <CavityNotes />
     </div>
   );
 }

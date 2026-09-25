@@ -4,7 +4,6 @@ import NmCavityMetrics from "./nmcavity/NmCavityMetrics";
 import NmCavitySweep from "./nmcavity/NmCavitySweep";
 import NmCavityLogAxis from "./nmcavity/NmCavityLogAxis";
 import NmCavityNotes from "./nmcavity/NmCavityNotes";
-import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
 import { C } from "../utils/physics";
 
@@ -86,21 +85,7 @@ export default function NmCavityPanel() {
 
       <NmCavityLogAxis f0Hz={f0Hz} driveHz={driveHz} />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <NmCavityNotes f0THz={f0THz} ratio500kHz={ratio500kHz} />
-        </div>
-        <PresetBar
-          panel="nm-cavity"
-          currentParams={{ gapNm, modeN, driveTHz, Q }}
-          onLoad={(p) => {
-            if (typeof p.gapNm === "number") setGapNm(p.gapNm);
-            if (typeof p.modeN === "number") setModeN(p.modeN);
-            if (typeof p.driveTHz === "number") setDriveTHz(p.driveTHz);
-            if (typeof p.Q === "number") setQ(p.Q);
-          }}
-        />
-      </div>
+      <NmCavityNotes f0THz={f0THz} ratio500kHz={ratio500kHz} />
     </div>
   );
 }

@@ -14,9 +14,7 @@ export default function ErrataPanel() {
           the engines, not typed in.
         </p>
         <p className="mt-2 dark-mode:text-slate-400 light-mode:text-slate-600 coffee-mode:text-slate-400">
-          Found in a review of the whole site on {ERRATA_DATE}. Spot something
-          else? File it in the Claim Registry with the tab and the numbers:
-          same rules as everything else.
+          Found in a review of the whole site on {ERRATA_DATE}.
         </p>
       </PlainExplainer>
 

@@ -30,13 +30,13 @@ The app is organised as tabs, each a self-contained mini-experiment:
 | **Leakage & Artifact Diagnostic** | A claimed power output vs. joule, RF, blackbody, mechanical and triboelectric leakage channels |
 | **Thrust & Weight Diagnostic** | A claimed weight change vs. ion wind, vibration, electrostatic and thermal-convection channels, with historical-claim presets |
 | **Circuit QED (microwave DCE)** | The regime where the dynamical Casimir effect was actually measured (Wilson et al., Nature 2011): parametric pumping at 2·f₀, thermal noise floor, parametric-oscillation threshold, pump-frequency scan, and g² correlation spectroscopy with the Cauchy–Schwarz test |
-| **Claim Registry** | File an anomalous power/thrust claim together with its computed artifact budget and uncertainty into a public, reproducible record; pre-register predictions before running the experiment |
+| **Claim Registry** | Put an anomalous power/thrust claim through its computed artifact budget and uncertainty, reproducible from the parameters (the public filing record is offline) |
 | **Experiment Design** | The budget engines inverted: state the effect you want to detect and at how many σ, get the rig requirements (vibration floor, pressure, shielding, temperature stability) — round-trip tested against the forward engines |
 | **Data Lab & Challenge** | Paste your own measurement series: drift removal, mains-comb identification, FFT spectrum and residual statistics — plus a blind "artifact or anomaly?" training game |
 | **Boundary Atlas** | Verdict-flip terrain for four engines — thrust budgets, the device model's plausibility frontier (with the material veto), circuit-QED regimes, and the decidability wall — computed live from the same tested functions |
 | **Dark Corners** | The 95%: the 10^120 vacuum-overshoot problem with a cutoff slider, local Casimir vacuum density vs the cosmological one, dark-matter flux through your desk, and dark energy's unwitnessable tide — each honest number paired with "here endeth the desk" |
 | **Acoustic Casimir** | Sound's radiation pressure (p²/ρc²) side by side with the vacuum Casimir force it mirrors — with the gap at which empty space matches your speaker, and a build-it-tonight parts list |
-| **Replication Network** | Calibration Census 001: record 60 s of your rig's noise floor (phone accelerometer in-browser, or paste CSV) and file it; median/√N of the fleet's noise is the best case a coordinated replication round (same effect, same time) could reach — not what the census itself sees |
+| **Replication Network** | Calibration Census 001: record 60 s of your rig's noise floor (phone accelerometer in-browser, or paste CSV) and see its profile; filing into the shared census is offline |
 | **Errata** | Every mistake the site has shipped and corrected, old value beside new; the corrected figures are computed live by the engines |
 
 Diagnostic panels end in a colour-coded verdict — *explained / partial / excess /
@@ -100,7 +100,6 @@ marked as invariant-by-construction in the Conscience Meter rather than pretendi
 - [Vite](https://vitejs.dev) + [React 18](https://react.dev) + [TypeScript](https://www.typescriptlang.org)
 - [Tailwind CSS 3](https://tailwindcss.com) with three themes (dark / light / coffee)
 - [lucide-react](https://lucide.dev) icons
-- [Supabase](https://supabase.com) for shared presets and diagnostic-run history
 - [Vitest](https://vitest.dev) for unit tests
 
 Originally scaffolded with [Bolt.new](https://bolt.new).
@@ -115,22 +114,14 @@ cd in-fini
 npm install
 ```
 
-### Environment variables (optional)
+### No database
 
-Without `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` the app still runs:
-every panel computes, and the Thrust panel serves its famous-claims presets
-from the built-in copy in `src/data/thrustPresets.ts`. Only cloud-backed
-features are unavailable — preset save/load and diagnostic-run history show a
-"Supabase is not configured" notice instead. To enable them, create:
-
-```bash
-# .env.local
-VITE_SUPABASE_URL=https://<your-project>.supabase.co
-VITE_SUPABASE_ANON_KEY=<your-anon-key>
-```
-
-Both values come from your Supabase dashboard (Project Settings → API). The anon key is
-public by design; access control is enforced by row-level security (see below).
+The site's Supabase project was shut down in September 2026. The client in
+`src/lib/supabase.ts` is always null, whatever `VITE_SUPABASE_*` the host sets:
+every panel computes in the browser, the Thrust panel serves its presets from
+`src/data/thrustPresets.ts`, and the database features (claim filing and
+pre-registration, the shared census, saved presets, the runs log) are off or
+say they are offline.
 
 The unit tests never touch the network and need no environment at all.
 
@@ -145,39 +136,12 @@ npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
 ```
 
-## Supabase backend
+## Former database
 
-SQL migrations are in `supabase/migrations/` (apply them with the Supabase CLI or by
-pasting them into the SQL editor in creation order). Six tables:
-
-- **`simulation_presets`** — user-saved parameter sets per panel. Anonymous by design:
-  inserts are open, but deletion is authorised by a per-preset `owner_token` generated
-  client-side and kept in the browser's `localStorage`; the `delete_preset` RPC is
-  `SECURITY DEFINER` and checks the token. The token column is excluded from the
-  anon-role `SELECT` grant (column-level grant) so it cannot be harvested through the
-  REST API.
-- **`diagnostic_runs`** — saved leakage-diagnostic results (params + verdict).
-- **`thrust_presets`** — the built-in historical-claim presets.
-- **`claim_registry`** — public claim filings (claim + parameters + computed
-  verdict + uncertainty). Public read, bounded anonymous insert, intentionally
-  no delete in v1: it is a record, not a scratchpad. Seeded with the famous
-  historical cases, their verdicts computed by these same engines.
-- **`network_runs`** — census filings for the Replication Network (noise
-  floor, top vibration line, mains frequency; no geolocation). Public read,
-  bounded anonymous insert, no delete.
-- **`preregistrations`** — timestamped predictions committed before an
-  experiment (client-side SHA-256 over a canonical title/type/magnitude
-  string). Filed claims matching a prior pre-registration are flagged
-  "pre-registered" in the registry list.
-
-Later migrations that are security fixes, worth knowing about before forking the schema:
-`20260710002212` hides `owner_token` from the API (it was previously readable by
-anyone), `20260710003928` bounds the size of anon-writable JSONB payloads, and
-`20260924130000` makes the server stamp `created_at` and `id` on every anonymous
-insert into the three public tables (a client could previously backdate a
-pre-registration) and caps each table's anonymous inserts per rolling hour
-(30 claims, 30 pre-registrations, 60 census runs; global caps, no client
-identifiers stored).
+`supabase/migrations/` keeps the schema the database features used, for
+anyone rebuilding them. The 2026-09-24 migrations (`20260924120000` to
+`20260924160000`, including server-set timestamps, filing caps and the census
+units rescale) were probably never applied: the project was shut down then.
 
 ## Project structure
 
@@ -186,13 +150,13 @@ src/
   App.tsx                 # tab shell
   components/             # one panel per topic (Controls/Metrics/Notes/Sweeps subfiles)
     ui/                   # shared primitives: Slider, MetricCard, GoverningEquation,
-                          # PlainExplainer, ConscienceMeter, PresetBar, …
+                          # PlainExplainer, ConscienceMeter, …
   contexts/               # theme provider (dark / light / coffee) + theme context
   data/                   # built-in thrust-claim presets (offline fallback, unit-tested)
-  lib/supabase.ts         # Supabase client + preset/run persistence (null-safe when
-                          # env vars are absent)
+  lib/supabase.ts         # former database client, now always off
+                          # (persistence code kept for a future backend)
   utils/                  # the physics and formatting modules (unit-tested)
-supabase/migrations/      # database schema and policies
+supabase/migrations/      # the former database's schema and policies
 ```
 
 ## CI

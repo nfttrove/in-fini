@@ -29,7 +29,7 @@ export default function HomePanel() {
           <li><strong>Real mathematics, not vignettes</strong>: logarithmic sweeps, Lorentzian resonances, Bessel sidebands, g² correlation spectroscopy, FFT residual hunting — the same machinery used in real quantum electrodynamics.</li>
           <li><strong>Artifact budgets with error bars</strong>: load a famous claim (Podkletnov, Searl, Biefeld–Brown, the ionocraft lifter) and see how much of it the mundane channels — vibration, ion wind, electrostatics, thermal buoyancy — can account for, with uncertainties.</li>
           <li><strong>The experiment-design inverter</strong>: don't just judge claims — state the effect you want to detect and learn what your rig must achieve, down to the thermal noise floor of its own test mass.</li>
-          <li><strong>A public record</strong>: file claims with their budgets, pre-register predictions before you measure, and join the Replication Network's calibration census with the phone in your pocket.</li>
+          <li><strong>Your own rig's baseline</strong>: measure your table's noise floor with the phone in your pocket in the Replication Network tab.</li>
           <li><strong>Things you can build tonight</strong>: acoustic radiation pressure — a classroom analogue of the vacuum Casimir force — with a speaker and a jewelry scale.</li>
         </ul>
       </section>
@@ -92,8 +92,8 @@ export default function HomePanel() {
             <p>A speaker, a tone-generator app, and a 0.001 g jewelry scale. Sound's radiation pressure pushes a plate with the same force the vacuum Casimir exerts across a ~{(Math.round(ACOUSTIC_GAP_NM / 10) * 10).toFixed(0)} nm gap — and a jewelry scale can register it, once it survives the null tests. The <strong>Acoustic Casimir</strong> tab has the parts list and the tests.</p>
           </div>
           <div>
-            <p className="font-semibold dark-mode:text-slate-100 light-mode:text-slate-800 coffee-mode:text-slate-100">Sixty seconds: join the fleet</p>
-            <p>Lay your phone on the table and record a census run in the <strong>Replication Network</strong> tab. Your noise floor joins the census: the fleet's measured baseline, and the best case a coordinated replication round could reach.</p>
+            <p className="font-semibold dark-mode:text-slate-100 light-mode:text-slate-800 coffee-mode:text-slate-100">Sixty seconds: measure your table</p>
+            <p>Lay your phone on the table and record a run in the <strong>Replication Network</strong> tab: your table's noise floor, mains hum and loudest vibration line — the floor any experiment on it has to beat.</p>
           </div>
           <div>
             <p className="font-semibold dark-mode:text-slate-100 light-mode:text-slate-800 coffee-mode:text-slate-100">A weekend: a thrust balance</p>
@@ -101,7 +101,7 @@ export default function HomePanel() {
           </div>
         </div>
         <p className="dark-mode:text-slate-300 light-mode:text-slate-700 coffee-mode:text-slate-300 text-sm">
-          When you've built something, come back and file it in the <strong>Claim Registry</strong> — pre-registered if you're serious. Let the tool say "Unexplained excess" or "Fully explained by mundane artifacts." Either way, you'll know where your claim stands against the known artifacts — and so will everyone else.
+          When you've built something, come back and put your numbers through the <strong>Claim Registry</strong>. Let the tool say "Unexplained excess" or "Fully explained by mundane artifacts." Either way, you'll know where your claim stands against the known artifacts.
         </p>
         <p className="dark-mode:text-slate-200 light-mode:text-slate-800 coffee-mode:text-slate-200 italic font-medium">
           The vacuum is infinite. Your curiosity should be, too.

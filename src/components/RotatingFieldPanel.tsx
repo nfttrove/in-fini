@@ -3,7 +3,6 @@ import RotatingControls from "./rotating/RotatingControls";
 import RotatingMetrics from "./rotating/RotatingMetrics";
 import RotatingCanvas from "./rotating/RotatingCanvas";
 import RotatingNotes from "./rotating/RotatingNotes";
-import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
 import ConscienceMeter from "./ui/ConscienceMeter";
 
@@ -113,20 +112,7 @@ export default function RotatingFieldPanel() {
         className="mt-4"
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <RotatingNotes frequencyHz={frequency * 1e3} cavityLengthM={cavityLength} />
-        </div>
-        <PresetBar
-          panel="rotating"
-          currentParams={{ frequency, amplitude, cavityLength }}
-          onLoad={(p) => {
-            if (typeof p.frequency === "number") setFrequency(p.frequency);
-            if (typeof p.amplitude === "number") setAmplitude(p.amplitude);
-            if (typeof p.cavityLength === "number") setCavityLength(p.cavityLength);
-          }}
-        />
-      </div>
+      <RotatingNotes frequencyHz={frequency * 1e3} cavityLengthM={cavityLength} />
     </div>
   );
 }

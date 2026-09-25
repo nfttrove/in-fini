@@ -77,7 +77,7 @@ export const ERRATA: Erratum[] = [
   {
     title: "Hand-written verdicts drifted",
     was: "Preset cards showed stored verdict strings (Podkletnov \"Fully explained\" while the engine said \"Partially explained\"), and the boundary-sensitive badge never appeared on the live site.",
-    now: "Cards show the engine's verdict, and the badge works for the cloud presets.",
+    now: "Cards show the engine's verdict, and the boundary-sensitive badge appears.",
     tab: "Thrust & Weight Diagnostic",
   },
   {
@@ -129,12 +129,6 @@ export const ERRATA: Erratum[] = [
     tab: "Boundary Atlas, Rotating Field, Leakage Diagnostic, Dark Corners",
   },
   {
-    title: "Pre-registrations could be backdated",
-    was: "A client filing a claim, pre-registration or census run could set the row's own timestamp and id, so a pre-registration could be dated before the data it predicts; nothing limited how fast rows could be filed.",
-    now: "The database stamps every new row's time and id itself, whatever the client sends, and caps filings per rolling hour (30 claims, 30 pre-registrations, 60 census runs).",
-    tab: "Claim Registry, Replication Network",
-  },
-  {
     title: "The rotor veto used the wrong failure mechanism",
     was: "The Device Model vetoed rotors whose rim acceleration passed 10⁶ g (\"it shatters\"), so it capped the claim-drive rotor near 1 µm; the Boundary Atlas marked its 71 µm, 1 MHz rotor as shattered. Spinning rims burst from hoop stress, ρv², which depends on rim speed, not size — small rotors survive far more than 10⁶ g.",
     now: `The veto is a rim speed: about ${rimLimit} m/s for generously strong silicon. At the claim's 500 kHz the slider's largest rotor (${SURVIVABLE_R_NM / 1000} µm, ${AT_CLAIM.v.toFixed(0)} m/s) survives and the ceiling is still ${atClaimShortfall}× short. With rotors that survive, the claim is reached only at gaps below about ${reachGap} nm, where real metals fall well short of the ideal-mirror law; the atlas now marks those cells for the gap.`,
@@ -161,7 +155,7 @@ export const ERRATA: Erratum[] = [
   {
     title: "Phone census runs were filed about 100× too high",
     was: `The Replication Network converted each phone sample from m/s² to milli-g, then converted the analysed noise and peak to milli-g again, so every phone run showed and filed ${phoneOverRead}× its real noise. Pasted CSV runs were converted once, so the fleet statistics mixed two scales.`,
-    now: "Both paths take m/s² and convert once. A database migration rescales the phone runs already filed and marks every row with its units; the page rescales any phone row still unmarked, such as one filed by a cached old page.",
+    now: "Both paths take m/s² and convert once.",
     tab: "Replication Network",
   },
   {

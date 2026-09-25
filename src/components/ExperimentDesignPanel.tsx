@@ -496,8 +496,8 @@ export default function ExperimentDesignPanel() {
               enough to see past — it does not make your sensor calibrated,
               your analysis blind, or your statistics honest. Real
               detections additionally want: sensor calibration traceable to
-              a standard, a pre-registered analysis plan (see the Claim
-              Registry), A/B null tests with the effect source off, and
+              a standard, a pre-registered analysis plan, A/B null tests
+              with the effect source off, and
               someone trying their hardest to prove you wrong. The universe
               does not give points for effort.
             </p>

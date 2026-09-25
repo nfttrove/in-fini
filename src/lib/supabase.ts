@@ -1,21 +1,18 @@
-import { createClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { normalizeRunUnits } from "../utils/networkCensus";
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
 /**
- * Null when VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are not set (e.g. a
- * fresh clone without .env.local). The app must still render and compute —
- * only cloud-backed features (saving/loading presets, run history) report
- * themselves as unavailable.
+ * The site's Supabase project was shut down in September 2026, so the cloud
+ * features (claim registry, census, saved presets, runs log) are offline and
+ * the client is always null, whatever VITE_SUPABASE_* the host still sets.
+ * Everything else computes in the browser. The persistence code below is
+ * kept so the features can return with a new backend.
  */
-export const supabase = url && anon ? createClient(url, anon) : null;
+export const supabase = null as SupabaseClient | null;
 
 export const supabaseConfigured = supabase !== null;
 
-const NOT_CONFIGURED_MESSAGE =
-  "Cloud presets are unavailable: Supabase is not configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local to enable them.";
+const NOT_CONFIGURED_MESSAGE = "The site's database is offline.";
 
 function requireClient() {
   if (!supabase) throw new Error(NOT_CONFIGURED_MESSAGE);

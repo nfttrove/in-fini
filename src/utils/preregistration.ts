@@ -2,8 +2,9 @@
  * Which filed claims count as pre-registered: a pre-registration with the
  * same canonical hash must have been filed strictly *before* the claim.
  * Matching on the hash alone (as the registry once did) let a prediction
- * filed after the result earn the badge. Timestamps are server-stamped
- * since migration 20260924130000, so this comparison can be trusted.
+ * filed after the result earn the badge. The comparison needs timestamps
+ * the client cannot set: migration 20260924130000 made the database stamp
+ * them, but it was never applied (the database was shut down first).
  */
 export function preregisteredClaimIds(
   claims: { id: string; created_at: string; hash: string }[],

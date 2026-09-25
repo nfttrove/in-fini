@@ -5,7 +5,6 @@ import NonlinearComb from "./nonlinear/NonlinearComb";
 import NonlinearEfficiency from "./nonlinear/NonlinearEfficiency";
 import NonlinearSweep from "./nonlinear/NonlinearSweep";
 import NonlinearNotes from "./nonlinear/NonlinearNotes";
-import PresetBar from "./ui/PresetBar";
 import PlainExplainer from "./ui/PlainExplainer";
 import { besselJ } from "../utils/bessel";
 
@@ -97,22 +96,7 @@ export default function NonlinearCouplingPanel() {
         <NonlinearSweep f0Hz={f0Hz} fmHz={fmHz} beta={beta} Q={Q} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <NonlinearNotes f0THz={f0THz} fmKHz={fmKHz} j1={j1} />
-        </div>
-        <PresetBar
-          panel="nonlinear"
-          currentParams={{ f0THz, fmKHz, beta, maxOrder, Q }}
-          onLoad={(p) => {
-            if (typeof p.f0THz === "number") setF0THz(p.f0THz);
-            if (typeof p.fmKHz === "number") setFmKHz(p.fmKHz);
-            if (typeof p.beta === "number") setBeta(p.beta);
-            if (typeof p.maxOrder === "number") setMaxOrder(p.maxOrder);
-            if (typeof p.Q === "number") setQ(p.Q);
-          }}
-        />
-      </div>
+      <NonlinearNotes f0THz={f0THz} fmKHz={fmKHz} j1={j1} />
     </div>
   );
 }
